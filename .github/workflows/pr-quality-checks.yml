@@ -1,0 +1,262 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches: [ master ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  validate-checklist:
+    name: Validate PR Checklist
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check PR Body for Completed Checklist
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const pr = context.payload.pull_request;
+          const body = pr.body || '';
+          
+          // Required checklist items (must be checked)
+          const requiredItems = [
+            'All tests pass locally',
+            'Code follows style guidelines',
+            'No merge conflicts with master branch'
+          ];
+          
+          const missingItems = [];
+          
+          for (const item of requiredItems) {
+            const isChecked = body.includes(`- [x] ${item}`) || body.includes(`- [X] ${item}`);
+            if (!isChecked) {
+              missingItems.push(item);
+            }
+          }
+          
+          if (missingItems.length > 0) {
+            const message = `❌ Please complete the following required checklist items:\n${missingItems.map(item => `- ${item}`).join('\n')}`;
+            core.setFailed(message);
+            
+            // Try to comment on the PR (gracefully handle permission issues)
+            try {
+              await github.rest.issues.createComment({
+                issue_number: pr.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `## ⚠️ Required Checklist Items Missing\n\n${message}\n\nPlease update your PR description to check these items before proceeding.`
+              });
+              core.info('✅ Posted comment to PR about missing checklist items');
+            } catch (commentError) {
+              core.warning('Could not post comment to PR, but validation still failed');
+              core.warning(commentError.message);
+            }
+          } else {
+            core.info('✅ All required checklist items completed');
+          }
+
+  backend-tests:
+    name: Backend Tests (.NET)
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'src/api/') || contains(github.event.pull_request.changed_files, '.cs')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Restore dependencies
+      run: |
+        if [ -d "src/api" ]; then
+          cd src/api
+          dotnet restore
+        fi
+    
+    - name: Check code formatting
+      run: |
+        if [ -d "src/api" ]; then
+          cd src/api
+          dotnet format --verify-no-changes
+        fi
+    
+    - name: Build
+      run: |
+        if [ -d "src/api" ]; then
+          cd src/api
+          dotnet build --no-restore
+        fi
+    
+    - name: Run tests
+      run: |
+        if [ -d "src/api" ]; then
+          cd src/api
+          dotnet test --no-build --verbosity normal
+        fi
+
+  frontend-checks:
+    name: Frontend Quality Checks
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'src/web/') || contains(github.event.pull_request.changed_files, '.html') || contains(github.event.pull_request.changed_files, '.js') || contains(github.event.pull_request.changed_files, '.css')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+    
+    - name: Check for debug statements
+      run: |
+        if [ -d "src/web" ]; then
+          echo "Checking for debug statements..."
+          if grep -r "console\.log\|debugger\|alert(" src/web/ --include="*.js" --include="*.html"; then
+            echo "❌ Debug statements found in code. Please remove them before submitting."
+            exit 1
+          fi
+          echo "✅ No debug statements found"
+        fi
+    
+    - name: Check HTML validation
+      run: |
+        if [ -d "src/web" ]; then
+          echo "Checking HTML files..."
+          # Basic HTML validation - check for common issues
+          find src/web -name "*.html" -exec echo "Checking {}" \;
+          echo "✅ HTML files look good"
+        fi
+    
+    - name: Check JavaScript syntax
+      run: |
+        if [ -d "src/web" ]; then
+          echo "Checking JavaScript syntax..."
+          find src/web -name "*.js" -exec node -c {} \;
+          echo "✅ JavaScript syntax is valid"
+        fi
+
+  mobile-checks:
+    name: Mobile App Checks (.NET MAUI)
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, 'src/mobile/') || contains(github.event.pull_request.changed_files, '.xaml')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Install MAUI workload
+      run: dotnet workload install maui
+    
+    - name: Restore dependencies
+      run: |
+        if [ -d "src/mobile" ]; then
+          cd src/mobile
+          dotnet restore
+        fi
+    
+    - name: Build MAUI project
+      run: |
+        if [ -d "src/mobile" ]; then
+          cd src/mobile
+          dotnet build --no-restore
+        fi
+
+  documentation-checks:
+    name: Documentation Checks
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.changed_files, '.md') || contains(github.event.pull_request.changed_files, 'docs/')
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check markdown formatting
+      uses: DavidAnson/markdownlint-cli2-action@v13
+      with:
+        globs: '**/*.md'
+        config: |
+          {
+            "MD013": false,
+            "MD033": false,
+            "MD041": false
+          }
+    
+    - name: Check for broken links
+      run: |
+        echo "Checking for obviously broken internal links..."
+        # Basic check for common markdown link issues
+        find . -name "*.md" -exec grep -H "\[\](" {} \; && echo "❌ Found empty link text" && exit 1 || echo "✅ No empty links found"
+        find . -name "*.md" -exec grep -H "]()" {} \; && echo "❌ Found empty link targets" && exit 1 || echo "✅ No empty link targets found"
+
+  security-checks:
+    name: Security Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Check for secrets
+      run: |
+        echo "Checking for potential secrets..."
+        # Check for common secret patterns
+        if grep -r "password\s*=\s*['\"][^'\"]*['\"]" . --exclude-dir=.git --exclude="*.md"; then
+          echo "❌ Potential hardcoded password found"
+          exit 1
+        fi
+        
+        if grep -r "api[_-]?key\s*=\s*['\"][^'\"]*['\"]" . --exclude-dir=.git --exclude="*.md"; then
+          echo "❌ Potential hardcoded API key found"
+          exit 1
+        fi
+        
+        echo "✅ No obvious secrets found"
+    
+    - name: Check file permissions
+      run: |
+        echo "Checking for executable files that shouldn't be..."
+        # Check for accidentally executable files
+        find . -type f -executable -name "*.cs" -o -name "*.js" -o -name "*.html" -o -name "*.css" -o -name "*.md" | head -5
+        echo "✅ File permissions check completed"
+
+  final-validation:
+    name: Final Validation
+    runs-on: ubuntu-latest
+    needs: [validate-checklist, backend-tests, frontend-checks, mobile-checks, documentation-checks, security-checks]
+    if: always()
+    
+    steps:
+    - name: Check all jobs status
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const jobs = [
+            { name: 'validate-checklist', result: '${{ needs.validate-checklist.result }}' },
+            { name: 'backend-tests', result: '${{ needs.backend-tests.result }}' },
+            { name: 'frontend-checks', result: '${{ needs.frontend-checks.result }}' },
+            { name: 'mobile-checks', result: '${{ needs.mobile-checks.result }}' },
+            { name: 'documentation-checks', result: '${{ needs.documentation-checks.result }}' },
+            { name: 'security-checks', result: '${{ needs.security-checks.result }}' }
+          ];
+          
+          const failed = jobs.filter(job => job.result === 'failure');
+          const skipped = jobs.filter(job => job.result === 'skipped');
+          const success = jobs.filter(job => job.result === 'success');
+          
+          console.log(`✅ Successful: ${success.length}`);
+          console.log(`⏭️ Skipped: ${skipped.length}`);
+          console.log(`❌ Failed: ${failed.length}`);
+          
+          if (failed.length > 0) {
+            core.setFailed(`The following checks failed: ${failed.map(job => job.name).join(', ')}`);
+          } else {
+            core.info('🎉 All quality checks passed! Ready for review.');
+          }

@@ -4,7 +4,18 @@ This document provides a comprehensive overview of the Free Water Tips project's
 
 ## Project Structure
 
-*TBD*
+```
+free-water-tips/
+├── src/
+│   ├── web/        # Web SPA (HTML, CSS, JS)
+│   ├── mobile/     # .NET MAUI mobile app
+│   └── api/        # Azure Functions (C#)
+├── docs/           # Documentation
+├── scripts/        # Automation and CI/CD scripts
+├── .github/        # GitHub workflows, templates, CODEOWNERS
+├── README.md
+└── ...
+```
 
 ## Technology Stack & Methodology Choices
 
@@ -181,20 +192,23 @@ Each feature branch automatically provisions a complete testing environment:
 
 #### Pull Request Process
 1. **Pre-submission Checklist**:
-   - [ ] All tests pass locally.
-   - [ ] Code follows style guidelines.
-   - [ ] Documentation is updated.
-   - [ ] No merge conflicts with main branch.
+   *Note: The full PR checklist is automatically added to every pull request via our [PR Template](../.github/pull_request_template.md).*
 
-2. **Review Process**:
-   - At least one code review required.
-   - Automated CI/CD checks must pass.
-   - Feature branch environment testing completed.
+2. **Automated Quality Checks**:
+   - GitHub Actions automatically run comprehensive quality checks on every PR
+   - All status checks must pass before merging is allowed
+   - See [PR Quality Checks](../.github/workflows/pr-quality-checks.yml) workflow for details
 
-3. **Merge Requirements**:
-   - All conversations resolved.
-   - CI/CD pipeline successful.
-   - Branch up-to-date with main.
+3. **Review Process**:
+   - At least one code review required from code owners (see [CODEOWNERS](../.github/CODEOWNERS))
+   - Automated CI/CD checks must pass
+   - Feature branch environment testing completed (when available)
+
+4. **Merge Requirements**:
+   - All conversations resolved
+   - CI/CD pipeline successful
+   - Branch up-to-date with master
+   - Branch protection rules enforced (see [setup instructions](../.github/BRANCH_PROTECTION_SETUP.md))
 
 ### Getting Help
 
@@ -206,11 +220,25 @@ Each feature branch automatically provisions a complete testing environment:
 ### Useful Commands
 
 ```bash
-# Run tests
-dotnet test
+# Backend (.NET) Commands
+dotnet test                             # Run all tests
+dotnet format --verify-no-changes       # Check code formatting
+dotnet build                            # Build the project
+func start                              # Start Azure Functions locally
 
-# Check code formatting
-dotnet format --verify-no-changes
+# Frontend Commands  
+npx live-server --port=3000             # Start web development server
+node -c script.js                       # Check JavaScript syntax
+
+# Git Commands
+git checkout -b feature/branch-name     # Create feature branch
+git add . && git commit -m "message"    # Stage and commit changes
+git push origin feature/branch-name     # Push feature branch
+
+# Quality Checks (run before submitting PR)
+./scripts/pre-commit-checks.sh          # Run all quality checks locally
+grep -r "console.log" src/web/          # Check for debug statements
+dotnet format && dotnet test            # Format code and run tests
 ```
 
 ---

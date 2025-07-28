@@ -1,0 +1,32 @@
+# Global code owners
+* @ivan-zdravkov
+
+# Documentation
+docs/ @ivan-zdravkov
+*.md @ivan-zdravkov
+
+# Frontend changes
+src/web/ @ivan-zdravkov
+*.html @ivan-zdravkov
+*.css @ivan-zdravkov
+*.js @ivan-zdravkov
+
+# Backend changes (Azure Functions)
+src/api/ @ivan-zdravkov
+*.cs @ivan-zdravkov
+
+# Mobile changes (MAUI)
+src/mobile/ @ivan-zdravkov
+*.xaml @ivan-zdravkov
+
+# Infrastructure and CI/CD
+.github/ @ivan-zdravkov
+*.yml @ivan-zdravkov
+*.yaml @ivan-zdravkov
+docker-compose.* @ivan-zdravkov
+Dockerfile* @ivan-zdravkov
+
+# Configuration files
+*.json @ivan-zdravkov
+*.config @ivan-zdravkov
+*.env* @ivan-zdravkov
