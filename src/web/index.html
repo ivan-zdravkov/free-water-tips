@@ -57,8 +57,36 @@
 
     <!-- Main App Container -->
     <div id="app" class="app hidden">
+        <!-- Mobile Header (always visible on mobile) -->
+        <header id="mobile-header" class="mobile-header">
+            <h1 class="mobile-title">
+                <span class="material-icons">water_drop</span>
+                Free Water Tips
+            </h1>
+            <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu">
+                <span class="material-icons">menu</span>
+            </button>
+        </header>
+
         <!-- Mobile Navigation Overlay -->
-        <div id="nav-overlay" class="nav-overlay"></div>
+        <div id="nav-overlay" class="nav-overlay">
+            <div class="nav-overlay-content">
+                <ul class="nav-links">
+                    <li><a href="#map" class="nav-link active" data-page="map">
+                        <span class="material-icons">map</span>
+                        Find Water
+                    </a></li>
+                    <li><a href="#contribute" class="nav-link" data-page="contribute">
+                        <span class="material-icons">add_location</span>
+                        Contribute
+                    </a></li>
+                    <li><a href="#about" class="nav-link" data-page="about">
+                        <span class="material-icons">info</span>
+                        About
+                    </a></li>
+                </ul>
+            </div>
+        </div>
 
         <!-- Navigation Menu -->
         <nav id="nav-menu" class="nav-menu">
@@ -67,9 +95,6 @@
                     <span class="material-icons">water_drop</span>
                     Free Water Tips
                 </h1>
-                <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu">
-                    <span class="material-icons">menu</span>
-                </button>
             </div>
             
             <div class="nav-content">

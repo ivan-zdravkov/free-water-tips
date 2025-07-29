@@ -141,13 +141,31 @@ class FreeWaterTipsApp {
     setupNavigation() {
         // Mobile navigation toggle
         const navToggle = document.getElementById('nav-toggle');
-        const navMenu = document.getElementById('nav-menu');
+        const navOverlay = document.getElementById('nav-overlay');
         
-        if (navToggle && navMenu) {
+        if (navToggle && navOverlay) {
             navToggle.addEventListener('click', () => {
-                navMenu.classList.toggle('open');
+                console.log('Toggle clicked!');
+                navOverlay.classList.toggle('show');
             });
         }
+
+        // Close menu when clicking overlay (but not the content)
+        if (navOverlay) {
+            navOverlay.addEventListener('click', (e) => {
+                // Only close if clicking the overlay itself, not the content
+                if (e.target === navOverlay) {
+                    navOverlay.classList.remove('show');
+                }
+            });
+        }
+
+        // Close menu when pressing escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && navOverlay && navOverlay.classList.contains('show')) {
+                navOverlay.classList.remove('show');
+            }
+        });
 
         // Navigation links
         const navLinks = document.querySelectorAll('.nav-link');
@@ -156,23 +174,16 @@ class FreeWaterTipsApp {
                 e.preventDefault();
                 const page = link.getAttribute('data-page');
                 
+                // Close mobile menu when a link is clicked
+                if (navOverlay && navOverlay.classList.contains('show')) {
+                    navOverlay.classList.remove('show');
+                }
+                
                 if (page) {
                     // Update URL
                     window.location.hash = page;
-                    
-                    // Close mobile menu
-                    if (navMenu) {
-                        navMenu.classList.remove('open');
-                    }
                 }
             });
-        });
-
-        // Close mobile menu when clicking outside
-        document.addEventListener('click', (e) => {
-            if (navMenu && !navMenu.contains(e.target) && navMenu.classList.contains('open')) {
-                navMenu.classList.remove('open');
-            }
         });
     }
 
