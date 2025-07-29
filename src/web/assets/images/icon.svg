@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+  <defs>
+    <!-- Radial gradient for water drop -->
+    <radialGradient id="waterGradient" cx="0.4" cy="0.3" r="0.7">
+      <stop offset="0%" stop-color="#4FC3F7"/>
+      <stop offset="40%" stop-color="#2196F3"/>
+      <stop offset="100%" stop-color="#1565C0"/>
+    </radialGradient>
+    
+    <!-- Gradient for the reflection -->
+    <radialGradient id="reflectionGradient" cx="0.5" cy="0.5" r="0.8">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.9)"/>
+      <stop offset="50%" stop-color="rgba(255,255,255,0.6)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0.2)"/>
+    </radialGradient>
+  </defs>
+  
+  <!-- Main water drop shape with blue gradient -->
+  <path d="M480-80q-137 0-228.5-94T160-408q0-100 79.5-217.5T480-880q161 137 240.5 254.5T800-408q0 140-91.5 234T480-80Z" 
+        fill="url(#waterGradient)"/>
+  
+  <!-- Bottom right reflection (original Material Design reflection) with white gradient -->
+  <path d="M491-200q12-1 20.5-9.5T520-230q0-14-9-22.5t-23-7.5q-41 3-87-22.5T343-375q-2-11-10.5-18t-19.5-7q-14 0-23 10.5t-6 24.5q17 91 80 130t127 35Z" 
+        fill="url(#reflectionGradient)"/>
+</svg>

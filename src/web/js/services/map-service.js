@@ -26,6 +26,8 @@ class MapService {
                 throw new Error(`Map container with ID '${containerId}' not found`);
             }
 
+            console.log('🗺️ Initializing Google Maps...');
+            
             const defaultOptions = {
                 center: { lat: 40.7128, lng: -74.0060 }, // New York City
                 zoom: 13,
@@ -42,10 +44,15 @@ class MapService {
             this.infoWindow = new google.maps.InfoWindow();
             this.isLoaded = true;
 
+            console.log('✅ Google Maps initialized successfully');
+
             // Set up map event listeners
             this.setupMapListeners();
 
             return this.map;
+        }).catch((error) => {
+            console.error('❌ Map initialization failed:', error);
+            throw error;
         });
 
         return this.loadPromise;
@@ -57,10 +64,13 @@ class MapService {
      */
     async loadGoogleMaps() {
         if (window.google && window.google.maps) {
+            console.log('✅ Google Maps API already loaded');
             return Promise.resolve();
         }
 
         const apiKey = window.Settings.getGoogleMapsApiKey();
+        console.log('🔑 Using Google Maps API key:', apiKey ? `${apiKey.substring(0, 8)}...` : 'NOT SET');
+        
         if (!apiKey || apiKey === 'YOUR_GOOGLE_MAPS_API_KEY') {
             throw new Error('Google Maps API key is not configured');
         }
@@ -70,8 +80,14 @@ class MapService {
             script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
             script.async = true;
             script.defer = true;
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Failed to load Google Maps API'));
+            script.onload = () => {
+                console.log('✅ Google Maps API loaded successfully');
+                resolve();
+            };
+            script.onerror = (error) => {
+                console.error('❌ Failed to load Google Maps API:', error);
+                reject(new Error('Failed to load Google Maps API'));
+            };
             document.head.appendChild(script);
         });
     }

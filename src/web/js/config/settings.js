@@ -30,14 +30,14 @@ class Settings {
     async _loadConfig() {
         try {
             // Try to load from config.json first (local development or production)
-            const response = await fetch('/js/config/config.json');
+            const response = await fetch('./js/config/config.json');
             
             if (response.ok) {
                 this.config = await response.json();
             } else {
                 // Fallback to example config for development
                 console.warn('config.json not found, falling back to example config');
-                const fallbackResponse = await fetch('/js/config/config.example.json');
+                const fallbackResponse = await fetch('./js/config/config.example.json');
                 this.config = await fallbackResponse.json();
             }
 

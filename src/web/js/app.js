@@ -15,7 +15,9 @@ class FreeWaterTipsApp {
             this.showLoading();
 
             // Load settings first
+            console.log('📋 Loading settings...');
             await window.Settings.load();
+            console.log('✅ Settings loaded');
 
             // Validate configuration
             const validation = window.Settings.isConfigured();
@@ -23,6 +25,7 @@ class FreeWaterTipsApp {
                 this.showConfigurationError(validation.errors);
                 return;
             }
+            console.log('✅ Configuration validated');
 
             // Initialize utilities and services
             await this.initializeServices();
