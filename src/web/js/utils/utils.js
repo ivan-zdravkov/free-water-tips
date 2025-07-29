@@ -196,6 +196,18 @@ window.Utils = {
     },
 
     /**
+     * Format number for display with thousand separators
+     * @param {number} num - Number to format
+     * @returns {string} Formatted number string
+     */
+    formatNumber(num) {
+        if (typeof num !== 'number' || isNaN(num)) {
+            return '0';
+        }
+        return num.toLocaleString();
+    },
+
+    /**
      * Format date for display
      * @param {Date|string} date - Date to format
      * @returns {string} Formatted date string

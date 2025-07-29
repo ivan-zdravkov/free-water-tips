@@ -2,7 +2,7 @@
 class ApiClient {
     constructor(baseUrl) {
         this.baseUrl = baseUrl;
-        this.timeout = 10000; // 10 seconds
+        this.timeout = 1000; // 1 second
         this.retryAttempts = 3;
     }
 
@@ -188,6 +188,20 @@ class ApiClient {
      */
     async health() {
         return await this.get('/health');
+    }
+
+    /**
+     * Get stats from the API
+     * @returns {Promise<Object>} Stats data
+     * @throws {Error} If stats cannot be fetched
+     */
+    async getStats() {
+        try {
+            return await this.get('/stats');
+        } catch (error) {
+            console.warn('Failed to fetch stats, returning empty object:', error.message);
+            return {};
+        }
     }
 
     /**

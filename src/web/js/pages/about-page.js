@@ -80,32 +80,23 @@ class AboutPage {
      * Load application statistics
      */
     async loadStats() {
+        var stats = {};
+        
         try {
             const apiClient = window.apiClient || new ApiClient(window.Settings.getApiBaseUrl());
-            const stats = await apiClient.getStats();
-            
-            this.stats = {
-                totalLocations: stats.totalLocations || 0,
-                totalContributors: stats.totalContributors || 0,
-                countriesServed: stats.countriesServed || 0,
-                lastUpdated: stats.lastUpdated || new Date().toISOString()
-            };
-            
-            this.updateStatsDisplay();
-            
+            stats = await apiClient.getStats();
         } catch (error) {
             console.error('Failed to load stats:', error);
-            
-            // Use fallback stats
-            this.stats = {
-                totalLocations: 150,
-                totalContributors: 75,
-                countriesServed: 12,
-                lastUpdated: new Date().toISOString()
-            };
-            
-            this.updateStatsDisplay();
         }
+
+        this.stats = {
+            totalLocations: stats.totalLocations || 0,
+            totalContributors: stats.totalContributors || 0,
+            countriesServed: stats.countriesServed || 0,
+            lastUpdated: stats.lastUpdated || new Date().toISOString()
+        };
+
+        this.updateStatsDisplay();
     }
 
     /**
@@ -411,6 +402,9 @@ class AboutPage {
         // Refresh stats when page becomes visible
         if (this.isLoaded) {
             this.loadStats();
+        } else {
+            // If not loaded yet, initialize
+            this.init();
         }
 
         // Reset scroll position for better UX
