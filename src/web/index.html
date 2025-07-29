@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Find free drinking water locations near you. Water is a right, not a product.">
+    <meta name="keywords" content="free water, drinking water, water fountain, public water, sustainability">
+    <meta name="author" content="Ivan Zdravkov">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://freewater.tips/">
+    <meta property="og:title" content="Free Water Tips - Find Free Drinking Water">
+    <meta property="og:description" content="Find free drinking water locations near you. Water is a right, not a product.">
+    <meta property="og:image" content="./assets/images/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://freewater.tips/">
+    <meta property="twitter:title" content="Free Water Tips - Find Free Drinking Water">
+    <meta property="twitter:description" content="Find free drinking water locations near you. Water is a right, not a product.">
+    <meta property="twitter:image" content="./assets/images/twitter-image.png">
+
+    <title>Free Water Tips - Find Free Drinking Water</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./assets/images/favicon.ico">
+    <link rel="apple-touch-icon" href="./assets/images/apple-touch-icon.png">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="./css/styles.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://maps.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <h2>Free Water Tips</h2>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app" class="app hidden">
+        <!-- Mobile Navigation Overlay -->
+        <div id="nav-overlay" class="nav-overlay"></div>
+
+        <!-- Navigation Menu -->
+        <nav id="nav-menu" class="nav-menu">
+            <div class="nav-header">
+                <h1 class="nav-title">
+                    <span class="material-icons">water_drop</span>
+                    Free Water Tips
+                </h1>
+                <button id="nav-toggle" class="nav-toggle" aria-label="Toggle menu">
+                    <span class="material-icons">menu</span>
+                </button>
+            </div>
+            
+            <div class="nav-content">
+                <ul class="nav-links">
+                    <li><a href="#map" class="nav-link active" data-page="map">
+                        <span class="material-icons">map</span>
+                        Find Water
+                    </a></li>
+                    <li><a href="#contribute" class="nav-link" data-page="contribute">
+                        <span class="material-icons">add_location</span>
+                        Contribute
+                    </a></li>
+                    <li><a href="#about" class="nav-link" data-page="about">
+                        <span class="material-icons">info</span>
+                        About
+                    </a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content" class="main-content">
+            <!-- Map Page -->
+            <div id="map-page" class="page active">
+                <div id="map-container" class="map-container">
+                    <div id="google-map" class="google-map"></div>
+                    
+                    <!-- Map Controls -->
+                    <div class="map-controls">
+                        <button id="locate-btn" class="map-control-btn" title="Find my location">
+                            <span class="material-icons">my_location</span>
+                        </button>
+                        <button id="search-toggle" class="map-control-btn" title="Search locations">
+                            <span class="material-icons">search</span>
+                        </button>
+                    </div>
+
+                    <!-- Search Panel -->
+                    <div id="search-panel" class="search-panel hidden">
+                        <div class="search-input-container">
+                            <input type="text" id="search-input" placeholder="Search for water locations..." class="search-input">
+                            <button id="search-btn" class="search-btn">
+                                <span class="material-icons">search</span>
+                            </button>
+                        </div>
+                        <div id="search-results" class="search-results"></div>
+                    </div>
+
+                    <!-- Location Info Panel -->
+                    <div id="location-info" class="location-info hidden">
+                        <div class="location-info-content">
+                            <button id="close-info" class="close-btn">
+                                <span class="material-icons">close</span>
+                            </button>
+                            <div id="location-details"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contribute Page -->
+            <div id="contribute-page" class="page">
+                <div class="page-content">
+                    <div class="page-header">
+                        <h2>
+                            <span class="material-icons">add_location</span>
+                            Contribute a Location
+                        </h2>
+                        <p>Help others find free drinking water by adding a location you know about.</p>
+                    </div>
+
+                    <form id="contribute-form" class="contribute-form">
+                        <div class="form-group">
+                            <label for="location-name">Location Name</label>
+                            <input type="text" id="location-name" name="name" required 
+                                   placeholder="e.g., Central Park Cafe, McDonald's Downtown">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location-address">Address</label>
+                            <input type="text" id="location-address" name="address" required
+                                   placeholder="Street address or nearby landmark">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location-type">Type of Location</label>
+                            <select id="location-type" name="type" required>
+                                <option value="">Select type...</option>
+                                <option value="restaurant">Restaurant</option>
+                                <option value="cafe">Cafe</option>
+                                <option value="fast-food">Fast Food</option>
+                                <option value="public-fountain">Public Fountain</option>
+                                <option value="park">Park</option>
+                                <option value="library">Library</option>
+                                <option value="gym">Gym/Fitness Center</option>
+                                <option value="shopping-center">Shopping Center</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location-description">Description (Optional)</label>
+                            <textarea id="location-description" name="description" rows="3"
+                                     placeholder="Additional details about the water access..."></textarea>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="accessible" name="accessible">
+                                <span class="checkmark"></span>
+                                Wheelchair accessible
+                            </label>
+                        </div>
+
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="always-available" name="alwaysAvailable">
+                                <span class="checkmark"></span>
+                                Available 24/7
+                            </label>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" id="use-current-location" class="btn btn-secondary">
+                                <span class="material-icons">my_location</span>
+                                Use Current Location
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <span class="material-icons">add</span>
+                                Add Location
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- About Page -->
+            <div id="about-page" class="page">
+                <div class="page-content">
+                    <div class="page-header">
+                        <h2>
+                            <span class="material-icons">info</span>
+                            About Free Water Tips
+                        </h2>
+                        <p class="hero-text">Water is a right, not a product.</p>
+                    </div>
+
+                    <div class="about-content">
+                        <section class="about-section">
+                            <h3>Our Mission</h3>
+                            <p>
+                                The UN believes that water is a 
+                                <a href="https://www.unwater.org/water-facts/human-rights-water-and-sanitation" target="_blank" rel="noopener">
+                                    fundamental human right
+                                </a> 
+                                and should not be treated as a commodity.
+                            </p>
+                            <p>
+                                Our mission is to make it easier for people to find places that serve safe drinking water 
+                                not burdened by a product or service tax, promoting sustainability and reducing plastic waste.
+                            </p>
+                        </section>
+
+                        <section class="about-section">
+                            <h3>Why This Matters</h3>
+                            <ul class="feature-list">
+                                <li>
+                                    <span class="material-icons">eco</span>
+                                    <strong>Environmental Impact:</strong> Reduce plastic waste
+                                </li>
+                                <li>
+                                    <span class="material-icons">savings</span>
+                                    <strong>Save Money:</strong> Avoid unnecessary expenses on bottled water
+                                </li>
+                                <li>
+                                    <span class="material-icons">diversity_1</span>
+                                    <strong>Community:</strong> Encourage businesses to provide free water
+                                </li>
+                                <li>
+                                    <span class="material-icons">public</span>
+                                    <strong>Human Rights:</strong> Promote water as a shared resource
+                                </li>
+                            </ul>
+                        </section>
+
+                        <section class="about-section">
+                            <h3>Created by Ivan Zdravkov</h3>
+                            <p>
+                                This project was created by 
+                                <a href="https://zdravkov.dev" target="_blank" rel="noopener">Ivan Zdravkov</a>, 
+                                a passionate developer dedicated to making clean drinking water more accessible to everyone.
+                            </p>
+                            <div class="author-links">
+                                <a href="https://github.com/ivan-zdravkov" target="_blank" rel="noopener" class="author-link">
+                                    <span class="material-icons">code</span>
+                                    GitHub Profile
+                                </a>
+                                <a href="https://www.linkedin.com/in/ivan-zdravkov/" target="_blank" rel="noopener" class="author-link">
+                                    <span class="material-icons">person_add</span>
+                                    LinkedIn Profile
+                                </a>
+                                <a href="https://zdravkov.dev" target="_blank" rel="noopener" class="author-link">
+                                    <span class="material-icons">web</span>
+                                    Personal Website
+                                </a>
+                            </div>
+                        </section>
+
+                        <section class="about-section">
+                            <h3>Support the Project</h3>
+                            <p>
+                                This project is and always will be free and open-source. 
+                                If you find it useful and want to support the mission, consider making a donation:
+                            </p>
+                            <div class="donation-links">
+                                <a href="https://github.com/sponsors/ivan-zdravkov" target="_blank" rel="noopener" class="donation-link github">
+                                    <span class="material-icons">favorite</span>
+                                    GitHub Sponsors
+                                </a>
+                                <a href="https://paypal.me/IZdravkov" target="_blank" rel="noopener" class="donation-link paypal">
+                                    <span class="material-icons">payment</span>
+                                    PayPal
+                                </a>
+                                <a href="https://revolut.me/ivan_zdravkov" target="_blank" rel="noopener" class="donation-link revolut">
+                                    <span class="material-icons">account_balance</span>
+                                    Revolut
+                                </a>
+                            </div>
+                        </section>
+
+                        <section class="about-section">
+                            <h3>Open Source</h3>
+                            <p>
+                                This project is licensed under the <a href="https://github.com/ivan-zdravkov/free-water-tips?tab=GPL-3.0-1-ov-file" target="_blank" rel="noopener">GNU General Public License v3.0.</a>
+                                The source code is available on GitHub and contributions are welcome!
+                            </p>
+                            <a href="https://github.com/ivan-zdravkov/free-water-tips" target="_blank" rel="noopener" class="btn btn-primary">
+                                <span class="material-icons">code</span>
+                                View Source Code
+                            </a>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="./js/config/settings.js"></script>
+    <script src="./js/utils/utils.js"></script>
+    <script src="./js/services/api-client.js"></script>
+    <script src="./js/services/map-service.js"></script>
+    <script src="./js/components/toast.js"></script>
+    <script src="./js/pages/map-page.js"></script>
+    <script src="./js/pages/contribute-page.js"></script>
+    <script src="./js/pages/about-page.js"></script>
+    <script src="./js/router/router.js"></script>
+    <script src="./js/app.js"></script>
+</body>
+</html>
