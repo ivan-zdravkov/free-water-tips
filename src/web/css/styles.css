@@ -330,25 +330,53 @@ a:hover {
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    width: 100%;
 }
 
 .page {
     display: none;
     height: 100%;
     overflow: hidden;
+    width: 100%;
 }
 
 .page.active {
     display: flex;
     flex-direction: column;
+    width: 100%;
 }
 
 .page-content {
     padding: var(--spacing-xl);
-    max-width: 800px;
+    max-width: 900px;
+    width: 100%;
     margin: 0 auto;
     overflow-y: auto;
     height: 100%;
+    box-sizing: border-box;
+}
+
+/* Ensure consistent width for all pages */
+#about-page .page-content,
+#contribute-page .page-content {
+    max-width: 900px;
+    width: 100%;
+}
+
+/* Fix scrollbar positioning - move it to the right edge */
+#about-page,
+#contribute-page {
+    overflow-y: auto;
+    height: 100%;
+    width: 100%;
+}
+
+#about-page .page-content,
+#contribute-page .page-content {
+    overflow-y: visible;
+    height: auto;
+    min-height: 100%;
+    padding-right: var(--spacing-xl);
 }
 
 .page-header {
@@ -505,6 +533,9 @@ a:hover {
     padding: var(--spacing-xl);
     border-radius: var(--border-radius);
     box-shadow: var(--shadow-1);
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
 }
 
 .form-group {
@@ -609,6 +640,8 @@ a:hover {
 /* About Page */
 .about-content {
     line-height: 1.7;
+    width: 100%;
+    max-width: none;
 }
 
 .about-section {
@@ -642,6 +675,35 @@ a:hover {
 .feature-list .material-icons {
     color: var(--primary-color);
     margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.feature-content {
+    flex: 1;
+    line-height: 1.5;
+    display: flex;
+    align-items: baseline;
+}
+
+.feature-content strong {
+    display: inline-block;
+    width: 180px;
+    margin-right: var(--spacing-md);
+    flex-shrink: 0;
+}
+
+/* Mobile responsive for feature list */
+@media (max-width: 480px) {
+    .feature-content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .feature-content strong {
+        width: auto;
+        margin-right: 0;
+        margin-bottom: var(--spacing-xs);
+    }
 }
 
 .author-links,
@@ -658,10 +720,7 @@ a:hover {
 }
 
 .stats-section h3 {
-    color: var(--primary-color);
-    margin-bottom: var(--spacing-xl);
-    font-size: var(--font-size-xl);
-    font-weight: 600;
+    text-align: left;
 }
 
 .stats-grid {
@@ -885,6 +944,7 @@ a:hover {
     .btn {
         text-align: center;
         justify-content: center;
+        width: 100%;
     }
     
     .toast-container {
