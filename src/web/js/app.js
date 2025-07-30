@@ -25,7 +25,7 @@ class FreeWaterTipsApp {
 
             await this.initializeServices();
             await this.initializePages();
-            
+
             this.initializeRouter();
             this.setupNavigation();
             this.hideLoading();
@@ -92,7 +92,7 @@ class FreeWaterTipsApp {
                 console.log('✅ API connection successful');
             }
         } catch (error) {
-            console.warn('⚠️ API not available (this is expected in development):', error.message);
+            console.warn('⚠️ API not available:', error.message);
         }
     }
 

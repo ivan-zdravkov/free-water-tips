@@ -45,7 +45,7 @@ class ApiClient {
                 
             } catch (error) {
                 lastError = error;
-                console.warn(`API request attempt ${attempt} failed:`, error.message);
+                console.warn(`API request '${endpoint}' attempt ${attempt} failed:`, error.message);
                 
                 // Don't retry on certain errors
                 if (error.name === 'AbortError' || 
