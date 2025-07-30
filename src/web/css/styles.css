@@ -850,73 +850,6 @@ a:hover {
     color: var(--text-primary);
 }
 
-/* Share Links */
-.share-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--spacing-md);
-    margin-top: var(--spacing-lg);
-}
-
-.share-link {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md);
-    background: var(--background-color);
-    border-radius: var(--border-radius);
-    text-decoration: none;
-    color: var(--text-primary);
-    transition: all 0.2s ease;
-}
-
-.share-link:hover {
-    background-color: var(--primary-light);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-2);
-}
-
-.share-link img {
-    width: 20px;
-    height: 20px;
-    filter: none;
-}
-
-.share-link.x {
-    background-color: var(--background-color);
-    color: var(--text-primary);
-}
-
-.share-link.facebook {
-    background-color: var(--background-color);
-    color: var(--text-primary);
-}
-
-.share-link.linkedin {
-    background-color: var(--background-color);
-    color: var(--text-primary);
-}
-
-.share-link.whatsapp {
-    background-color: var(--background-color);
-    color: var(--text-primary);
-}
-
-.share-link.telegram {
-    background-color: var(--background-color);
-    color: var(--text-primary);
-}
-
-.share-link.instagram {
-    background-color: var(--background-color);
-    color: var(--text-primary);
-}
-
-.share-link.share {
-    background-color: black;
-    color: black;
-}
-
 /* Toast Notifications */
 .toast-container {
     position: fixed;
@@ -1012,14 +945,12 @@ a:hover {
     }
     
     .author-links,
-    .donation-links,
-    .share-links {
+    .donation-links {
         flex-direction: column;
     }
     
     .author-link,
-    .donation-link,
-    .share-link {
+    .donation-link {
         text-align: center;
         justify-content: center;
     }
@@ -1146,6 +1077,10 @@ a:hover {
     transform: translateY(-2px);
 }
 
+.mobile-share-link[data-platform="instagram"]:hover img {
+    transform: translateY(-5px) scale(1.1);
+}
+
 .mobile-share-link[data-platform="facebook"] img {
     filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
 }
@@ -1160,10 +1095,6 @@ a:hover {
 
 .mobile-share-link[data-platform="telegram"] img {
     filter: brightness(0) saturate(100%) invert(30%) sepia(98%) saturate(1200%) hue-rotate(190deg) brightness(95%) contrast(101%);
-}
-
-.mobile-share-link[data-platform="share"] img {
-    /* filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);*/
 }
 
 /* New social platform colors */
@@ -1248,6 +1179,10 @@ a:hover {
         height: 52px;
         transform: translateY(-2px);
     }
+    
+    .mobile-share-link[data-platform="instagram"]:hover img {
+        transform: translateY(-5px) scale(1.1);
+    }
 }
 
 @media (max-width: 480px) {
@@ -1264,5 +1199,9 @@ a:hover {
         width: 48px;
         height: 48px;
         transform: translateY(-2px);
+    }
+    
+    .mobile-share-link[data-platform="instagram"]:hover img {
+        transform: translateY(-5px) scale(1.1);
     }
 }

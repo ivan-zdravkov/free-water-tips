@@ -118,6 +118,30 @@ window.Utils = {
     },
 
     /**
+     * Validate phone number
+     * @param {string} phone - Phone to validate
+     * @returns {boolean} True if valid phone
+     */
+    isValidPhone(phone) {
+        const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
+        return phoneRegex.test(phone.replace(/[\s\-\(\)]/g, ''));
+    },
+
+    /**
+     * Validate URL
+     * @param {string} url - URL to validate
+     * @returns {boolean} True if valid URL
+     */
+    isValidUrl(url) {
+        try {
+            new URL(url);
+            return true;
+        } catch {
+            return false;
+        }
+    },
+
+    /**
      * Validate required form fields
      * @param {HTMLFormElement} form - Form to validate
      * @returns {Object} Validation result
