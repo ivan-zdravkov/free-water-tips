@@ -63,6 +63,18 @@ class AboutPage {
             btn.addEventListener('click', (e) => this.handleShare(e));
         });
 
+        // SVG Social sharing buttons
+        const svgShareButtons = document.querySelectorAll('.svg-share-btn');
+        svgShareButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => this.handleShare(e));
+        });
+
+        // Share links
+        const shareLinks = document.querySelectorAll('.share-link');
+        shareLinks.forEach(link => {
+            link.addEventListener('click', (e) => this.handleShare(e));
+        });
+
         // Back to top button
         const backToTopBtn = document.getElementById('back-to-top');
         if (backToTopBtn) {
@@ -207,132 +219,15 @@ class AboutPage {
     }
 
     /**
-     * Handle contact form submission
-     * @param {Event} event - Form submit event
-     */
-    async handleContactSubmit(event) {
-        event.preventDefault();
-        
-        const form = event.target;
-        const submitBtn = form.querySelector('button[type="submit"]');
-        
-        try {
-            Utils.toggleButtonLoading(submitBtn, true);
-            
-            const formData = new FormData(form);
-            const contactData = {
-                name: formData.get('name'),
-                email: formData.get('email'),
-                subject: formData.get('subject'),
-                message: formData.get('message')
-            };
-
-            // Validate form data
-            if (!this.validateContactForm(contactData)) {
-                return;
-            }
-
-            // Submit to API
-            const apiClient = window.apiClient || new ApiClient(window.Settings.getApiBaseUrl());
-            const result = await apiClient.submitContact(contactData);
-            
-            if (result.success) {
-                Toast.success('Thank you for your message! We\'ll get back to you soon.');
-                form.reset();
-            } else {
-                throw new Error(result.message || 'Failed to send message');
-            }
-            
-        } catch (error) {
-            console.error('Contact form submission failed:', error);
-            Toast.error('Failed to send message. Please try again or email us directly.');
-        } finally {
-            Utils.toggleButtonLoading(submitBtn, false);
-        }
-    }
-
-    /**
-     * Validate contact form data
-     * @param {Object} data - Form data
-     * @returns {boolean} True if valid
-     */
-    validateContactForm(data) {
-        if (!data.name || data.name.trim().length < 2) {
-            Toast.error('Please enter your full name');
-            return false;
-        }
-
-        if (!data.email || !Utils.isValidEmail(data.email)) {
-            Toast.error('Please enter a valid email address');
-            return false;
-        }
-
-        if (!data.subject || data.subject.trim().length < 5) {
-            Toast.error('Please enter a subject for your message');
-            return false;
-        }
-
-        if (!data.message || data.message.trim().length < 10) {
-            Toast.error('Please enter a message (at least 10 characters)');
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Handle newsletter signup
-     * @param {Event} event - Form submit event
-     */
-    async handleNewsletterSubmit(event) {
-        event.preventDefault();
-        
-        const form = event.target;
-        const submitBtn = form.querySelector('button[type="submit"]');
-        const emailInput = form.querySelector('input[type="email"]');
-        
-        try {
-            Utils.toggleButtonLoading(submitBtn, true);
-            
-            const email = emailInput.value.trim();
-            
-            if (!email || !Utils.isValidEmail(email)) {
-                Toast.error('Please enter a valid email address');
-                return;
-            }
-
-            // Submit to API
-            const apiClient = window.apiClient || new ApiClient(window.Settings.getApiBaseUrl());
-            const result = await apiClient.subscribeNewsletter(email);
-            
-            if (result.success) {
-                Toast.success('Thank you for subscribing to our newsletter!');
-                form.reset();
-            } else {
-                throw new Error(result.message || 'Subscription failed');
-            }
-            
-        } catch (error) {
-            console.error('Newsletter subscription failed:', error);
-            
-            if (error.message.includes('already subscribed')) {
-                Toast.info('You\'re already subscribed to our newsletter!');
-            } else {
-                Toast.error('Failed to subscribe. Please try again later.');
-            }
-        } finally {
-            Utils.toggleButtonLoading(submitBtn, false);
-        }
-    }
-
-    /**
      * Handle social sharing
      * @param {Event} event - Click event
      */
     handleShare(event) {
         event.preventDefault();
         
-        const platform = event.target.dataset.platform;
+        // Get platform from the clicked element or its parent
+        const target = event.target.closest('[data-platform]') || event.target;
+        const platform = target.dataset.platform;
         const url = encodeURIComponent(window.location.origin);
         const text = encodeURIComponent('Find free water sources near you with Free Water Tips!');
         
@@ -340,6 +235,7 @@ class AboutPage {
         
         switch (platform) {
             case 'twitter':
+            case 'x':
                 shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
                 break;
             case 'facebook':
@@ -351,9 +247,15 @@ class AboutPage {
             case 'whatsapp':
                 shareUrl = `https://wa.me/?text=${text}%20${url}`;
                 break;
+            case 'instagram':
+                // Instagram doesn't support direct URL sharing, so we'll copy to clipboard
+                Utils.copyToClipboard(`${decodeURIComponent(text)} ${window.location.origin}`);
+                Toast.success('Link copied! Paste it in your Instagram story or bio.');
+                return;
             case 'telegram':
                 shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
                 break;
+            case 'share':
             default:
                 // Generic share or copy to clipboard
                 if (navigator.share) {
@@ -382,17 +284,6 @@ class AboutPage {
             top: 0,
             behavior: 'smooth'
         });
-    }
-
-    /**
-     * Get application version info
-     */
-    getVersionInfo() {
-        return {
-            version: '1.0.0',
-            buildDate: '2024-01-15',
-            commit: 'abc123f'
-        };
     }
 
     /**

@@ -615,14 +615,15 @@ a:hover {
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    color: white;
+    background-color: var(--background-color);
+    color: var(--text-primary);
 }
 
 .btn-primary:hover {
-    background-color: var(--primary-dark);
-    color: white;
-    transform: translateY(-1px);
+    /* background-color: var(--primary-light); */
+    /*color: var(--primary-dark); */
+    transform: translateY(-2px); 
+    color: var(--text-primary);
     box-shadow: var(--shadow-2);
 }
 
@@ -816,23 +817,104 @@ a:hover {
 
 .author-link:hover,
 .donation-link:hover {
-    background-color: var(--primary-light);
     transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+    color: var(--text-primary)
+}
+
+/* Icons8 SVG styling for author links, donation links, and buttons */
+.author-link img,
+.donation-link img,
+.btn img {
+    width: 20px;
+    height: 20px;
+}
+
+.donation-link img,
+.btn img {
+    filter: none;
 }
 
 .donation-link.github {
-    background-color: #24292e;
-    color: white;
+    background-color: var(--background-color);
+    color: var(--text-primary);
 }
 
 .donation-link.paypal {
-    background-color: #0070ba;
-    color: white;
+    background-color: var(--background-color);
+    color: var(--text-primary);
 }
 
 .donation-link.revolut {
-    background-color: #0075eb;
-    color: white;
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+/* Share Links */
+.share-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-lg);
+}
+
+.share-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.share-link:hover {
+    background-color: var(--primary-light);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-2);
+}
+
+.share-link img {
+    width: 20px;
+    height: 20px;
+    filter: none;
+}
+
+.share-link.x {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.share-link.facebook {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.share-link.linkedin {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.share-link.whatsapp {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.share-link.telegram {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.share-link.instagram {
+    background-color: var(--background-color);
+    color: var(--text-primary);
+}
+
+.share-link.share {
+    background-color: var(--background-color);
+    color: var(--text-primary);
 }
 
 /* Toast Notifications */
@@ -930,12 +1012,14 @@ a:hover {
     }
     
     .author-links,
-    .donation-links {
+    .donation-links,
+    .share-links {
         flex-direction: column;
     }
     
     .author-link,
-    .donation-link {
+    .donation-link,
+    .share-link {
         text-align: center;
         justify-content: center;
     }
