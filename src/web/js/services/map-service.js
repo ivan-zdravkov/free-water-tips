@@ -28,26 +28,34 @@ class MapService {
 
             console.log('🗺️ Initializing Google Maps...');
             
-            const defaultOptions = {
-                center: { lat: 40.7128, lng: -74.0060 }, // New York City
-                zoom: 13,
-                styles: this.getMapStyles(),
-                zoomControl: true,
-                mapTypeControl: false,
-                scaleControl: true,
-                streetViewControl: false,
-                rotateControl: false,
-                fullscreenControl: true
-            };
+            try {
+                const defaultOptions = {
+                    center: { lat: 40.7128, lng: -74.0060 }, // New York City
+                    zoom: 13,
+                    styles: this.getMapStyles(),
+                    zoomControl: true,
+                    mapTypeControl: false,
+                    scaleControl: true,
+                    streetViewControl: false,
+                    rotateControl: false,
+                    fullscreenControl: true
+                };
 
-            this.map = new google.maps.Map(container, { ...defaultOptions, ...options });
-            this.infoWindow = new google.maps.InfoWindow();
-            this.isLoaded = true;
+                this.map = new google.maps.Map(container, { ...defaultOptions, ...options });
+                this.infoWindow = new google.maps.InfoWindow();
+                this.isLoaded = true;
 
-            console.log('✅ Google Maps initialized successfully');
+                console.log('✅ Google Maps initialized successfully');
+                console.log('Map instance:', this.map);
+                console.log('Map container dimensions:', container.offsetWidth, 'x', container.offsetHeight);
 
-            // Set up map event listeners
-            this.setupMapListeners();
+                // Set up map event listeners
+                this.setupMapListeners();
+                
+            } catch (error) {
+                console.error('❌ Failed to create Google Maps instance:', error);
+                throw new Error(`Failed to create Google Maps instance: ${error.message}`);
+            }
 
             return this.map;
         }).catch((error) => {
@@ -76,17 +84,30 @@ class MapService {
         }
 
         return new Promise((resolve, reject) => {
+            // Add global error handler for Google Maps API errors
+            window.gm_authFailure = () => {
+                console.error('❌ Google Maps authentication failed - check API key validity and restrictions');
+                reject(new Error('Google Maps authentication failed. Please check your API key and domain restrictions.'));
+            };
+
             const script = document.createElement('script');
             script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
             script.async = true;
             script.defer = true;
             script.onload = () => {
-                console.log('✅ Google Maps API loaded successfully');
-                resolve();
+                // Additional check to ensure google.maps is actually available
+                if (window.google && window.google.maps) {
+                    console.log('✅ Google Maps API loaded successfully');
+                    resolve();
+                } else {
+                    console.error('❌ Google Maps API loaded but google.maps is not available');
+                    reject(new Error('Google Maps API loaded but objects are not available'));
+                }
             };
             script.onerror = (error) => {
-                console.error('❌ Failed to load Google Maps API:', error);
-                reject(new Error('Failed to load Google Maps API'));
+                console.error('❌ Failed to load Google Maps API script:', error);
+                console.error('Check network connectivity and API key permissions');
+                reject(new Error('Failed to load Google Maps API script. Check your internet connection and API key.'));
             };
             document.head.appendChild(script);
         });
@@ -424,5 +445,39 @@ class MapService {
     }
 }
 
-// Make MapService available globally
+/**
+ * Debug function to check Google Maps API status
+ * Call this in browser console: debugGoogleMaps()
+ */
+function debugGoogleMaps() {
+    console.log('🔍 Google Maps Debug Information:');
+    console.log('API Key configured:', !!Settings.getGoogleMapsApiKey());
+    console.log('Google object exists:', !!window.google);
+    console.log('Google Maps exists:', !!window.google?.maps);
+    console.log('Map container exists:', !!document.getElementById('map'));
+    
+    const container = document.getElementById('map');
+    if (container) {
+        console.log('Map container dimensions:', {
+            width: container.offsetWidth,
+            height: container.offsetHeight,
+            display: getComputedStyle(container).display,
+            visibility: getComputedStyle(container).visibility
+        });
+    }
+    
+    // Check for authentication errors
+    if (window.gm_authFailure) {
+        console.log('❌ Google Maps authentication error detected');
+    }
+    
+    console.log('MapService instance:', window.mapService);
+    if (window.mapService) {
+        console.log('Map instance:', window.mapService.map);
+        console.log('API loaded:', window.mapService.isApiLoaded());
+    }
+}
+
+// Make MapService and debug function available globally
 window.MapService = MapService;
+window.debugGoogleMaps = debugGoogleMaps;

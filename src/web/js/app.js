@@ -11,15 +11,11 @@ class FreeWaterTipsApp {
 
     async init() {
         try {
-            // Show loading screen
             this.showLoading();
 
-            // Load settings first
-            console.log('📋 Loading settings...');
             await window.Settings.load();
             console.log('✅ Settings loaded');
 
-            // Validate configuration
             const validation = window.Settings.isConfigured();
             if (!validation.isValid) {
                 this.showConfigurationError(validation.errors);
@@ -27,19 +23,11 @@ class FreeWaterTipsApp {
             }
             console.log('✅ Configuration validated');
 
-            // Initialize utilities and services
             await this.initializeServices();
-
-            // Initialize pages
             await this.initializePages();
-
-            // Initialize router
+            
             this.initializeRouter();
-
-            // Set up navigation
             this.setupNavigation();
-
-            // Hide loading screen and show app
             this.hideLoading();
 
             this.isInitialized = true;

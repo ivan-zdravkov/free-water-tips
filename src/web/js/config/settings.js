@@ -42,7 +42,7 @@ class Settings {
             }
 
             this.isLoaded = true;
-            console.log('✅ Settings loaded successfully');
+
             return this.config;
 
         } catch (error) {
