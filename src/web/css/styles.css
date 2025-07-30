@@ -913,8 +913,8 @@ a:hover {
 }
 
 .share-link.share {
-    background-color: var(--background-color);
-    color: var(--text-primary);
+    background-color: black;
+    color: black;
 }
 
 /* Toast Notifications */
@@ -1140,6 +1140,12 @@ a:hover {
     filter: brightness(0) saturate(0);
 }
 
+.mobile-share-link[data-platform="instagram"] img {
+    width: 56px;
+    height: 56px;
+    transform: translateY(-2px);
+}
+
 .mobile-share-link[data-platform="facebook"] img {
     filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
 }
@@ -1156,15 +1162,8 @@ a:hover {
     filter: brightness(0) saturate(100%) invert(30%) sepia(98%) saturate(1200%) hue-rotate(190deg) brightness(95%) contrast(101%);
 }
 
-.mobile-share-link[data-platform="instagram"] img {
-    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    border-radius: var(--border-radius);
-    padding: 4px;
-    filter: brightness(0) saturate(100%) invert(100%) brightness(2);
-}
-
 .mobile-share-link[data-platform="share"] img {
-    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
+    /* filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);*/
 }
 
 /* New social platform colors */
@@ -1243,6 +1242,12 @@ a:hover {
         width: 44px;
         height: 44px;
     }
+    
+    .mobile-share-link[data-platform="instagram"] img {
+        width: 52px;
+        height: 52px;
+        transform: translateY(-2px);
+    }
 }
 
 @media (max-width: 480px) {
@@ -1253,5 +1258,11 @@ a:hover {
     .mobile-share-link img {
         width: 40px;
         height: 40px;
+    }
+    
+    .mobile-share-link[data-platform="instagram"] img {
+        width: 48px;
+        height: 48px;
+        transform: translateY(-2px);
     }
 }
