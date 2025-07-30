@@ -69,15 +69,27 @@ If traffic or functionality requirements outgrow the serverless architecture, th
 git clone https://github.com/ivan-zdravkov/free-water-tips.git
 cd free-water-tips
 
+# Automated setup (recommended)
+npm run setup
+
+# Full stack development
+npm run dev:full
+
+# Individual components:
 # Web development
-cd src/web && npm start
+npm run dev
 
-# API development
-cd src/api && func start
+# .NET API development
+npm run api:dev
 
-# Mobile development
+# Mobile development (when available)
 cd src/mobile && dotnet build -t:Run -f net8.0-android
 ```
+
+**Prerequisites:**
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Azure Functions Core Tools v4](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- [Node.js](https://nodejs.org/)
 
 For complete setup instructions including prerequisites and IDE configuration, see the [Development Setup](../CONTRIBUTING.md#development-setup) section in our Contributing Guide.
 

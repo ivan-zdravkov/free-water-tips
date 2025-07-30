@@ -141,62 +141,77 @@ Check the [Technical Guide](/docs/technical-guide.md) for architecture and techn
 
 #### Quick Setup (Recommended)
 
+**Prerequisites:**
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) for API development
+- [Azure Functions Core Tools v4](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local) for local API testing
+- [Node.js](https://nodejs.org/) for web development and build tools
+
 For a faster setup process, you can use our automated setup script:
 
 ```bash
-# After cloning the repository
-cd free-water-tips/scripts
-chmod +x setup-dev.sh
-./setup-dev.sh
+npm run setup
 ```
 
 This script will:
-- Create local configuration files from examples
-- Install necessary dependencies
+- Install all dependencies (Node.js packages and .NET packages)
+- Create configuration files from templates (config.json for /web and local.settings.json for api)
+- Set up both web and .NET API development environments
+- Check prerequisites (.NET SDK, Azure Functions Core Tools, Node.js)
 - Guide you through API key setup
-- Provide next steps for starting development
 
 #### Application Start
+
+**Full Stack Development (Recommended):**
+```bash
+# Start both web and API servers
+npm run dev:full
+```
+
+**Individual Components:**
+
 1. **Web Development**
    ```bash
-   # Navigate to web folder
-   cd src/web
-   
-   # Start local development server at http://localhost:3000
-   npm start
+   # Start web dev server at http://localhost:3000
+   npm run dev
    ```
 
-2. **API Development (Azure Functions)**
+2. **API Development (.NET Azure Functions)**
    ```bash
-   # Navigate to API folder
-   cd src/api
+   # Restore .NET packages
+   npm run api:restore
    
-   # Install dependencies
-   dotnet restore
-   
-   # Start Functions runtime at http://localhost:7071
-   func start
+   # Start API dev server at http://localhost:7071
+   npm run api:dev
    ```
 
 3. **Mobile Development**
    ```bash
-   # Navigate to mobile folder
-   cd src/mobile
-   
-   # Restore and run MAUI app
-   dotnet restore
-   dotnet build
-   
-   # Run on specific platform
-   dotnet build -t:Run -f net8.0-android
+   TBD
    ```
 
-#### IDE Configuration
-
-##### Visual Studio Code
-Install recommended extensions:
+#### Visual Studio Code Recommended Extensions
 - [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
 - [Azure Functions](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
+- [REST Client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) for API testing
+
+#### Available npm Scripts
+```bash
+# Web Development
+npm start               # Start web server
+npm run dev             # Start web dev server with live reload
+
+# .NET API Development  
+npm run api:restore     # Restore .NET packages
+npm run api:build       # Build .NET API
+npm run api:start       # Start API server
+npm run api:dev         # Start API dev server with CORS
+
+# Full Stack Development
+npm run dev:full        # Start both web and API servers
+
+# Setup and Maintenance
+npm run setup           # Run development setup script
+```
 
 ### Contributing Workflow
 
@@ -250,17 +265,11 @@ git push origin feature/your-feature-name
 ### Useful Development Commands
 
 ```bash
-# Setup Commands
-./scripts/setup-dev.sh                  # Quick development environment setup
-
 # Backend (.NET) Commands
 dotnet test                             # Run all tests
 dotnet format --verify-no-changes       # Check code formatting
-dotnet build                            # Build the project
-func start                              # Start Azure Functions locally
 
 # Frontend Commands  
-npm start                               # Start web development server
 node -c script.js                       # Check JavaScript syntax
 
 # Git Commands
@@ -270,16 +279,14 @@ git push origin feature/branch-name     # Push feature branch
 
 # Quality Checks (run before submitting PR)
 ./scripts/pre-commit-checks.sh          # Run all quality checks locally
-grep -r "console.log" src/web/          # Check for debug statements
-dotnet format && dotnet test            # Format code and run tests
 ```
 
 ## Adding Water Sources
 
 You can contribute by adding new water source locations:
 
-1. **Use the Contribute page** on the web app
-2. **Provide accurate information**: Name, address, description
+1. **Use the Contribute page** on the web or mobile apps
+2. **Provide accurate information**: Name, address, description, etc.
 3. **Include helpful details**: Operating hours, accessibility info
 4. **Verify location**: Ensure GPS coordinates are correct
 5. **Add photos**: If possible, include photos of the water source

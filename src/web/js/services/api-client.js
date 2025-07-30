@@ -128,8 +128,8 @@ class ApiClient {
         try {
             return await this.get('/locations', filters);
         } catch (error) {
-            console.warn('Failed to fetch locations, returning mock data:', error.message);
-            return this.getMockLocations();
+            console.warn('Failed to fetch locations, returning empty array:', error.message);
+            return [];
         }
     }
 
@@ -144,8 +144,8 @@ class ApiClient {
         try {
             return await this.get('/locations/nearby', { lat, lng, radius });
         } catch (error) {
-            console.warn('Failed to fetch nearby locations, returning mock data:', error.message);
-            return this.getMockNearbyLocations(lat, lng);
+            console.warn('Failed to fetch nearby locations, returning empty array:', error.message);
+            return [];
         }
     }
 
@@ -177,8 +177,8 @@ class ApiClient {
         try {
             return await this.get('/locations/search', { q: query });
         } catch (error) {
-            console.warn('Failed to search locations, returning mock results:', error.message);
-            return this.getMockSearchResults(query);
+            console.warn('Failed to search locations, returning empty array:', error.message);
+            return [];
         }
     }
 
@@ -211,90 +211,6 @@ class ApiClient {
      */
     wait(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
-    /**
-     * Get mock locations for development/fallback
-     * @returns {Array} Mock location data
-     */
-    getMockLocations() {
-        return [
-            {
-                id: '1',
-                name: 'Central Park Visitor Center',
-                address: 'Central Park, New York, NY',
-                type: 'park',
-                coordinates: { lat: 40.7829, lng: -73.9654 },
-                description: 'Free water fountains available near the visitor center',
-                accessible: true,
-                alwaysAvailable: false,
-                rating: 4.5,
-                createdAt: '2024-01-15T10:00:00Z'
-            },
-            {
-                id: '2',
-                name: 'Starbucks Times Square',
-                address: '1585 Broadway, New York, NY',
-                type: 'cafe',
-                coordinates: { lat: 40.7580, lng: -73.9855 },
-                description: 'Ask barista for free water cup',
-                accessible: true,
-                alwaysAvailable: false,
-                rating: 4.2,
-                createdAt: '2024-01-16T14:30:00Z'
-            },
-            {
-                id: '3',
-                name: 'Washington Square Park',
-                address: 'Washington Square Park, New York, NY',
-                type: 'public-fountain',
-                coordinates: { lat: 40.7308, lng: -73.9973 },
-                description: 'Public water fountain near the arch',
-                accessible: true,
-                alwaysAvailable: true,
-                rating: 4.0,
-                createdAt: '2024-01-17T09:15:00Z'
-            }
-        ];
-    }
-
-    /**
-     * Get mock nearby locations for development/fallback
-     * @param {number} lat - User latitude
-     * @param {number} lng - User longitude
-     * @returns {Array} Mock nearby locations
-     */
-    getMockNearbyLocations(lat, lng) {
-        const mockLocations = this.getMockLocations();
-        
-        // Calculate distances and sort by proximity
-        return mockLocations
-            .map(location => ({
-                ...location,
-                distance: Utils.calculateDistance(
-                    lat, lng,
-                    location.coordinates.lat, location.coordinates.lng
-                )
-            }))
-            .sort((a, b) => a.distance - b.distance)
-            .slice(0, 10); // Return top 10 nearest
-    }
-
-    /**
-     * Get mock search results for development/fallback
-     * @param {string} query - Search query
-     * @returns {Array} Mock search results
-     */
-    getMockSearchResults(query) {
-        const mockLocations = this.getMockLocations();
-        const lowerQuery = query.toLowerCase();
-        
-        return mockLocations.filter(location => 
-            location.name.toLowerCase().includes(lowerQuery) ||
-            location.address.toLowerCase().includes(lowerQuery) ||
-            location.type.toLowerCase().includes(lowerQuery) ||
-            (location.description && location.description.toLowerCase().includes(lowerQuery))
-        );
     }
 }
 
