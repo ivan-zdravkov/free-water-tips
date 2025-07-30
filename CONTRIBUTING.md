@@ -131,9 +131,7 @@ Check the [Technical Guide](/docs/technical-guide.md) for architecture and techn
 - [Visual Studio Code](https://code.visualstudio.com/)
 - [Node.js](https://nodejs.org/) (for local web development server)
 
-#### Local Development Setup
-
-1. **Fork and Clone the Repository**
+#### Clone Repository
    ```bash
    # Fork the repository on GitHub first, then:
    git clone https://github.com/your-username/free-water-tips.git
@@ -141,7 +139,25 @@ Check the [Technical Guide](/docs/technical-guide.md) for architecture and techn
    git remote add upstream https://github.com/ivan-zdravkov/free-water-tips.git
    ```
 
-2. **Web Development**
+#### Quick Setup (Recommended)
+
+For a faster setup process, you can use our automated setup script:
+
+```bash
+# After cloning the repository
+cd free-water-tips/scripts
+chmod +x setup-dev.sh
+./setup-dev.sh
+```
+
+This script will:
+- Create local configuration files from examples
+- Install necessary dependencies
+- Guide you through API key setup
+- Provide next steps for starting development
+
+#### Application Start
+1. **Web Development**
    ```bash
    # Navigate to web folder
    cd src/web
@@ -150,7 +166,7 @@ Check the [Technical Guide](/docs/technical-guide.md) for architecture and techn
    npm start
    ```
 
-3. **API Development (Azure Functions)**
+2. **API Development (Azure Functions)**
    ```bash
    # Navigate to API folder
    cd src/api
@@ -162,7 +178,7 @@ Check the [Technical Guide](/docs/technical-guide.md) for architecture and techn
    func start
    ```
 
-4. **Mobile Development**
+3. **Mobile Development**
    ```bash
    # Navigate to mobile folder
    cd src/mobile
@@ -234,6 +250,9 @@ git push origin feature/your-feature-name
 ### Useful Development Commands
 
 ```bash
+# Setup Commands
+./scripts/setup-dev.sh                  # Quick development environment setup
+
 # Backend (.NET) Commands
 dotnet test                             # Run all tests
 dotnet format --verify-no-changes       # Check code formatting
