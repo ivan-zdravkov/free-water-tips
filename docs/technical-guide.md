@@ -7,13 +7,13 @@ This document provides a comprehensive overview of the Free Water Tips project's
 ```
 free-water-tips/
 ├── src/
-│   ├── web/        # Web SPA (HTML, CSS, JS)
+│   ├── [web/](../src/web/)        # Web SPA (HTML, CSS, JS)
 │   ├── mobile/     # .NET MAUI mobile app
 │   └── api/        # Azure Functions (C#)
-├── docs/           # Documentation
-├── scripts/        # Automation and CI/CD scripts
+├── [docs/](../docs/)           # Documentation
+├── [scripts/](../scripts/)        # Automation and CI/CD scripts
 ├── .github/        # GitHub workflows, templates, CODEOWNERS
-├── README.md
+├── [README.md](../README.md)
 └── ...
 ```
 
@@ -62,185 +62,32 @@ If traffic or functionality requirements outgrow the serverless architecture, th
   - **Why**: Native GitHub integration, extensive marketplace.
   - **Benefits**: Infrastructure as Code, automated testing, environment provisioning.
 
-## Development Setup Guide
-
-### Prerequisites
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download) or later
-- [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
-- [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
-- [Git](https://git-scm.com/downloads)
-- [Visual Studio Code](https://code.visualstudio.com/)
-- [Node.js](https://nodejs.org/) (for local web development server)
-
-### Local Development Setup
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/ivan-zdravkov/free-water-tips.git
-   cd free-water-tips
-   ```
-
-2. **Web Development**
-   ```bash
-   # Navigate to web folder
-   cd src/web
-   
-   # Start local development server
-   npx live-server --port=3000
-   
-   # Web app available at: http://localhost:3000
-   ```
-
-3. **API Development (Azure Functions)**
-   ```bash
-   # Navigate to API folder
-   cd src/api
-   
-   # Install dependencies
-   dotnet restore
-   
-   # Start Functions runtime
-   func start
-   
-   # API available at: http://localhost:7071
-   ```
-
-4. **Mobile Development**
-   ```bash
-   # Navigate to mobile folder
-   cd src/mobile
-   
-   # Restore and run MAUI app
-   dotnet restore
-   dotnet build
-   
-   # Run on specific platform
-   dotnet build -t:Run -f net8.0-android
-   ```
-
-### IDE Configuration
-
-#### Visual Studio Code
-Install recommended extensions:
-- [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
-- [Azure Functions](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
-
-## Contributor's Guide
-
-### Contributing Workflow
-
-We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow) branching strategy:
-
-1. **Fork and Clone**
-   ```bash
-   # Fork the repository on GitHub
-   git clone https://github.com/YOUR-USERNAME/free-water-tips.git
-   cd free-water-tips
-   git remote add upstream https://github.com/ivan-zdravkov/free-water-tips.git
-   ```
-
-2. **Create Feature Branch**
-   ```bash
-   # Create and switch to a new feature branch
-   git checkout -b feature/your-feature-name
-   ```
-
-3. **Development**
-   - Write your code following the project's coding standards.
-   - Add tests for new functionality.
-   - Update documentation as needed.
-   - Ensure all tests pass locally.
-
-4. **Commit Changes**
-   ```bash
-   # Stage your changes
-   git add .
-   
-   # Commit with descriptive message
-   git commit -m "feat: add location search functionality"
-   ```
-
-5. **Push and Create Pull Request**
-   ```bash
-   # Push to your fork
-   git push origin feature/your-feature-name
-   
-   # Create pull request on GitHub
-   ```
-
-### Feature Branch Infrastructure
-
-Each feature branch automatically provisions a complete testing environment:
- 
-- **Automated Environment Provisioning**: GitHub Actions automatically deploys feature branches to isolated Azure environments.
-- **End-to-End Testing**: Full stack testing with mock data in a production-like environment.
-- **Environment Cleanup**: Automatic resource cleanup when the feature branch is merged or closed.
-
-### Code Quality Standards
-
-#### Coding Guidelines
-- Follow [C# Coding Conventions](https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions).
-- Use meaningful variable and method names.
-- Write self-documenting code with clear comments.
-- Follow SOLID principles and clean architecture patterns.
-
-#### Testing Requirements
-- Unit tests for business logic (minimum 80% coverage).
-- Integration tests for API endpoints.
-- End-to-end tests for critical user flows.
-- Performance tests for scalability validation.
-
-#### Pull Request Process
-1. **Pre-submission Checklist**:
-   *Note: The full PR checklist is automatically added to every pull request via our [PR Template](../.github/pull_request_template.md).*
-
-2. **Automated Quality Checks**:
-   - GitHub Actions automatically run comprehensive quality checks on every PR
-   - All status checks must pass before merging is allowed
-   - See [PR Quality Checks](../.github/workflows/pr-quality-checks.yml) workflow for details
-
-3. **Review Process**:
-   - At least one code review required from code owners (see [CODEOWNERS](../.github/CODEOWNERS))
-   - Automated CI/CD checks must pass
-   - Feature branch environment testing completed (when available)
-
-4. **Merge Requirements**:
-   - All conversations resolved
-   - CI/CD pipeline successful
-   - Branch up-to-date with master
-   - Branch protection rules enforced (see [setup instructions](../.github/BRANCH_PROTECTION_SETUP.md))
-
-### Getting Help
-
-- **Documentation**: Check this guide and inline code comments.
-- **Issues**: Create a GitHub issue for bugs or feature requests.
-- **Discussions**: Use GitHub Discussions for questions and ideas.
-- **Contact**: Reach out to [Ivan Zdravkov](https://github.com/ivan-zdravkov) for architectural guidance.
-
-### Useful Commands
+#### Quick Development Setup
 
 ```bash
-# Backend (.NET) Commands
-dotnet test                             # Run all tests
-dotnet format --verify-no-changes       # Check code formatting
-dotnet build                            # Build the project
-func start                              # Start Azure Functions locally
+# Clone and setup
+git clone https://github.com/ivan-zdravkov/free-water-tips.git
+cd free-water-tips
 
-# Frontend Commands  
-npx live-server --port=3000             # Start web development server
-node -c script.js                       # Check JavaScript syntax
+# Web development
+cd src/web && npm start
 
-# Git Commands
-git checkout -b feature/branch-name     # Create feature branch
-git add . && git commit -m "message"    # Stage and commit changes
-git push origin feature/branch-name     # Push feature branch
+# API development
+cd src/api && func start
 
-# Quality Checks (run before submitting PR)
-./scripts/pre-commit-checks.sh          # Run all quality checks locally
-grep -r "console.log" src/web/          # Check for debug statements
-dotnet format && dotnet test            # Format code and run tests
+# Mobile development
+cd src/mobile && dotnet build -t:Run -f net8.0-android
 ```
 
----
+For complete setup instructions including prerequisites and IDE configuration, see the [Development Setup](../CONTRIBUTING.md#development-setup) section in our Contributing Guide.
 
-**Ready to contribute? Start by setting up your development environment and exploring the codebase. Every contribution, no matter how small, helps make clean drinking water more accessible to everyone!**
+## Contributing to the Project
+
+For information about contributing to Free Water Tips, including:
+- Development setup and prerequisites
+- Contribution workflows and branching strategy
+- Code quality standards and testing requirements
+- Pull request process and review guidelines
+- Bug reporting and feature request procedures
+
+Please see our comprehensive [Contributing Guide](../CONTRIBUTING.md).

@@ -49,6 +49,19 @@ Even though the applications are free, the infrastructure and developer fees cos
 * [Paypal](https://paypal.me/IZdravkov)
 * [Revolut](https://revolut.me/ivan_zdravkov)
 
+## Contributing
+
+We welcome contributions from the community! Whether you want to report bugs, suggest features, add water source locations, or contribute code, there are many ways to help.
+
+Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
+- How to report bugs effectively
+- Submitting feature requests
+- Development setup and code guidelines
+- Adding new water source locations
+- Community guidelines
+
+For quick bug reports, you can also use the "Report Bug" button in the [About section](https://freewater.tips/#about) of our web app.
+
 ## License
 
 This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
