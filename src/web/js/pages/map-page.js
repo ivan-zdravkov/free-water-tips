@@ -420,9 +420,9 @@ const searchResultStyles = `
 `;
 
 // Inject search result styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = searchResultStyles;
-document.head.appendChild(styleSheet);
+const searchResultStyleSheet = document.createElement('style');
+searchResultStyleSheet.textContent = searchResultStyles;
+document.head.appendChild(searchResultStyleSheet);
 
 // Make MapPage available globally
 window.MapPage = MapPage;

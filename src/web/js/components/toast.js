@@ -206,9 +206,9 @@ const toastStyles = `
 `;
 
 // Inject toast styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = toastStyles;
-document.head.appendChild(styleSheet);
+const toastStyleSheet = document.createElement('style');
+toastStyleSheet.textContent = toastStyles;
+document.head.appendChild(toastStyleSheet);
 
 // Make Toast available globally
 window.Toast = Toast;
