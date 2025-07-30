@@ -75,6 +75,12 @@ class AboutPage {
             link.addEventListener('click', (e) => this.handleShare(e));
         });
 
+        // Mobile share links
+        const mobileShareLinks = document.querySelectorAll('.mobile-share-link');
+        mobileShareLinks.forEach(link => {
+            link.addEventListener('click', (e) => this.handleShare(e));
+        });
+
         // Back to top button
         const backToTopBtn = document.getElementById('back-to-top');
         if (backToTopBtn) {
@@ -254,6 +260,20 @@ class AboutPage {
                 return;
             case 'telegram':
                 shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
+                break;
+            case 'discord':
+                // Discord doesn't support direct URL sharing, so we'll copy to clipboard
+                Utils.copyToClipboard(`${decodeURIComponent(text)} ${window.location.origin}`);
+                Toast.success('Link copied! Paste it in your Discord channel or DM.');
+                return;
+            case 'messenger':
+                shareUrl = `https://www.facebook.com/dialog/send?link=${url}&app_id=1&redirect_uri=${url}`;
+                break;
+            case 'viber':
+                shareUrl = `viber://forward?text=${text}%20${url}`;
+                break;
+            case 'reddit':
+                shareUrl = `https://www.reddit.com/submit?url=${url}&title=${text}`;
                 break;
             case 'share':
             default:

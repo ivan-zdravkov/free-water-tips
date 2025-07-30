@@ -1109,3 +1109,149 @@ a:hover {
         height: 45px;
     }
 }
+
+/* Mobile Share Links */
+.mobile-share-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--spacing-lg);
+    margin-top: var(--spacing-xl);
+    flex-wrap: wrap;
+}
+
+.mobile-share-link {
+    text-decoration: none;
+}
+
+.mobile-share-link img {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.mobile-share-link:hover img {
+    transform: translateY(-3px) scale(1.1);
+}
+
+/* Platform-specific colors for mobile share icons */
+.mobile-share-link[data-platform="x"] img {
+    filter: brightness(0) saturate(0);
+}
+
+.mobile-share-link[data-platform="facebook"] img {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
+}
+
+.mobile-share-link[data-platform="linkedin"] img {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(94%) saturate(7151%) hue-rotate(200deg) brightness(90%) contrast(96%);
+}
+
+.mobile-share-link[data-platform="whatsapp"] img {
+    filter: brightness(0) saturate(100%) invert(62%) sepia(98%) saturate(1933%) hue-rotate(87deg) brightness(96%) contrast(78%);
+}
+
+.mobile-share-link[data-platform="telegram"] img {
+    filter: brightness(0) saturate(100%) invert(30%) sepia(98%) saturate(1200%) hue-rotate(190deg) brightness(95%) contrast(101%);
+}
+
+.mobile-share-link[data-platform="instagram"] img {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-radius: var(--border-radius);
+    padding: 4px;
+    filter: brightness(0) saturate(100%) invert(100%) brightness(2);
+}
+
+.mobile-share-link[data-platform="share"] img {
+    filter: brightness(0) saturate(100%) invert(27%) sepia(51%) saturate(2878%) hue-rotate(200deg) brightness(104%) contrast(97%);
+}
+
+/* New social platform colors */
+.mobile-share-link[data-platform="discord"] img {
+    filter: brightness(0) saturate(100%) invert(25%) sepia(83%) saturate(3467%) hue-rotate(234deg) brightness(89%) contrast(93%);
+}
+
+.mobile-share-link[data-platform="messenger"] img {
+    filter: brightness(0) saturate(100%) invert(11%) sepia(100%) saturate(5781%) hue-rotate(238deg) brightness(103%) contrast(106%);
+}
+
+.mobile-share-link[data-platform="viber"] img {
+    filter: brightness(0) saturate(100%) invert(36%) sepia(78%) saturate(1835%) hue-rotate(264deg) brightness(95%) contrast(106%);
+}
+
+.mobile-share-link[data-platform="reddit"] img {
+    filter: brightness(0) saturate(100%) invert(42%) sepia(94%) saturate(4151%) hue-rotate(360deg) brightness(106%) contrast(102%);
+}
+
+/* Tooltip for mobile share links */
+.mobile-share-link {
+    position: relative;
+    display: inline-block;
+}
+
+.mobile-share-link::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--text-primary);
+    color: var(--surface-color);
+    padding: 6px 10px;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.mobile-share-link::before {
+    content: '';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--text-primary);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.mobile-share-link:hover::after,
+.mobile-share-link:hover::before {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Mobile share links responsive design */
+@media (max-width: 768px) {
+    .mobile-share-links {
+        gap: var(--spacing-md);
+    }
+    
+    .mobile-share-link img {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mobile-share-links {
+        gap: var(--spacing-sm);
+    }
+    
+    .mobile-share-link img {
+        width: 40px;
+        height: 40px;
+    }
+}
