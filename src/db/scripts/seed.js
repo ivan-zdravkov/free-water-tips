@@ -1,7 +1,11 @@
 const { CosmosClient } = require('@azure/cosmos');
 require('dotenv').config();
 
-const endpoint = process.env.COSMOS_ENDPOINT || 'https://localhost:8081';
+// Disable SSL verification for Azure Cosmos DB Emulator (development only)
+// The emulator uses a self-signed certificate that Node.js rejects by default
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
+const endpoint = process.env.COSMOS_ENDPOINT || 'https://127.0.0.1:8081';
 const key = process.env.COSMOS_KEY || 'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==';
 const databaseId = process.env.COSMOS_DATABASE_NAME || 'FreeWaterTipsDB';
 const containerId = process.env.COSMOS_CONTAINER_NAME || 'Locations';
@@ -259,7 +263,7 @@ async function seedDatabase() {
     } catch (error) {
         console.error('❌ Error seeding database:', error.message);
         if (error.message.includes('ECONNREFUSED') || error.message.includes('certificate')) {
-            console.error('💡 Make sure the Azure Cosmos DB Emulator is running on https://localhost:8081');
+            console.error('💡 Make sure the Azure Cosmos DB Emulator is running on https://127.0.0.1:8081');
             console.error('💡 You can download it from: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator');
         }
         process.exit(1);
