@@ -15,6 +15,9 @@ src/web/ @ivan-zdravkov
 src/api/ @ivan-zdravkov
 *.cs @ivan-zdravkov
 
+# Database changes
+src/db/ @ivan-zdravkov
+
 # Mobile changes (MAUI)
 src/mobile/ @ivan-zdravkov
 *.xaml @ivan-zdravkov

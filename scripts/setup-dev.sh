@@ -284,8 +284,8 @@ echo "🚀 Setting up .NET Azure Functions API Configuration..."
 # Check if API local.settings.json exists
 if [ ! -f "src/api/local.settings.json" ]; then
     echo "📝 Creating API configuration file..."
-    cp src/api/settings.example.json src/api/local.settings.json
-    echo "✅ Created API local.settings.json from settings.example.json"
+    cp src/api/local.settings.example.json src/api/local.settings.json
+    echo "✅ Created API local.settings.json from local.settings.example.json"
     echo ""
     echo "ℹ️  API Configuration Notes:"
     echo "   - src/api/local.settings.json contains Azure Functions settings"
@@ -316,8 +316,7 @@ echo "🔧 Next steps:"
 echo ""
 echo "🗄️  Database Setup:"
 echo "   1. Run 'npm run db:seed' to populate with Sofia locations"
-echo "   2. Use 'npm run db:clean' to clear data, 'npm run db:reset' to clean and reseed"
-echo "   3. Emulator UI available at https://localhost:8081/_explorer/index.html"
+echo "   2. Emulator UI available at https://localhost:8081/_explorer/index.html"
 echo ""
 echo "🚀 API Development (.NET):"
 echo "   1. Run 'npm run api:start' to start the API development server"

@@ -189,6 +189,13 @@ npm run all:start
    TBD
    ```
 
+#### Configuration Files
+
+After running the setup script, you'll need to configure API keys and local settings. See the [Configuration Guide](docs/configuration-guide.md) for details on:
+- File naming conventions across web, API, and database layers
+- Required configuration values for development
+- How to manage secrets and API keys securely
+
 #### Visual Studio Code Recommended Extensions
 - [C# Dev Kit](https://marketplace.visualstudio.com/items?itemName=ms-dotnettools.csdevkit)
 - [Azure Functions](https://marketplace.visualstudio.com/items?itemName=ms-azuretools.vscode-azurefunctions)
