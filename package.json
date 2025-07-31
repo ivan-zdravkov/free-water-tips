@@ -31,9 +31,7 @@
     "validate": "npx html-validate src/web/index.html && npx stylelint src/web/css/*.css",
     "watch": "npx chokidar 'src/web/**/*' -c 'npm run build:copy'",
     "lighthouse": "npx lighthouse http://localhost:3000 --view",
-    "audit": "npm audit && npx lighthouse http://localhost:3000 --only-categories=accessibility,best-practices,seo --chrome-flags='--headless'",
-    "prepare": "echo 'Setting up development environment...'",
-    "postinstall": "echo 'Dependencies installed successfully!'"
+    "audit": "npm audit && npx lighthouse http://localhost:3000 --only-categories=accessibility,best-practices,seo --chrome-flags='--headless'"
   },
   "keywords": [
     "water",

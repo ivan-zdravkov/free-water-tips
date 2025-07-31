@@ -8,16 +8,295 @@ echo "🌊 Setting up Free Water Tips development environment..."
 # Navigate to project root
 cd "$(dirname "$0")/.."
 
-echo "📦 Installing main project dependencies..."
+echo ""
+echo "🛠️  Prerequisites Check..."
+
+# Track missing prerequisites
+MISSING_PREREQS=()
+
+# Check Git (recommended but not required)
+if command -v git &> /dev/null; then
+    echo "   ✅ Git: $(git --version)"
+else
+    echo "   ⚠️  Git: Not installed (recommended for version control)"
+fi
+
+# Check Node.js and npm
+if command -v node &> /dev/null; then
+    echo "   ✅ Node.js: $(node --version)"
+    if command -v npm &> /dev/null; then
+        echo "   ✅ npm: $(npm --version)"
+    else
+        echo "   ❌ npm: Not found (usually comes with Node.js)"
+        MISSING_PREREQS+=("npm")
+    fi
+else
+    echo "   ❌ Node.js: Not installed (required for web development and package management)"
+    MISSING_PREREQS+=("Node.js")
+fi
+
+# Check .NET SDK
+if command -v dotnet &> /dev/null; then
+    echo "   ✅ .NET SDK: $(dotnet --version)"
+else
+    echo "   ❌ .NET SDK: Not installed (required for API development)"
+    MISSING_PREREQS+=(".NET SDK")
+fi
+
+# Check Azure Functions Core Tools
+if command -v func &> /dev/null; then
+    echo "   ✅ Azure Functions Core Tools: $(func --version)"
+else
+    echo "   ❌ Azure Functions Core Tools: Not installed (required for API development)"
+    MISSING_PREREQS+=("Azure Functions Core Tools")
+fi
+
+# Check Azure Cosmos DB Emulator (platform specific)
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+    if command -v "Microsoft.Azure.Cosmos.Emulator.exe" &> /dev/null || [ -f "/c/Program Files/Azure Cosmos DB Emulator/Microsoft.Azure.Cosmos.Emulator.exe" ]; then
+        echo "   ✅ Azure Cosmos DB Emulator: Installed"
+    else
+        echo "   ❌ Azure Cosmos DB Emulator: Not installed (required for database)"
+        MISSING_PREREQS+=("Azure Cosmos DB Emulator")
+    fi
+else
+    echo "   ⚠️  Azure Cosmos DB Emulator: Linux/macOS support limited"
+    echo "      You can use Docker-based emulator or connect to Azure Cosmos DB in the cloud"
+fi
+
+# Check curl
+if command -v curl &> /dev/null; then
+    echo "   ✅ curl: $(curl --version | head -n1)"
+else
+    echo "   ❌ curl: Not installed (used for health checks)"
+    MISSING_PREREQS+=("curl")
+fi
+
+# If any required prerequisites are missing, stop and show installation guide
+if [ ${#MISSING_PREREQS[@]} -gt 0 ]; then
+    echo ""
+    echo "❌ Missing required prerequisites: ${MISSING_PREREQS[*]}"
+    echo ""
+    echo "📥 Please install the missing prerequisites before continuing:"
+    echo ""
+    
+    # Detect OS for specific instructions
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        echo "🐧 Linux Installation Instructions:"
+        echo ""
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Node.js " ]]; then
+            echo "Node.js:"
+            echo "   # Ubuntu/Debian:"
+            echo "   curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -"
+            echo "   sudo apt-get install -y nodejs"
+            echo "   # Or use package manager: sudo apt install nodejs npm"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " .NET SDK " ]]; then
+            echo ".NET SDK:"
+            echo "   # Ubuntu/Debian:"
+            echo "   wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb"
+            echo "   sudo dpkg -i packages-microsoft-prod.deb"
+            echo "   sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0"
+            echo "   # Or visit: https://dotnet.microsoft.com/download/dotnet/8.0"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Functions Core Tools " ]]; then
+            echo "Azure Functions Core Tools:"
+            echo "   npm install -g azure-functions-core-tools@4 --unsafe-perm true"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " curl " ]]; then
+            echo "curl:"
+            echo "   sudo apt-get install curl"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Cosmos DB Emulator " ]]; then
+            echo "Azure Cosmos DB:"
+            echo "   # Use Azure Cosmos DB Linux Emulator (Docker-based):"
+            echo "   # https://docs.microsoft.com/en-us/azure/cosmos-db/linux-emulator"
+            echo "   # Or connect to Azure Cosmos DB in the cloud"
+            echo ""
+        fi
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        echo "🍎 macOS Installation Instructions:"
+        echo ""
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Node.js " ]]; then
+            echo "Node.js:"
+            echo "   # Using Homebrew (recommended):"
+            echo "   brew install node"
+            echo "   # Or download from: https://nodejs.org/"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " .NET SDK " ]]; then
+            echo ".NET SDK:"
+            echo "   # Using Homebrew:"
+            echo "   brew install dotnet"
+            echo "   # Or download from: https://dotnet.microsoft.com/download/dotnet/8.0"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Functions Core Tools " ]]; then
+            echo "Azure Functions Core Tools:"
+            echo "   # Using Homebrew:"
+            echo "   brew tap azure/functions"
+            echo "   brew install azure-functions-core-tools@4"
+            echo "   # Or via npm:"
+            echo "   npm install -g azure-functions-core-tools@4 --unsafe-perm true"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " curl " ]]; then
+            echo "curl:"
+            echo "   # Usually pre-installed, or:"
+            echo "   brew install curl"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Cosmos DB Emulator " ]]; then
+            echo "Azure Cosmos DB:"
+            echo "   # Use Azure Cosmos DB Emulator for macOS (Docker-based):"
+            echo "   # https://docs.microsoft.com/en-us/azure/cosmos-db/linux-emulator"
+            echo "   # Or connect to Azure Cosmos DB in the cloud"
+            echo ""
+        fi
+    else
+        echo "🪟 Windows Installation Instructions:"
+        echo ""
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Node.js " ]]; then
+            echo "Node.js:"
+            echo "   # Download and install from: https://nodejs.org/"
+            echo "   # Or using Chocolatey: choco install nodejs"
+            echo "   # Or using winget: winget install OpenJS.NodeJS"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " .NET SDK " ]]; then
+            echo ".NET SDK:"
+            echo "   # Download from: https://dotnet.microsoft.com/download/dotnet/8.0"
+            echo "   # Or using Chocolatey: choco install dotnet-8.0-sdk"
+            echo "   # Or using winget: winget install Microsoft.DotNet.SDK.8"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Functions Core Tools " ]]; then
+            echo "Azure Functions Core Tools:"
+            echo "   npm install -g azure-functions-core-tools@4 --unsafe-perm true"
+            echo "   # Or using Chocolatey: choco install azure-functions-core-tools"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " curl " ]]; then
+            echo "curl:"
+            echo "   # Usually available in Windows 10+, or:"
+            echo "   # Using Chocolatey: choco install curl"
+            echo ""
+        fi
+        if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Cosmos DB Emulator " ]]; then
+            echo "Azure Cosmos DB Emulator:"
+            echo "   # Download from: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator"
+            echo ""
+        fi
+    fi
+    
+    echo "⚠️  IMPORTANT: After installation, make sure the tools are in your PATH."
+    echo "   You may need to restart your terminal or run 'source ~/.bashrc' (Linux/macOS)"
+    echo "   or restart your command prompt (Windows) for the changes to take effect."
+    echo ""
+    echo "Once you've installed the missing prerequisites, run this setup script again."
+    echo ""
+    exit 1
+fi
+
+echo "✅ All required prerequisites are installed!"
+echo ""
+
+echo "📦 Installing root project dependencies..."
+
+# Install main project dependencies
 if [ -f "package.json" ]; then
     npm install
-    echo "✅ Main dependencies installed"
+    echo "✅ Root project dependencies installed"
 else
     echo "ℹ️  No package.json found in root, skipping main dependency installation"
 fi
 
+# Install database dependencies
+if [ -d "src/db" ]; then
+    echo ""
+    echo "📦 Installing database dependencies..."
+    cd src/db
+    if [ -f "package.json" ]; then
+        npm install
+        echo "✅ Database dependencies installed"
+    else
+        echo "ℹ️  No package.json found in src/db"
+    fi
+    cd ../..
+else
+    echo "ℹ️  Database directory not found"
+fi
+
+# Restore .NET API packages
+if [ -f "src/api/FreeWaterTips.Api.csproj" ]; then
+    echo ""
+    echo "📦 Restoring .NET API packages..."
+    cd src/api
+    dotnet restore
+    echo "✅ .NET API packages restored"
+    cd ../..
+else
+    echo "ℹ️  No .NET project found, skipping package restore"
+fi
+
 echo ""
-echo "🔧 Setting up Web Application..."
+echo "🌐 Checking Azure Cosmos DB Emulator..."
+
+# Check if running on Windows (where emulator is typically installed)
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+    # Try to check if it's running
+    if curl -k -s https://localhost:8081 > /dev/null 2>&1; then
+        echo "✅ Azure Cosmos DB Emulator is running"
+    else
+        echo "⚠️  Azure Cosmos DB Emulator is not running"
+        echo "   Please start it manually or it will start automatically when you run the API"
+    fi
+else
+    echo "ℹ️  Non-Windows system detected"
+    echo "   For Linux/macOS, please install and run Azure Cosmos DB Emulator"
+    echo "   Visit: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator"
+fi
+
+echo ""
+echo "🗄️  Setting up Database Configuration..."
+
+# Create .env file if it doesn't exist
+if [ -d "src/db" ]; then
+    if [ ! -f "src/db/.env" ]; then
+        echo "📝 Creating database configuration file..."
+        cp src/db/.env.example src/db/.env
+        echo "✅ Created database .env from example"
+    else
+        echo "✅ Database configuration file already exists"
+    fi
+else
+    echo "ℹ️  Database directory not found, creating it..."
+    mkdir -p src/db/scripts
+fi
+
+echo ""
+echo "🚀 Setting up .NET Azure Functions API Configuration..."
+
+# Check if API local.settings.json exists
+if [ ! -f "src/api/local.settings.json" ]; then
+    echo "📝 Creating API configuration file..."
+    cp src/api/settings.example.json src/api/local.settings.json
+    echo "✅ Created API local.settings.json from settings.example.json"
+    echo ""
+    echo "ℹ️  API Configuration Notes:"
+    echo "   - src/api/local.settings.json contains Azure Functions settings"
+    echo "   - CosmosDB connection configured for local emulator"
+    echo "   - Make sure Azure Cosmos DB Emulator is installed and running"
+else
+    echo "✅ API configuration file already exists"
+fi
+
+echo ""
+echo "🔧 Setting up Web Application Configuration..."
 
 # Check if web config.json exists
 if [ ! -f "src/web/js/config/config.json" ]; then
@@ -28,106 +307,43 @@ if [ ! -f "src/web/js/config/config.json" ]; then
     echo "⚠️  IMPORTANT: Please edit src/web/js/config/config.json and add your API keys:"
     echo "   - GOOGLE_MAPS_API_KEY: Get from https://console.cloud.google.com/apis/credentials"
     echo "   - API_BASE_URL: Your API endpoint (http://localhost:7071/api for local development)"
-    echo ""
 else
     echo "✅ Web configuration file already exists"
 fi
 
 echo ""
-echo "🚀 Setting up .NET Azure Functions API..."
-
-# Check for .NET SDK
-if command -v dotnet &> /dev/null; then
-    DOTNET_VERSION=$(dotnet --version)
-    echo "✅ .NET SDK found: $DOTNET_VERSION"
-    
-    # Restore .NET packages
-    if [ -f "src/api/FreeWaterTips.Api.csproj" ]; then
-        echo "📦 Restoring .NET packages..."
-        cd src/api
-        dotnet restore
-        echo "✅ .NET packages restored"
-        cd ../..
-    else
-        echo "ℹ️  No .NET project found, skipping package restore"
-    fi
-else
-    echo "❌ .NET SDK not found!"
-    echo "   Please install .NET 8 SDK from: https://dotnet.microsoft.com/download/dotnet/8.0"
-    echo ""
-fi
-
-# Check for Azure Functions Core Tools
-if command -v func &> /dev/null; then
-    FUNC_VERSION=$(func --version)
-    echo "✅ Azure Functions Core Tools found: $FUNC_VERSION"
-else
-    echo "❌ Azure Functions Core Tools not found!"
-    echo "   Please install Azure Functions Core Tools:"
-    echo "   npm install -g azure-functions-core-tools@4 --unsafe-perm true"
-    echo "   Or visit: https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local"
-    echo ""
-fi
-
-# Check if API local.settings.json exists
-if [ ! -f "src/api/local.settings.json" ]; then
-    echo "📝 Creating API configuration file..."
-    cp src/api/local.settings.example.json src/api/local.settings.json
-    echo "✅ Created API local.settings.json from example"
-    echo ""
-    echo "ℹ️  API Configuration Notes:"
-    echo "   - src/api/local.settings.json contains Azure Functions settings"
-    echo "   - For local development, the default settings should work"
-    echo "   - Add your database connection string when implementing data layer"
-    echo ""
-else
-    echo "✅ API configuration file already exists"
-fi
-
-echo ""
 echo "🔧 Next steps:"
+echo ""
+echo "🗄️  Database Setup:"
+echo "   1. Run 'npm run db:seed' to populate with Sofia locations"
+echo "   2. Use 'npm run db:clean' to clear data, 'npm run db:reset' to clean and reseed"
+echo "   3. Emulator UI available at https://localhost:8081/_explorer/index.html"
+echo ""
+echo "🚀 API Development (.NET):"
+echo "   1. Run 'npm run api:start' to start the API development server"
+echo "   2. API will be available at http://localhost:7071/api"
 echo ""
 echo "📱 Web Development:"
 echo "   1. Edit src/web/js/config/config.json with your Google Maps API key"
-echo "   2. Run 'npm start' or 'npm run dev' to start the web development server"
+echo "   2. Run 'npm run web:start' to start the web development server"
 echo "   3. Open http://localhost:3000 in your browser"
 echo ""
-echo "🚀 API Development (.NET):"
-echo "   1. Ensure .NET 8 SDK is installed"
-echo "   2. Ensure Azure Functions Core Tools v4 is installed"
-echo "   3. Run 'npm run api:dev' to start the API development server"
-echo "   4. API will be available at http://localhost:7071/api"
-echo ""
 echo "🔄 Full Stack Development:"
-echo "   1. Run 'npm run dev:full' to start both web and API servers"
+echo "   1. Run 'npm run all:start' to start both web and API servers"
 echo "   2. Web: http://localhost:3000"
 echo "   3. API: http://localhost:7071/api"
 echo ""
 echo "📋 Available npm scripts:"
-echo "   - npm start               Start web server"
-echo "   - npm run dev             Start web dev server with live reload"
+echo "   - npm run web:start       Start web development server"
 echo "   - npm run api:restore     Restore .NET packages"
 echo "   - npm run api:build       Build .NET API"
-echo "   - npm run api:start       Start API server"
-echo "   - npm run api:dev         Start API dev server with CORS"
-echo "   - npm run dev:full        Start both web and API servers"
+echo "   - npm run api:start       Start API server with CORS"
+echo "   - npm run db:install      Install database dependencies"
+echo "   - npm run db:clean        Clear all database data"
+echo "   - npm run db:seed         Seed database with Sofia locations"
+echo "   - npm run db:reset        Clean and reseed database"
+echo "   - npm run all:start       Start both web and API servers"
 echo ""
-echo "🛠️  Prerequisites Check:"
-if command -v dotnet &> /dev/null; then
-    echo "   ✅ .NET SDK: $(dotnet --version)"
-else
-    echo "   ❌ .NET SDK: Not installed (required)"
-fi
-
-if command -v func &> /dev/null; then
-    echo "   ✅ Azure Functions Core Tools: $(func --version)"
-else
-    echo "   ❌ Azure Functions Core Tools: Not installed (required for API development)"
-fi
-
-if command -v node &> /dev/null; then
-    echo "   ✅ Node.js: $(node --version)"
-else
-    echo "   ❌ Node.js: Not installed (required for web development)"
-fi
+echo "🎉 Setup complete! Your Free Water Tips development environment is ready!"
+echo "   Run 'npm run all:start' to start both web and API servers, or use individual scripts as needed."
 echo ""
