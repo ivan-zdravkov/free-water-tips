@@ -89,7 +89,7 @@ git clone https://github.com/your-username/free-water-tips.git
 cd free-water-tips
 
 # Run the setup script (checks prerequisites and sets up everything)
-./scripts/setup-dev.sh
+npm run setup # or './scripts/setup-dev.sh' directly if Node.js is not already installed
 ```
 
 The setup script will:
@@ -164,7 +164,7 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
 
 2. **Setup Development Environment**
    ```bash
-   ./scripts/setup-dev.sh  # Recommended automated setup
+   npm run setup # or './scripts/setup-dev.sh' directly if Node.js is not already installed
    ```
 
 3. **Create Feature Branch**
