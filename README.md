@@ -34,7 +34,7 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 
 - **Spread the Word**: Share the project with your friends, family, and community.
 - **Add Locations**: If you know of places that serve free drinking water, add them to our database.
-- **Contribute**: Help us improve the project by contributing code, reporting issues, or suggesting features. Find out how in the [Technical Guide](./docs/technical-guide.md).
+- **Contribute**: Help us improve the project by contributing code, reporting issues, or suggesting features. Find out how in the [Contributing Guide](CONTRIBUTING.md).
 
 ## Monetization
 
