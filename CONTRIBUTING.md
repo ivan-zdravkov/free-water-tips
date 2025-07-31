@@ -154,7 +154,7 @@ npm run setup
 
 This script will:
 - Install all dependencies (Node.js packages and .NET packages)
-- Create configuration files from templates (config.json for /web and local.settings.json for api)
+- Create configuration files from templates (config.json for /web and local.settings.json for /api)
 - Set up both web and .NET API development environments
 - Check prerequisites (.NET SDK, Azure Functions Core Tools, Node.js)
 - Guide you through API key setup
