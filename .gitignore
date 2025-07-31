@@ -5,6 +5,11 @@
 
 # Local configuration files
 src/web/js/config/config.json
+src/api/local.settings.json
+
+# Database configuration
+src/db/.env
+*.db
 
 dist/
 build/

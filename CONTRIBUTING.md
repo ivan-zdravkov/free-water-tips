@@ -164,7 +164,7 @@ This script will:
 **Full Stack Development (Recommended):**
 ```bash
 # Start both web and API servers
-npm run dev:full
+npm run all:start
 ```
 
 **Individual Components:**
@@ -172,7 +172,7 @@ npm run dev:full
 1. **Web Development**
    ```bash
    # Start web dev server at http://localhost:3000
-   npm run dev
+   npm run web:start
    ```
 
 2. **API Development (.NET Azure Functions)**
@@ -181,7 +181,7 @@ npm run dev:full
    npm run api:restore
    
    # Start API dev server at http://localhost:7071
-   npm run api:dev
+   npm run api:start
    ```
 
 3. **Mobile Development**
@@ -198,16 +198,16 @@ npm run dev:full
 ```bash
 # Web Development
 npm start               # Start web server
-npm run dev             # Start web dev server with live reload
+npm run web:start       # Start web dev server with live reload
 
 # .NET API Development  
 npm run api:restore     # Restore .NET packages
 npm run api:build       # Build .NET API
 npm run api:start       # Start API server
-npm run api:dev         # Start API dev server with CORS
+npm run api:start       # Start API server with CORS
 
 # Full Stack Development
-npm run dev:full        # Start both web and API servers
+npm run all:start       # Start both web and API servers
 
 # Setup and Maintenance
 npm run setup           # Run development setup script

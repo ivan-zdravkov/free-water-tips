@@ -14,7 +14,7 @@ public class StatsFunction
 
     public StatsFunction(ILogger<StatsFunction> logger, IStatsService statsService)
     {
-        logger = logger;
+        this.logger = logger;
         _statsService = statsService;
     }
 

@@ -15,7 +15,7 @@ public class LocationsSearchFunction
 
     public LocationsSearchFunction(ILogger<LocationsSearchFunction> logger, ILocationService locationService)
     {
-        logger = logger;
+        this.logger = logger;
         _locationService = locationService;
     }
 

@@ -214,10 +214,11 @@ class MapService {
             'cafe': 'orange',
             'fast-food': 'yellow',
             'public-fountain': 'blue',
+            'public-dispenser': 'ltblue',
             'park': 'green',
             'library': 'purple',
             'gym': 'pink',
-            'shopping-center': 'ltblue',
+            'shopping-center': 'white',
             'other': 'gray'
         };
         return colors[type] || 'blue';

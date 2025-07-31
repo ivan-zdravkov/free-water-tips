@@ -1,5 +1,5 @@
 using System.Net;
-using System.Text.Json;
+using Newtonsoft.Json;
 using FreeWaterTips.Api.Models;
 using FreeWaterTips.Api.Services;
 using FreeWaterTips.Api.Utils;
@@ -16,7 +16,7 @@ public class LocationsFunction
 
     public LocationsFunction(ILogger<LocationsFunction> logger, ILocationService locationService)
     {
-        logger = logger;
+        this.logger = logger;
         _locationService = locationService;
     }
 
@@ -75,9 +75,9 @@ public class LocationsFunction
                 return await HttpResponseHelper.CreateBadRequestAsync(req, "Request body is required");
             }
 
-            var locationRequest = JsonSerializer.Deserialize<CreateLocationRequest>(body, new JsonSerializerOptions
+            var locationRequest = JsonConvert.DeserializeObject<CreateLocationRequest>(body, new JsonSerializerSettings
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                ContractResolver = new Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()
             });
 
             if (locationRequest == null)

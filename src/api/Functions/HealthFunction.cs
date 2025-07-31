@@ -14,7 +14,7 @@ public class HealthFunction
 
     public HealthFunction(ILogger<HealthFunction> logger)
     {
-        logger = logger;
+        this.logger = logger;
     }
 
     [Function("Health")]

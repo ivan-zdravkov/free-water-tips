@@ -1,5 +1,6 @@
 using System.Net;
-using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using FreeWaterTips.Api.Models;
 using Microsoft.Azure.Functions.Worker.Http;
 
@@ -7,10 +8,10 @@ namespace FreeWaterTips.Api.Utils;
 
 public static class HttpResponseHelper
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    private static readonly JsonSerializerSettings JsonSettings = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = false
+        ContractResolver = new CamelCasePropertyNamesContractResolver(),
+        Formatting = Formatting.None
     };
 
     public static async Task<HttpResponseData> CreateSuccessResponseAsync<T>(
@@ -27,7 +28,7 @@ public static class HttpResponseHelper
         };
 
         response.Headers.Add("Content-Type", "application/json");
-        await response.WriteStringAsync(System.Text.Json.JsonSerializer.Serialize(apiResponse, JsonOptions));
+        await response.WriteStringAsync(JsonConvert.SerializeObject(apiResponse, JsonSettings));
         return response;
     }
 
@@ -51,7 +52,7 @@ public static class HttpResponseHelper
         };
 
         response.Headers.Add("Content-Type", "application/json");
-        await response.WriteStringAsync(System.Text.Json.JsonSerializer.Serialize(apiResponse, JsonOptions));
+        await response.WriteStringAsync(JsonConvert.SerializeObject(apiResponse, JsonSettings));
         return response;
     }
 

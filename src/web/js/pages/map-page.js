@@ -289,6 +289,7 @@ class MapPage {
             'cafe': 'Cafe',
             'fast-food': 'Fast Food',
             'public-fountain': 'Public Fountain',
+            'public-dispenser': 'Public Dispenser',
             'park': 'Park',
             'library': 'Library',
             'gym': 'Gym',

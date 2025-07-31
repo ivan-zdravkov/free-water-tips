@@ -15,7 +15,7 @@ public class LocationsNearbyFunction
 
     public LocationsNearbyFunction(ILogger<LocationsNearbyFunction> logger, ILocationService locationService)
     {
-        logger = logger;
+        this.logger = logger;
         _locationService = locationService;
     }
 

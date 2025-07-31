@@ -23,8 +23,6 @@ src/mobile/ @ivan-zdravkov
 .github/ @ivan-zdravkov
 *.yml @ivan-zdravkov
 *.yaml @ivan-zdravkov
-docker-compose.* @ivan-zdravkov
-Dockerfile* @ivan-zdravkov
 
 # Configuration files
 *.json @ivan-zdravkov

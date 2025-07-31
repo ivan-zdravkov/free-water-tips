@@ -5,13 +5,15 @@
   "main": "src/web/index.html",
   "scripts": {
     "setup": "bash scripts/setup-dev.sh",
-    "start": "npx http-server src/web -p 3000 -o",
-    "dev": "npx http-server src/web -p 3000 -o -c-1",
+    "web:start": "npx http-server src/web -p 3000 -o -c-1",
     "api:restore": "cd src/api && dotnet restore",
     "api:build": "cd src/api && dotnet build",
-    "api:start": "cd src/api && func start",
-    "api:dev": "cd src/api && func start --cors",
-    "dev:full": "concurrently \"npm run dev\" \"npm run api:dev\"",
+    "api:start": "cd src/api && func start --cors",
+    "db:install": "cd src/db && npm install",
+    "db:clean": "cd src/db && npm run db:clean",
+    "db:seed": "cd src/db && npm run db:seed",
+    "db:reset": "cd src/db && npm run db:reset",
+    "all:start": "concurrently \"npm run web:start\" \"npm run api:start\"",
     "build": "npm run build:prepare && npm run build:copy && npm run build:optimize",
     "build:prepare": "rm -rf dist && mkdir -p dist",
     "build:copy": "cp -r src/web/* dist/",
@@ -45,6 +47,7 @@
   ],
   "author": "Free Water Tips Team",
   "license": "MIT",
+  "homepage": "https://github.com/your-username/free-water-tips#readme",
   "repository": {
     "type": "git",
     "url": "https://github.com/your-username/free-water-tips.git"
@@ -52,25 +55,22 @@
   "bugs": {
     "url": "https://github.com/your-username/free-water-tips/issues"
   },
-  "homepage": "https://free-water-tips.pages.dev",
   "devDependencies": {
     "@types/google.maps": "^3.54.10",
     "autoprefixer": "^10.4.16",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^8.2.2",
     "cssnano": "^6.0.1",
-    "eslint": "^8.54.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-prettier": "^5.0.1",
+    "eslint": "^8.55.0",
     "gh-pages": "^6.1.0",
-    "html-validate": "^8.7.3",
+    "html-validate": "^8.7.4",
     "http-server": "^14.1.1",
     "lighthouse": "^11.4.0",
     "postcss": "^8.4.32",
-    "postcss-cli": "^10.1.0",
-    "prettier": "^3.1.0",
-    "stylelint": "^15.11.0",
-    "stylelint-config-standard": "^34.0.0"
+    "postcss-cli": "^11.0.0",
+    "prettier": "^3.1.1",
+    "stylelint": "^16.0.2",
+    "stylelint-config-standard": "^36.0.0"
   },
   "dependencies": {},
   "engines": {

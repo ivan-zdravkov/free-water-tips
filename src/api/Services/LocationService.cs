@@ -1,3 +1,4 @@
+using Microsoft.Azure.Cosmos;
 using FreeWaterTips.Api.Models;
 
 namespace FreeWaterTips.Api.Services;
@@ -13,6 +14,14 @@ public interface ILocationService
 
 public class LocationService : ILocationService
 {
+    private readonly Container? _container;
+    private readonly bool _useCosmosDb;
+
+    public LocationService(Container? container = null)
+    {
+        _container = container;
+        _useCosmosDb = container != null;
+    }
     private static readonly List<Location> MockLocations = new()
     {
         new Location
@@ -21,6 +30,7 @@ public class LocationService : ILocationService
             Name = "Central Park Visitor Center",
             Address = "Central Park, New York, NY",
             Type = "park",
+            City = "New York",
             Coordinates = new Coordinates { Lat = 40.7829, Lng = -73.9654 },
             Description = "Free water fountains available near the visitor center",
             Accessible = true,
@@ -38,6 +48,7 @@ public class LocationService : ILocationService
             Name = "Starbucks Times Square",
             Address = "1585 Broadway, New York, NY",
             Type = "cafe",
+            City = "New York",
             Coordinates = new Coordinates { Lat = 40.7580, Lng = -73.9855 },
             Description = "Ask barista for free water cup",
             Accessible = true,
@@ -55,6 +66,7 @@ public class LocationService : ILocationService
             Name = "Washington Square Park",
             Address = "Washington Square Park, New York, NY",
             Type = "public-fountain",
+            City = "New York",
             Coordinates = new Coordinates { Lat = 40.7308, Lng = -73.9973 },
             Description = "Public water fountain near the arch",
             Accessible = true,
@@ -187,36 +199,46 @@ public class LocationService : ILocationService
         }
     };
 
-    public Task<IEnumerable<Location>> GetLocationsAsync(LocationFilters filters)
+    private static List<Location> GetMockLocations()
     {
-        // TODO: Replace with actual database query when data layer is implemented
-        var locations = MockLocations.Where(l => l.Status == "active").AsEnumerable();
+        return MockLocations.ToList();
+    }
 
-        if (!string.IsNullOrEmpty(filters.Type))
+    public async Task<IEnumerable<Location>> GetLocationsAsync(LocationFilters filters)
+    {
+        if (!_useCosmosDb)
         {
-            locations = locations.Where(l => l.Type.Equals(filters.Type, StringComparison.OrdinalIgnoreCase));
+            return GetMockLocations().Where(l => l.Status == "active").Take(filters.Limit);
         }
 
-        if (filters.Verified.HasValue)
+        try
         {
-            locations = locations.Where(l => l.Verified == filters.Verified.Value);
-        }
+            var queryDefinition = new QueryDefinition("SELECT * FROM c WHERE c.status = @status");
+            queryDefinition.WithParameter("@status", "active");
 
-        if (filters.Accessible.HasValue)
+            if (!string.IsNullOrEmpty(filters.Type))
+            {
+                queryDefinition = new QueryDefinition("SELECT * FROM c WHERE c.status = @status AND c.type = @type");
+                queryDefinition.WithParameter("@status", "active");
+                queryDefinition.WithParameter("@type", filters.Type);
+            }
+
+            var query = _container!.GetItemQueryIterator<Location>(queryDefinition);
+            var results = new List<Location>();
+
+            while (query.HasMoreResults && results.Count < filters.Limit)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response);
+            }
+
+            return results.Take(filters.Limit);
+        }
+        catch
         {
-            locations = locations.Where(l => l.Accessible == filters.Accessible.Value);
+            // Fallback to mock data if CosmosDB is not available
+            return GetMockLocations().Where(l => l.Status == "active").Take(filters.Limit);
         }
-
-        if (filters.AlwaysAvailable.HasValue)
-        {
-            locations = locations.Where(l => l.AlwaysAvailable == filters.AlwaysAvailable.Value);
-        }
-
-        var maxLimit = Environment.GetEnvironmentVariable("MAX_LOCATIONS_PER_REQUEST");
-        var defaultMax = int.TryParse(maxLimit, out var max) ? max : 100;
-        var limit = Math.Min(filters.Limit, defaultMax);
-
-        return Task.FromResult(locations.Take(limit));
     }
 
     public Task<IEnumerable<Location>> GetNearbyLocationsAsync(double lat, double lng, double radiusMeters)

@@ -73,14 +73,14 @@ cd free-water-tips
 npm run setup
 
 # Full stack development
-npm run dev:full
+npm run all:start
 
 # Individual components:
 # Web development
-npm run dev
+npm run web:start
 
 # .NET API development
-npm run api:dev
+npm run api:start
 
 # Mobile development (when available)
 cd src/mobile && dotnet build -t:Run -f net8.0-android
