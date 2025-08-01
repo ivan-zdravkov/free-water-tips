@@ -12,9 +12,9 @@ app.http('locations', {
     route: 'locations',
     handler: async (request, context) => {
         try {
-            const flagged = applySecurityMiddleware(context, request, {
-                rateLimit: true,
-                security: true,
+            const flagged = await applySecurityMiddleware(context, request, {
+                enableRateLimit: true,
+                enableSecurity: true,
                 maxRequests: 100,
                 windowMs: 15 * 60 * 1000 // 15-minute window
             });

@@ -12,9 +12,9 @@ app.http('locations-search', {
     route: 'locations-search',
     handler: async (request, context) => {
         try {
-            const flagged = applySecurityMiddleware(context, request, {
-                rateLimit: true,
-                security: true,
+            const flagged = await applySecurityMiddleware(context, request, {
+                enableRateLimit: true,
+                enableSecurity: true,
                 maxRequests: 50,         // Lower limit for search to prevent abuse
                 windowMs: 10 * 60 * 1000 // 10-minute window
             });

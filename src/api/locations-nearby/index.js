@@ -12,9 +12,9 @@ app.http('locations-nearby', {
     route: 'locations-nearby',
     handler: async (request, context) => {
         try {
-            const flagged = applySecurityMiddleware(context, request, {
-                rateLimit: true,
-                security: true,
+            const flagged = await applySecurityMiddleware(context, request, {
+                enableRateLimit: true,
+                enableSecurity: true,
                 maxRequests: 75,         // Moderate limit for location queries
                 windowMs: 10 * 60 * 1000 // 10-minute window
             });

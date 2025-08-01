@@ -10,10 +10,10 @@ app.http('health', {
     route: 'health',
     handler: async (request, context) => {
         try {
-            const flagged = applySecurityMiddleware(context, request, {
-                rateLimit: true,
-                security: false,        // Don't block health checks
-                maxRequests: 200,       // Higher limit for monitoring
+            const flagged = await applySecurityMiddleware(context, request, {
+                enableRateLimit: true,
+                enableSecurity: false, // Don't block health checks
+                maxRequests: 200,      // Higher limit for monitoring
                 windowMs: 5 * 60 * 1000 // 5-minute window
             });
             

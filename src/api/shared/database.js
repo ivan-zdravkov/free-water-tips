@@ -246,6 +246,115 @@ class DatabaseService {
 
     return R * c;
   }
+
+  // =============================================================================
+  // GENERIC CRUD OPERATIONS (Added for rate limiting and other generic use cases)
+  // =============================================================================
+
+  /**
+   * Get a single item by ID
+   * @param {string} id - The item ID
+   * @param {string} partitionKey - Optional partition key (defaults to id)
+   * @returns {Object} The item
+   */
+  async getItemById(id, partitionKey = null) {
+    await this.initialize();
+    
+    try {
+      const { resource } = await this.container
+        .item(id, partitionKey || id)
+        .read();
+      return resource;
+    } catch (error) {
+      if (error.code === 404) {
+        return null; // Item not found
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new item
+   * @param {Object} item - The item to create
+   * @returns {Object} The created item
+   */
+  async createItem(item) {
+    await this.initialize();
+    
+    try {
+      const { resource } = await this.container.items.create(item);
+      return resource;
+    } catch (error) {
+      console.error('Error creating item:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an existing item
+   * @param {Object} item - The item to update (must include id)
+   * @returns {Object} The updated item
+   */
+  async updateItem(item) {
+    await this.initialize();
+    
+    try {
+      const { resource } = await this.container
+        .item(item.id, item.id)
+        .replace(item);
+      return resource;
+    } catch (error) {
+      console.error('Error updating item:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete an item by ID
+   * @param {string} id - The item ID
+   * @param {string} partitionKey - Optional partition key (defaults to id)
+   * @returns {boolean} Success status
+   */
+  async deleteItem(id, partitionKey = null) {
+    await this.initialize();
+    
+    try {
+      await this.container
+        .item(id, partitionKey || id)
+        .delete();
+      return true;
+    } catch (error) {
+      if (error.code === 404) {
+        return false; // Item not found
+      }
+      console.error('Error deleting item:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Query items with custom SQL
+   * @param {string} query - SQL query string
+   * @param {Array} parameters - Query parameters
+   * @returns {Array} Query results
+   */
+  async queryItems(query, parameters = []) {
+    await this.initialize();
+    
+    try {
+      const { resources } = await this.container.items
+        .query({
+          query,
+          parameters
+        })
+        .fetchAll();
+      
+      return resources;
+    } catch (error) {
+      console.error('Error querying items:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = DatabaseService;

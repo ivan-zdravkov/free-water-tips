@@ -11,9 +11,9 @@ app.http('stats', {
     route: 'stats',
     handler: async (request, context) => {
         try {
-            const flagged = applySecurityMiddleware(context, request, {
-                rateLimit: true,
-                security: true,
+            const flagged = await applySecurityMiddleware(context, request, {
+                enableRateLimit: true,
+                enableSecurity: true,
                 maxRequests: 100,        // Higher limit for stats endpoint
                 windowMs: 15 * 60 * 1000 // 15-minute window
             });
