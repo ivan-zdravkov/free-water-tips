@@ -35,14 +35,6 @@ else
     MISSING_PREREQS+=("Node.js")
 fi
 
-# Check .NET SDK
-if command -v dotnet &> /dev/null; then
-    echo "   ✅ .NET SDK: $(dotnet --version)"
-else
-    echo "   ❌ .NET SDK: Not installed (required for API development)"
-    MISSING_PREREQS+=(".NET SDK")
-fi
-
 # Check Azure Functions Core Tools
 if command -v func &> /dev/null; then
     echo "   ✅ Azure Functions Core Tools: $(func --version)"
@@ -92,15 +84,6 @@ if [ ${#MISSING_PREREQS[@]} -gt 0 ]; then
             echo "   # Or use package manager: sudo apt install nodejs npm"
             echo ""
         fi
-        if [[ " ${MISSING_PREREQS[*]} " =~ " .NET SDK " ]]; then
-            echo ".NET SDK:"
-            echo "   # Ubuntu/Debian:"
-            echo "   wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb"
-            echo "   sudo dpkg -i packages-microsoft-prod.deb"
-            echo "   sudo apt-get update && sudo apt-get install -y dotnet-sdk-8.0"
-            echo "   # Or visit: https://dotnet.microsoft.com/download/dotnet/8.0"
-            echo ""
-        fi
         if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Functions Core Tools " ]]; then
             echo "Azure Functions Core Tools:"
             echo "   npm install -g azure-functions-core-tools@4 --unsafe-perm true"
@@ -126,13 +109,6 @@ if [ ${#MISSING_PREREQS[@]} -gt 0 ]; then
             echo "   # Using Homebrew (recommended):"
             echo "   brew install node"
             echo "   # Or download from: https://nodejs.org/"
-            echo ""
-        fi
-        if [[ " ${MISSING_PREREQS[*]} " =~ " .NET SDK " ]]; then
-            echo ".NET SDK:"
-            echo "   # Using Homebrew:"
-            echo "   brew install dotnet"
-            echo "   # Or download from: https://dotnet.microsoft.com/download/dotnet/8.0"
             echo ""
         fi
         if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Functions Core Tools " ]]; then
@@ -165,13 +141,6 @@ if [ ${#MISSING_PREREQS[@]} -gt 0 ]; then
             echo "   # Download and install from: https://nodejs.org/"
             echo "   # Or using Chocolatey: choco install nodejs"
             echo "   # Or using winget: winget install OpenJS.NodeJS"
-            echo ""
-        fi
-        if [[ " ${MISSING_PREREQS[*]} " =~ " .NET SDK " ]]; then
-            echo ".NET SDK:"
-            echo "   # Download from: https://dotnet.microsoft.com/download/dotnet/8.0"
-            echo "   # Or using Chocolatey: choco install dotnet-8.0-sdk"
-            echo "   # Or using winget: winget install Microsoft.DotNet.SDK.8"
             echo ""
         fi
         if [[ " ${MISSING_PREREQS[*]} " =~ " Azure Functions Core Tools " ]]; then
@@ -231,16 +200,20 @@ else
     echo "ℹ️  Database directory not found"
 fi
 
-# Restore .NET API packages
-if [ -f "src/api/FreeWaterTips.Api.csproj" ]; then
+# Install API dependencies
+if [ -d "src/api" ]; then
     echo ""
-    echo "📦 Restoring .NET API packages..."
+    echo "📦 Installing API dependencies..."
     cd src/api
-    dotnet restore
-    echo "✅ .NET API packages restored"
+    if [ -f "package.json" ]; then
+        npm install
+        echo "✅ API dependencies installed"
+    else
+        echo "ℹ️  No package.json found in src/api"
+    fi
     cd ../..
 else
-    echo "ℹ️  No .NET project found, skipping package restore"
+    echo "ℹ️  API directory not found"
 fi
 
 echo ""
@@ -279,7 +252,7 @@ else
 fi
 
 echo ""
-echo "🚀 Setting up .NET Azure Functions API Configuration..."
+echo "🚀 Setting up API Configuration..."
 
 # Check if API local.settings.json exists
 if [ ! -f "src/api/local.settings.json" ]; then
@@ -290,13 +263,14 @@ if [ ! -f "src/api/local.settings.json" ]; then
     echo "ℹ️  API Configuration Notes:"
     echo "   - src/api/local.settings.json contains Azure Functions settings"
     echo "   - CosmosDB connection configured for local emulator"
+    echo "   - Using Node.js runtime for Azure Functions"
     echo "   - Make sure Azure Cosmos DB Emulator is installed and running"
 else
     echo "✅ API configuration file already exists"
 fi
 
 echo ""
-echo "🔧 Setting up Web Application Configuration..."
+echo "🔧 Setting up Web Configuration..."
 
 # Check if web config.json exists
 if [ ! -f "src/web/js/config/config.json" ]; then
@@ -312,15 +286,59 @@ else
 fi
 
 echo ""
+echo "🗄️  Setting up Cosmos DB Containers..."
+
+# Load environment variables
+if [ -f "src/api/local.settings.json" ]; then
+    echo "📄 Loading configuration from src/api/local.settings.json"
+    # Extract values from local.settings.json (basic parsing)
+    COSMOS_ENDPOINT=$(grep -o '"COSMOS_ENDPOINT": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+    COSMOS_KEY=$(grep -o '"COSMOS_KEY": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+    COSMOS_DATABASE_NAME=$(grep -o '"COSMOS_DATABASE_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+    COSMOS_LOCATIONS_CONTAINER_NAME=$(grep -o '"COSMOS_LOCATIONS_CONTAINER_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+    COSMOS_RATELIMIT_CONTAINER_NAME=$(grep -o '"COSMOS_RATELIMIT_CONTAINER_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+    COSMOS_TEST_CONTAINER_NAME=$(grep -o '"COSMOS_TEST_CONTAINER_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+else
+    echo "❌ src/api/local.settings.json not found. Skipping container setup."
+    return 1
+fi
+
+echo "🔧 Configuration:"
+echo "  Database: $COSMOS_DATABASE_NAME"
+echo "  Locations Container: $COSMOS_LOCATIONS_CONTAINER_NAME"
+echo "  Rate Limits Container: $COSMOS_RATELIMIT_CONTAINER_NAME"
+echo "  Test Data Container: $COSMOS_TEST_CONTAINER_NAME"
+
+# Check if this is local emulator
+if [[ $COSMOS_ENDPOINT == *"127.0.0.1"* ]] || [[ $COSMOS_ENDPOINT == *"localhost"* ]]; then
+    echo "🏠 Detected Cosmos DB Emulator"
+    
+    # Check if emulator is running
+    if ! curl -s -k "$COSMOS_ENDPOINT" > /dev/null; then
+        echo "⚠️  Cosmos DB Emulator is not running - skipping container setup"
+        echo "💡 Please start the Cosmos DB Emulator and run 'npm run containers:setup' later"
+        return 0
+    fi
+    
+    echo "✅ Cosmos DB Emulator is running"
+else
+    echo "☁️  Detected Azure Cosmos DB (Cloud)"
+fi
+
+echo "✨ Cosmos DB containers setup complete!"
+
+echo ""
 echo "🔧 Next steps:"
 echo ""
 echo "🗄️  Database Setup:"
-echo "   1. Run 'npm run db:seed' to populate with Sofia locations"
-echo "   2. Emulator UI available at https://localhost:8081/_explorer/index.html"
+echo "   1. Cosmos DB containers will be created automatically"
+echo "   2. Run 'npm run containers:setup' to manually create containers"
+echo "   3. Emulator UI available at https://localhost:8081/_explorer/index.html"
 echo ""
-echo "🚀 API Development (.NET):"
+echo "🚀 API Development (Node.js Azure Functions):"
 echo "   1. Run 'npm run api:start' to start the API development server"
 echo "   2. API will be available at http://localhost:7071/api"
+echo "   3. Functions use Node.js runtime with enhanced security and rate limiting"
 echo ""
 echo "📱 Web Development:"
 echo "   1. Edit src/web/js/config/config.json with your Google Maps API key"
@@ -333,15 +351,15 @@ echo "   2. Web: http://localhost:3000"
 echo "   3. API: http://localhost:7071/api"
 echo ""
 echo "📋 Available npm scripts:"
-echo "   - npm run web:start       Start web development server"
-echo "   - npm run api:restore     Restore .NET packages"
-echo "   - npm run api:build       Build .NET API"
-echo "   - npm run api:start       Start API server with CORS"
-echo "   - npm run db:install      Install database dependencies"
-echo "   - npm run db:clean        Clear all database data"
-echo "   - npm run db:seed         Seed database with Sofia locations"
-echo "   - npm run db:reset        Clean and reseed database"
-echo "   - npm run all:start       Start both web and API servers"
+echo "   - npm run web:start         Start web development server"
+echo "   - npm run api:install       Install API dependencies"
+echo "   - npm run api:start         Start Node.js Azure Functions API"
+echo "   - npm run containers:setup  Create optimized Cosmos DB containers"
+echo "   - npm run db:install        Install database dependencies"
+echo "   - npm run db:clean          Clear all database data"
+echo "   - npm run db:seed           Seed database with Sofia locations"
+echo "   - npm run db:reset          Clean and reseed database"
+echo "   - npm run all:start         Start both web and API servers"
 echo ""
 echo "🎉 Setup complete! Your Free Water Tips development environment is ready!"
 echo "   Run 'npm run all:start' to start both web and API servers, or use individual scripts as needed."

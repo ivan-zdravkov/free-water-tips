@@ -71,7 +71,7 @@ Help make the platform accessible in different languages (coming soon).
 
 ### Development Stack
 - **Languages**: JavaScript, C#
-- **Frameworks**: Vanilla JS, [.NET 8](https://dotnet.microsoft.com/en-us/download/dotnet/8.0), [Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
+- **Frameworks**: Vanilla JS, [Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
 - **Database**: [Azure Cosmos DB](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator) (local emulator for development)
 - **CI/CD**: [GitHub Actions](https://github.com/features/actions)
 - **Tools**: [VS Code](https://code.visualstudio.com/), [Azure Functions Core Tools](https://docs.microsoft.com/en-us/azure/azure-functions/functions-run-local)
@@ -94,7 +94,7 @@ npm run setup # or './scripts/setup-dev.sh' directly if Node.js is not already i
 
 The setup script will:
 - ✅ Check all prerequisites and guide you through installation if needed
-- ✅ Install all dependencies ([Node.js](https://nodejs.org/), [.NET](https://dotnet.microsoft.com/), database packages)  
+- ✅ Install all dependencies
 - ✅ Create configuration files from templates
 - ✅ Set up development environment for all layers
 - ✅ Provide next steps and available commands
@@ -105,7 +105,6 @@ If you prefer not to use the setup script, here are the manual steps:
 
 **Prerequisites:**
 - [Node.js](https://nodejs.org/) (latest LTS)
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)  
 - [Azure Functions Core Tools v4](https://learn.microsoft.com/en-us/azure/azure-functions/functions-run-local#install-the-azure-functions-core-tools)
 - [Azure Cosmos DB Emulator](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator) (Windows) or [Docker version](https://docs.microsoft.com/en-us/azure/cosmos-db/linux-emulator) (Linux/macOS)
 - [Git](https://git-scm.com/downloads)

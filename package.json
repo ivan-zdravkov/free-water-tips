@@ -6,7 +6,6 @@
   "scripts": {
     "setup": "bash scripts/setup-dev.sh",
     "containers:setup": "cd src/api && bash ../../scripts/setup-containers.sh",
-    "containers:test": "cd src/api && node test-containers.js",
     "web:start": "npx http-server src/web -p 3000 -o -c-1",
     "api:install": "cd src/api && npm install",
     "api:start": "cd src/api && func start",
