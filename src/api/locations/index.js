@@ -2,6 +2,7 @@ const { app } = require('@azure/functions');
 const DatabaseService = require('../shared/database');
 const responses = require('../shared/responses');
 const { validateLocation, sanitizeLocation } = require('../shared/validation');
+const { applySecurityMiddleware } = require('../shared/security');
 
 const db = new DatabaseService();
 
@@ -11,31 +12,40 @@ app.http('locations', {
     route: 'locations',
     handler: async (request, context) => {
         try {
+            const flagged = applySecurityMiddleware(context, request, {
+                rateLimit: true,
+                security: true,
+                maxRequests: 100,
+                windowMs: 15 * 60 * 1000 // 15-minute window
+            });
+            
+            if (flagged) {
+                return flagged;
+            }
+
             if (request.method === 'GET') {
-                // Get all locations
                 const locations = await db.getAllLocations();
-                return responses.success('Locations retrieved successfully', locations);
+
+                return responses.success(request, 'Locations retrieved successfully', locations);
             }
             
             if (request.method === 'POST') {
-                // Create new location
                 const locationData = await request.json();
                 const sanitizedLocation = sanitizeLocation(locationData);
-                
-                // Validate the location data
                 const validation = validateLocation(sanitizedLocation);
+
                 if (!validation.isValid) {
-                    return responses.badRequest('Invalid location data', validation.errors);
+                    return responses.badRequest(request, 'Invalid location data', validation.errors);
                 }
                 
-                // Create the location
                 const newLocation = await db.createLocation(sanitizedLocation);
-                return responses.created('Location created successfully', newLocation);
+
+                return responses.created(request, 'Location created successfully', newLocation);
             }
             
-            return responses.methodNotAllowed();
+            return responses.methodNotAllowed(request);
         } catch (error) {
-            return responses.handleError(error, 'Locations endpoint');
+            return responses.handleError(request, error, 'Locations endpoint');
         }
     }
 });

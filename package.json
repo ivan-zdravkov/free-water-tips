@@ -25,8 +25,6 @@
     "test:html": "echo 'Skipping HTML validation - focusing on API'",
     "test:lighthouse": "npx lighthouse http://localhost:3000 --output=html --output-path=./lighthouse-report.html --chrome-flags='--headless'",
     "test:api": "jest tests/e2e --verbose --detectOpenHandles --forceExit",
-    "test:api:simple": "jest tests/simple-api.test.js --verbose",
-    "test:api:auto": "bash scripts/test-api.sh",
     "test:api:watch": "jest tests/e2e --watch --verbose",
     "test:api:coverage": "jest tests/e2e --coverage --verbose --detectOpenHandles --forceExit",
     "test:api:full": "concurrently --kill-others --success first \"npm run api:start\" \"wait-on http://localhost:7071/api/health && npm run test:api\"",

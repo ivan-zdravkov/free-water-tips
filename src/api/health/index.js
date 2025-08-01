@@ -1,5 +1,6 @@
 const { app } = require('@azure/functions');
 const responses = require('../shared/responses');
+const { applySecurityMiddleware } = require('../shared/security');
 
 const startTime = new Date();
 
@@ -9,6 +10,17 @@ app.http('health', {
     route: 'health',
     handler: async (request, context) => {
         try {
+            const flagged = applySecurityMiddleware(context, request, {
+                rateLimit: true,
+                security: false,        // Don't block health checks
+                maxRequests: 200,       // Higher limit for monitoring
+                windowMs: 5 * 60 * 1000 // 5-minute window
+            });
+            
+            if (flagged) {
+                return flagged;
+            }
+
             const healthData = {
                 status: 'healthy',
                 timestamp: new Date().toISOString(),
@@ -17,9 +29,9 @@ app.http('health', {
                 environment: process.env.ENVIRONMENT || 'unknown'
             };
 
-            return responses.success('API is healthy', healthData);
+            return responses.success(request, 'API is healthy', healthData);
         } catch (error) {
-            return responses.handleError(error, 'Health check');
+            return responses.handleError(request, error, 'Health check');
         }
     }
 });

@@ -1,6 +1,7 @@
 const { app } = require('@azure/functions');
 const DatabaseService = require('../shared/database');
 const responses = require('../shared/responses');
+const { applySecurityMiddleware } = require('../shared/security');
 
 const db = new DatabaseService();
 
@@ -10,15 +11,26 @@ app.http('stats', {
     route: 'stats',
     handler: async (request, context) => {
         try {
-            // Get statistics from the database
+            const flagged = applySecurityMiddleware(context, request, {
+                rateLimit: true,
+                security: true,
+                maxRequests: 100,        // Higher limit for stats endpoint
+                windowMs: 15 * 60 * 1000 // 15-minute window
+            });
+            
+            if (flagged) {
+                return flagged;
+            }
+
             const stats = await db.getStatistics();
             
-            return responses.success('Statistics retrieved successfully', {
+            return responses.success(request, 'Statistics retrieved successfully', {
                 ...stats,
                 lastUpdated: new Date().toISOString()
             });
+            
         } catch (error) {
-            return responses.handleError(error, 'Statistics endpoint');
+            return responses.handleError(request, error, 'Statistics endpoint');
         }
     }
 });
