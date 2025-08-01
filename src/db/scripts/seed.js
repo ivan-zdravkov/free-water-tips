@@ -8,7 +8,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const endpoint = process.env.COSMOS_ENDPOINT || 'https://127.0.0.1:8081';
 const key = process.env.COSMOS_KEY || 'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==';
 const databaseId = process.env.COSMOS_DATABASE_NAME || 'FreeWaterTipsDB';
-const containerId = process.env.COSMOS_CONTAINER_NAME || 'Locations';
+const containerId = process.env.COSMOS_LOCATIONS_CONTAINER_NAME || 'Locations';
 
 // Sofia public drinking fountains and water dispensers
 const sofiaLocations = [

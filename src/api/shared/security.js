@@ -21,15 +21,15 @@
 
 const DatabaseService = require('./database');
 
-// Initialize database service for rate limiting
-// We'll use a separate container or the same container with a different partition key
-let dbService = null;
+// Initialize database service specifically for rate limiting
+// Uses dedicated 'RateLimits' container with optimized configuration
+let rateLimitDbService = null;
 
-function getDbService() {
-    if (!dbService) {
-        dbService = new DatabaseService();
+function getRateLimitDbService() {
+    if (!rateLimitDbService) {
+        rateLimitDbService = new DatabaseService('ratelimits');
     }
-    return dbService;
+    return rateLimitDbService;
 }
 
 /**
@@ -54,7 +54,7 @@ function getDbService() {
  */
 async function cosmosRateLimitMiddleware(context, req, maxRequests = 100, windowMs = 15 * 60 * 1000) {
     try {
-        const db = getDbService();
+        const db = getRateLimitDbService();
         
         // Get client identifier with better fallback strategy
         const forwardedFor = req.headers['x-forwarded-for'];
