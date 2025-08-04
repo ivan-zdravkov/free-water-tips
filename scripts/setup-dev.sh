@@ -313,7 +313,7 @@ setup_cosmos_containers() {
         
         # Run the dedicated container setup script
         echo "🔧 Creating optimized containers for high-performance operations..."
-        if node scripts/setup-containers.js setup; then
+        if node src/db/scripts/setup-containers.js setup; then
             echo ""
             echo "✅ Container setup completed successfully"
             
@@ -370,6 +370,7 @@ echo "   - npm run db:install        Install database dependencies"
 echo "   - npm run db:clean          Clear all database data"
 echo "   - npm run db:seed           Seed database with Sofia locations"
 echo "   - npm run db:reset          Clean and reseed database"
+echo "   - npm run all:install       Install all dependencies for API and DB"
 echo "   - npm run all:start         Start both web and API servers"
 echo ""
 echo "🎉 Setup complete! Your Free Water Tips development environment is ready!"

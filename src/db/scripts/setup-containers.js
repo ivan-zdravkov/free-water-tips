@@ -192,7 +192,7 @@ class ContainerSetup {
     
     switch (containerType) {
       case 'locations':
-        console.log(`   🗺️  Geo-spatial indexing: ST_DISTANCE queries enabled`);
+        console.log(`   🗺️ Geo-spatial indexing: ST_DISTANCE queries enabled`);
         console.log(`   🔑 Partition key: city-country-type for geographic distribution`);
         console.log(`   📊 Composite indexes: optimized for location queries`);
         console.log(`   ⚡ Throughput: Default (emulator) / 1000 RU/s (cloud) for high-performance geo queries`);
@@ -265,25 +265,8 @@ async function main() {
       case 'test':
         await setup.testContainerConnectivity();
         break;
-      case 'help':
-        console.log('Cosmos DB Container Setup Tool');
-        console.log('');
-        console.log('Usage:');
-        console.log('  node setup-containers.js setup  - Create all containers with optimized configurations');
-        console.log('  node setup-containers.js test   - Test connectivity to all containers');
-        console.log('  node setup-containers.js help   - Show this help message');
-        console.log('');
-        console.log('Container Optimizations:');
-        console.log('  Locations  - Fast geo-spatial queries, composite indexes, optimized throughput');
-        console.log('  RateLimits - Instant operations, minimal indexing, TTL cleanup, optimized throughput');
-        console.log('  TestData   - Same as Locations with TTL cleanup, optimized throughput');
-        console.log('');
-        console.log('Note: Throughput settings are applied automatically in cloud deployments.');
-        console.log('      Local emulator uses default throughput settings.');
-        break;
       default:
         console.error(`Unknown command: ${command}`);
-        console.log('Use "help" for available commands');
         process.exit(1);
     }
   } catch (error) {
