@@ -155,7 +155,7 @@ class ContainerSetup {
       throw new Error(`Unknown container type: ${containerType}`);
     }
 
-    const { purpose, config } = CONTAINER_CONFIGS[containerType];
+    const { config } = CONTAINER_CONFIGS[containerType];
     const containerName = config.id;
 
     console.log(`\n🗄️  Setting up container: ${containerName}`);
