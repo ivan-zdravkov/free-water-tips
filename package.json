@@ -5,7 +5,9 @@
   "main": "src/web/index.html",
   "scripts": {
     "setup": "bash scripts/setup-dev.sh",
-    "containers:setup": "cd src/api && bash ../../scripts/setup-containers.sh",
+    "containers:setup": "node scripts/setup-containers.js setup",
+    "containers:test": "node scripts/setup-containers.js test",
+    "containers:help": "node scripts/setup-containers.js help",
     "web:start": "npx http-server src/web -p 3000 -o -c-1",
     "api:install": "cd src/api && npm install",
     "api:start": "cd src/api && func start",
@@ -103,5 +105,8 @@
   "config": {
     "port": 3000,
     "build_dir": "dist"
+  },
+  "dependencies": {
+    "@azure/cosmos": "^4.4.1"
   }
 }

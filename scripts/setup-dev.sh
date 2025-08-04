@@ -288,57 +288,68 @@ fi
 echo ""
 echo "🗄️  Setting up Cosmos DB Containers..."
 
-# Load environment variables
-if [ -f "src/api/local.settings.json" ]; then
-    echo "📄 Loading configuration from src/api/local.settings.json"
-    # Extract values from local.settings.json (basic parsing)
-    COSMOS_ENDPOINT=$(grep -o '"COSMOS_ENDPOINT": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
-    COSMOS_KEY=$(grep -o '"COSMOS_KEY": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
-    COSMOS_DATABASE_NAME=$(grep -o '"COSMOS_DATABASE_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
-    COSMOS_LOCATIONS_CONTAINER_NAME=$(grep -o '"COSMOS_LOCATIONS_CONTAINER_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
-    COSMOS_RATELIMIT_CONTAINER_NAME=$(grep -o '"COSMOS_RATELIMIT_CONTAINER_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
-    COSMOS_TEST_CONTAINER_NAME=$(grep -o '"COSMOS_TEST_CONTAINER_NAME": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
-else
-    echo "❌ src/api/local.settings.json not found. Skipping container setup."
-    return 1
-fi
-
-echo "🔧 Configuration:"
-echo "  Database: $COSMOS_DATABASE_NAME"
-echo "  Locations Container: $COSMOS_LOCATIONS_CONTAINER_NAME"
-echo "  Rate Limits Container: $COSMOS_RATELIMIT_CONTAINER_NAME"
-echo "  Test Data Container: $COSMOS_TEST_CONTAINER_NAME"
-
-# Check if this is local emulator
-if [[ $COSMOS_ENDPOINT == *"127.0.0.1"* ]] || [[ $COSMOS_ENDPOINT == *"localhost"* ]]; then
-    echo "🏠 Detected Cosmos DB Emulator"
-    
-    # Check if emulator is running
-    if ! curl -s -k "$COSMOS_ENDPOINT" > /dev/null; then
-        echo "⚠️  Cosmos DB Emulator is not running - skipping container setup"
-        echo "💡 Please start the Cosmos DB Emulator and run 'npm run containers:setup' later"
+# Function to setup Cosmos containers
+setup_cosmos_containers() {
+    if [ -f "src/api/local.settings.json" ]; then
+        echo "📄 Using configuration from src/api/local.settings.json"
+        
+        # Extract endpoint to check if it's emulator
+        COSMOS_ENDPOINT=$(grep -o '"COSMOS_ENDPOINT": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
+        
+        if [[ $COSMOS_ENDPOINT == *"127.0.0.1"* ]] || [[ $COSMOS_ENDPOINT == *"localhost"* ]]; then
+            echo "🏠 Detected Cosmos DB Emulator"
+            
+            # Check if emulator is running
+            if ! curl -s -k "$COSMOS_ENDPOINT" > /dev/null; then
+                echo "⚠️  Cosmos DB Emulator is not running"
+                echo "💡 Please start the Cosmos DB Emulator and run 'npm run containers:setup' later"
+                return 0
+            fi
+            
+            echo "✅ Cosmos DB Emulator is running"
+        else
+            echo "☁️  Detected Azure Cosmos DB (Cloud)"
+        fi
+        
+        # Run the dedicated container setup script
+        echo "🔧 Creating optimized containers for high-performance operations..."
+        if node scripts/setup-containers.js setup; then
+            echo ""
+            echo "✅ Container setup completed successfully"
+            
+            # Seed the database with initial data
+            echo ""
+            echo "🌱 Seeding development database with initial data..."
+            if npm run db:seed; then
+                echo "✅ Database seeding completed successfully"
+            else
+                echo "⚠️  Database seeding encountered issues, but continuing..."
+                echo "💡 You can manually run 'npm run db:seed' later"
+            fi
+        else
+            echo "⚠️  Container setup encountered issues, but continuing..."
+            echo "💡 You can manually run 'npm run containers:setup' later"
+        fi
+        
+    else
+        echo "❌ src/api/local.settings.json not found"
+        echo "💡 Please configure your Cosmos DB settings and run 'npm run containers:setup'"
         return 0
     fi
-    
-    echo "✅ Cosmos DB Emulator is running"
-else
-    echo "☁️  Detected Azure Cosmos DB (Cloud)"
-fi
+}
 
-echo "✨ Cosmos DB containers setup complete!"
+# Run container setup
+setup_cosmos_containers
 
 echo ""
 echo "🔧 Next steps:"
 echo ""
-echo "🗄️  Database Setup:"
-echo "   1. Cosmos DB containers will be created automatically"
-echo "   2. Run 'npm run containers:setup' to manually create containers"
-echo "   3. Emulator UI available at https://localhost:8081/_explorer/index.html"
+echo "🗄️ Database Setup:"
+echo "   1. Emulator UI available at https://localhost:8081/_explorer/index.html"
 echo ""
 echo "🚀 API Development (Node.js Azure Functions):"
 echo "   1. Run 'npm run api:start' to start the API development server"
-echo "   2. API will be available at http://localhost:7071/api"
-echo "   3. Functions use Node.js runtime with enhanced security and rate limiting"
+echo "   2. API available at http://localhost:7071/api"
 echo ""
 echo "📱 Web Development:"
 echo "   1. Edit src/web/js/config/config.json with your Google Maps API key"
@@ -350,11 +361,11 @@ echo "   1. Run 'npm run all:start' to start both web and API servers"
 echo "   2. Web: http://localhost:3000"
 echo "   3. API: http://localhost:7071/api"
 echo ""
-echo "📋 Available npm scripts:"
+echo "📋 Available npm scripts (full list at /package.json):"
+echo "   - npm run setup             Setup the development environment"
 echo "   - npm run web:start         Start web development server"
 echo "   - npm run api:install       Install API dependencies"
 echo "   - npm run api:start         Start Node.js Azure Functions API"
-echo "   - npm run containers:setup  Create optimized Cosmos DB containers"
 echo "   - npm run db:install        Install database dependencies"
 echo "   - npm run db:clean          Clear all database data"
 echo "   - npm run db:seed           Seed database with Sofia locations"
@@ -362,5 +373,4 @@ echo "   - npm run db:reset          Clean and reseed database"
 echo "   - npm run all:start         Start both web and API servers"
 echo ""
 echo "🎉 Setup complete! Your Free Water Tips development environment is ready!"
-echo "   Run 'npm run all:start' to start both web and API servers, or use individual scripts as needed."
 echo ""

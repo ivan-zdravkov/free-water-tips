@@ -175,39 +175,23 @@ const sofiaLocations = [
 ];
 
 async function createDatabaseAndContainer(client) {
-    console.log('🏗️  Creating database and container if they don\'t exist...');
+    console.log('🏗️  Using existing database and container...');
     
-    const { database } = await client.databases.createIfNotExists({
-        id: databaseId
-    });
+    const database = client.database(databaseId);
+    const container = database.container(containerId);
     
-    const { container } = await database.containers.createIfNotExists({
-        id: containerId,
-        partitionKey: { 
-            paths: ['/city'],
-            kind: 'Hash'
-        },
-        indexingPolicy: {
-            includedPaths: [
-                {
-                    path: "/*"
-                }
-            ],
-            excludedPaths: [
-                {
-                    path: "/\"_etag\"/?"
-                }
-            ],
-            spatialIndexes: [
-                {
-                    path: "/location/?",
-                    types: ["Point", "Polygon"]
-                }
-            ]
+    // Verify container exists
+    try {
+        await container.read();
+        console.log('✅ Container found and ready');
+    } catch (error) {
+        if (error.code === 404) {
+            console.error('❌ Container not found. Please run "npm run containers:setup" first.');
+            throw new Error('Container not found. Run container setup first.');
         }
-    });
+        throw error;
+    }
     
-    console.log('✅ Database and container ready');
     return container;
 }
 
@@ -232,9 +216,19 @@ async function seedDatabase() {
             // Add timestamps and additional fields
             const locationData = {
                 ...location,
+                // Generate composite partition key (city-country-type) for new container structure
+                partitionKey: `${location.city.toLowerCase()}-${location.country.toLowerCase()}-${location.type}`,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-                // Add GeoJSON point for spatial queries
+                // Add coordinates in the format expected by our new container structure
+                coordinates: {
+                    type: "Point",
+                    coordinates: [location.longitude, location.latitude],
+                    // Keep original format for backward compatibility
+                    latitude: location.latitude,
+                    longitude: location.longitude
+                },
+                // Legacy GeoJSON point for compatibility (if needed)
                 location: {
                     type: "Point",
                     coordinates: [location.longitude, location.latitude]
