@@ -117,7 +117,7 @@ If you prefer not to use the setup script, here are the manual steps:
    - [`src/db/.env.example`](src/db/.env.example) → `.env`
 3. Add your API keys ([Google Maps API key](https://console.cloud.google.com/apis/credentials) required)
 4. Start [Azure Cosmos DB Emulator](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator)
-5. Run database seeding: `npm run db:seed`
+5. Run database seeding: `npm run db:seed:locations`
 
 **💡 Tip: The setup script handles all edge cases and platform differences. Manual setup may require troubleshooting.**
 
@@ -128,13 +128,13 @@ If you prefer not to use the setup script, here are the manual steps:
 npm run all:start
 
 # Individual components
-npm run web:start       # Web app (http://localhost:3000)
-npm run api:start       # API server (http://localhost:7071)
-npm run db:seed         # Populate database with sample data
+npm run web:start         # Web app (http://localhost:3000)
+npm run api:start         # API server (http://localhost:7071)
+npm run db:seed:locations # Populate database with sample data
 
 # Database management
-npm run db:clean        # Clear all data
-npm run db:reset        # Clean and reseed
+npm run db:clean          # Clear all data
+npm run db:reset          # Clean and reseed
 ```
 
 ### Configuration

@@ -100,7 +100,7 @@ class ContainerSetup {
 
   async initialize() {
     // Load configuration from local.settings.json
-    const configPath = path.join(__dirname, '..', 'src', 'api', 'local.settings.json');
+    const configPath = path.join(__dirname, '..', '..', 'api', 'local.settings.json');
     
     let config = {};
     if (fs.existsSync(configPath)) {

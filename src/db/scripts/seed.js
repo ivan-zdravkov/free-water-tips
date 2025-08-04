@@ -1,4 +1,5 @@
 const { CosmosClient } = require('@azure/cosmos');
+const { sofiaLocations } = require('../data/seed-data');
 require('dotenv').config();
 
 // Disable SSL verification for Azure Cosmos DB Emulator (development only)
@@ -8,195 +9,49 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const endpoint = process.env.COSMOS_ENDPOINT || 'https://127.0.0.1:8081';
 const key = process.env.COSMOS_KEY || 'C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==';
 const databaseId = process.env.COSMOS_DATABASE_NAME || 'FreeWaterTipsDB';
-const containerId = process.env.COSMOS_LOCATIONS_CONTAINER_NAME || 'Locations';
 
-// Sofia public drinking fountains and water dispensers
-const sofiaLocations = [
-    {
-        id: "sofia-vitosha-fountain-001",
-        name: "Vitosha Boulevard Fountain",
-        description: "Historic public fountain on Sofia's main pedestrian street, near the intersection with Patriarch Evtimiy Boulevard",
-        address: "Vitosha Boulevard 15",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6977,
-        longitude: 23.3219,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.2,
-        status: "active"
+const CONTAINER_CONFIGS = {
+    'locations': {
+        name: process.env.COSMOS_LOCATIONS_CONTAINER_NAME || 'Locations',
     },
-    {
-        id: "sofia-alexander-nevsky-fountain-002",
-        name: "Alexander Nevsky Cathedral Fountain", 
-        description: "Beautiful ornate fountain located in the square in front of the Alexander Nevsky Cathedral",
-        address: "Alexander Nevsky Square",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6956,
-        longitude: 23.3332,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.5,
-        status: "active"
+    'ratelimits': {
+        name: process.env.COSMOS_RATELIMIT_CONTAINER_NAME || 'RateLimits',
     },
-    {
-        id: "sofia-city-garden-fountain-003",
-        name: "City Garden Central Fountain",
-        description: "Historic fountain in the center of Sofia's City Garden park, established in 1884",
-        address: "City Garden, Tsar Osvoboditel Boulevard",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6947,
-        longitude: 23.3253,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.1,
-        status: "active"
-    },
-    {
-        id: "sofia-borisova-gradina-fountain-004",
-        name: "Borisova Gradina Park Fountain",
-        description: "Large decorative fountain in Sofia's largest and oldest park, perfect for refilling water bottles",
-        address: "Borisova Gradina Park, near the main entrance",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6794,
-        longitude: 23.3370,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.3,
-        status: "active"
-    },
-    {
-        id: "sofia-national-theatre-fountain-005",
-        name: "National Theatre Fountain",
-        description: "Elegant fountain in front of the Ivan Vazov National Theatre, a beautiful architectural landmark",
-        address: "Dyakon Ignatiy Street 1",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6951,
-        longitude: 23.3258,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.0,
-        status: "active"
-    },
-    {
-        id: "sofia-ndk-fountain-006",
-        name: "National Palace of Culture Fountain",
-        description: "Modern fountain complex at the National Palace of Culture (NDK), one of Sofia's largest cultural venues",
-        address: "Bulgaria Boulevard 1",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6831,
-        longitude: 23.3193,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.6,
-        status: "active"
-    },
-    {
-        id: "sofia-south-park-fountain-007",
-        name: "South Park Fountain",
-        description: "Peaceful fountain in South Park (Yuzhen Park), popular with joggers and families",
-        address: "South Park, Cherni Vrah Boulevard",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6656,
-        longitude: 23.3131,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 3.9,
-        status: "active"
-    },
-    {
-        id: "sofia-doctors-garden-fountain-008",
-        name: "Doctors' Garden Fountain",
-        description: "Small, charming fountain in the quiet Doctors' Garden park, near the medical university",
-        address: "Doctors' Garden, Oborishte Street",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6925,
-        longitude: 23.3343,
-        type: "public-fountain",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: true,
-        rating: 4.2,
-        status: "active"
-    },
-    {
-        id: "sofia-paradise-dispenser-009",
-        name: "Paradise Center Water Dispenser",
-        description: "Modern public water dispenser located inside Paradise Center shopping mall",
-        address: "Paradise Center, Cherni Vrah Boulevard 100",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6510,
-        longitude: 23.3394,
-        type: "public-dispenser",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: false, // Mall hours only
-        rating: 4.1,
-        status: "active"
-    },
-    {
-        id: "sofia-crystal-garden-dispenser-010",
-        name: "Crystal Garden Water Dispenser",
-        description: "High-tech water dispenser in the Crystal Garden business complex, available during business hours",
-        address: "Crystal Garden, Sitnyakovo Boulevard",
-        city: "Sofia",
-        country: "Bulgaria",
-        latitude: 42.6565,
-        longitude: 23.3515,
-        type: "public-dispenser",
-        verified: true,
-        accessible: true,
-        alwaysAvailable: false, // Business hours only
-        rating: 4.4,
-        status: "active"
+    'testdata': {
+        name: process.env.COSMOS_TEST_CONTAINER_NAME || 'TestData',
     }
-];
+};
 
-async function createDatabaseAndContainer(client) {
-    console.log('🏗️  Using existing database and container...');
+async function getContainer(client, containerType = 'locations') {
+    console.log(`🏗️  Using existing database and container for: ${containerType}`);
+    
+    const config = CONTAINER_CONFIGS[containerType];
+
+    if (!config) {
+        throw new Error(`Unknown container type: ${containerType}. Available: ${Object.keys(CONTAINER_CONFIGS).join(', ')}`);
+    }
     
     const database = client.database(databaseId);
-    const container = database.container(containerId);
+    const container = database.container(config.name);
     
-    // Verify container exists
     try {
         await container.read();
-        console.log('✅ Container found and ready');
+        console.log(`✅ Container "${config.name}" found and ready`);
     } catch (error) {
         if (error.code === 404) {
-            console.error('❌ Container not found. Please run "npm run containers:setup" first.');
-            throw new Error('Container not found. Run container setup first.');
+            console.error(`❌ Container "${config.name}" not found. Please run "npm run containers:setup" first.`);
+
+            throw new Error(`Container not found. Run container setup first.`);
         }
+
         throw error;
     }
     
     return container;
 }
 
-async function seedDatabase() {
-    console.log('🌱 Seeding database with Sofia locations...');
+async function seedDatabase(containerType = 'locations') {
+    console.log(`🌱 Seeding database with ${containerType} data...`);
     
     try {
         const client = new CosmosClient({ 
@@ -207,42 +62,67 @@ async function seedDatabase() {
             }
         });
         
-        const container = await createDatabaseAndContainer(client);
+        const container = await getContainer(client, containerType);
+        
+        let dataToSeed = [];
+        let dataTypeName = '';
+        
+        switch (containerType) {
+            case 'locations':
+                dataToSeed = sofiaLocations;
+                dataTypeName = 'locations';
+                break;
+            case 'ratelimits':
+                dataToSeed = [];
+                dataTypeName = 'rate limit entries';
+                break;
+            case 'testdata':
+                dataToSeed = sofiaLocations;
+                dataTypeName = 'test data entries';
+                break;
+            default:
+                throw new Error(`No seed data available for container type: ${containerType}`);
+        }
         
         let seeded = 0;
         let skipped = 0;
         
-        for (const location of sofiaLocations) {
-            // Add timestamps and additional fields
-            const locationData = {
-                ...location,
-                // Generate composite partition key (city-country-type) for new container structure
-                partitionKey: `${location.city.toLowerCase()}-${location.country.toLowerCase()}-${location.type}`,
+        for (const item of dataToSeed) {
+            let itemData = {
+                ...item,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
-                // Add coordinates in the format expected by our new container structure
-                coordinates: {
-                    type: "Point",
-                    coordinates: [location.longitude, location.latitude],
-                    // Keep original format for backward compatibility
-                    latitude: location.latitude,
-                    longitude: location.longitude
-                },
-                // Legacy GeoJSON point for compatibility (if needed)
-                location: {
-                    type: "Point",
-                    coordinates: [location.longitude, location.latitude]
-                }
+                source: 'development-seed'
             };
+            
+            if (containerType === 'locations' || containerType === 'testdata') {
+                itemData = {
+                    ...itemData,
+                    partitionKey: `${item.city.toLowerCase()}-${item.country.toLowerCase()}-${item.type}`,
+                    coordinates: {
+                        type: "Point",
+                        coordinates: [item.longitude, item.latitude],
+                        latitude: item.latitude,
+                        longitude: item.longitude
+                    },
+                    location: {
+                        type: "Point",
+                        coordinates: [item.longitude, item.latitude]
+                    }
+                };
+            } else if (containerType === 'ratelimits') {
+                itemData.partitionKey = item.clientId;
+                itemData.ttl = item.ttl || 3600; // Default 1 hour TTL
+            }
 
             try {
-                await container.items.create(locationData);
+                await container.items.create(itemData);
                 seeded++;
-                console.log(`✅ Added: ${location.name}`);
+                console.log(`✅ Added: ${item.name || item.id}`);
             } catch (error) {
                 if (error.code === 409) {
                     skipped++;
-                    console.log(`⚠️  Already exists: ${location.name}`);
+                    console.log(`⚠️  Already exists: ${item.name || item.id}`);
                 } else {
                     throw error;
                 }
@@ -250,10 +130,9 @@ async function seedDatabase() {
         }
 
         console.log(`🎉 Database seeding completed!`);
-        console.log(`   📊 Added: ${seeded} locations`);
-        console.log(`   ⏭️  Skipped: ${skipped} existing locations`);
-        console.log(`   📍 Total Sofia locations: ${sofiaLocations.length}`);
-        
+        console.log(`   📊 Added: ${seeded} ${dataTypeName}`);
+        console.log(`   ⏭️  Skipped: ${skipped} existing ${dataTypeName}`);
+        console.log(`   📍 Total ${dataTypeName}: ${dataToSeed.length}`);
     } catch (error) {
         console.error('❌ Error seeding database:', error.message);
         if (error.message.includes('ECONNREFUSED') || error.message.includes('certificate')) {
@@ -265,7 +144,21 @@ async function seedDatabase() {
 }
 
 if (require.main === module) {
-    seedDatabase();
+    const containerType = process.argv[2] || 'locations';
+    
+    const validTypes = ['locations', 'ratelimits', 'testdata'];
+    if (!validTypes.includes(containerType)) {
+        console.error(`❌ Invalid container type: ${containerType}`);
+        console.error(`   Valid options: ${validTypes.join(', ')}`);
+        console.error(`   Usage: node seed.js [container-type]`);
+        console.error(`   Example: node seed.js locations`);
+        process.exit(1);
+    }
+    
+    seedDatabase(containerType);
 }
 
-module.exports = { seedDatabase, sofiaLocations };
+module.exports = { 
+    seedDatabase,
+    sofiaLocations
+};
