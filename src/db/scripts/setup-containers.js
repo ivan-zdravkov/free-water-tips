@@ -110,19 +110,18 @@ class ContainerSetup {
 
   async initialize() {
     console.log(`🔌 Connecting to Cosmos DB: ${endpoint}`);
-    console.log(`📁 Database: ${databaseId}`);
 
     this.client = createClient();
     this.database = this.client.database(databaseId);
 
     try {
       await this.database.read();
-      console.log(`✅ Database "${databaseId}" found`);
+      console.log(`✅ Database ${databaseId} found`);
     } catch (error) {
       if (error.code === 404) {
-        console.log(`📁 Creating database "${databaseId}"...`);
-        await this.client.databases.create({ id: databaseName });
-        console.log(`✅ Database "${databaseName}" created`);
+        console.log(`📁 Creating database ${databaseId}...`);
+        await this.client.databases.create({ id: databaseId });
+        console.log(`✅ Database ${databaseId} created`);
       } else {
         throw error;
       }
@@ -140,9 +139,9 @@ class ContainerSetup {
 
     try {
       try {
-        console.log(`\n🗄️ Setting up container: ${container.config.id}...`);
+        console.log(`\n🗄️  Setting up container: ${container.config.id}...`);
         await this.database.container(container.config.id).read();
-        console.log(`✅ Container "${container.config.id}" already exists`);
+        console.log(`✅ Container ${container.config.id} already exists`);
         return;
       } catch (error) {
         if (error.code !== 404) {
@@ -152,12 +151,12 @@ class ContainerSetup {
 
       console.log(`🔧 Creating container with optimized configuration...`);
       await this.database.containers.create(container.config);
-      console.log(`✅ Container "${container.config.id}" created successfully`);
+      console.log(`✅ Container ${container.config.id} created successfully`);
 
       console.log(`🚀 Optimization details for ${container.config.id}:`);
       container.output.forEach(line => console.log(`   ${line}`));
     } catch (error) {
-      console.error(`❌ Failed to create container "${container.config.id}":`, error.message);
+      console.error(`❌ Failed to create container ${container.config.id}:`, error.message);
       throw error;
     }
   }
@@ -165,14 +164,14 @@ class ContainerSetup {
   async setupAllContainers() {
     await this.initialize();
 
-    Object.keys(containers).forEach(async (containerKey) => {
+    for (const containerKey of Object.keys(containers)) {
       try {
         await this.createContainer(containerKey);
       } catch (error) {
         console.error(`❌ Failed to setup ${containerKey} container:`, error.message);
-        process.exit(1);
+        throw error;
       }
-    });
+    }
   }
 
   async testContainerConnectivity() {
@@ -206,16 +205,15 @@ async function main() {
         await setup.testContainerConnectivity();
         break;
       default:
-        console.error(`Unknown command: ${command}`);
-        process.exit(1);
+        throw new Error(`Unknown command: ${command}`);
     }
   } catch (error) {
     console.error('❌ Setup failed:', error.message);
     console.log('\n🔧 Troubleshooting:');
-    console.log('1. Check your /src/db/.env file exists and has correct Cosmos DB settings');
+    console.log('1. Check your src/db/.env file exists and has correct Cosmos DB settings');
     console.log('2. Verify Cosmos DB emulator is running');
     console.log('3. Check network connectivity and firewall settings');
-    process.exit(1);
+    throw error;
   }
 }
 

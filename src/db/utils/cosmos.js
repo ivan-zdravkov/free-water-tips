@@ -1,5 +1,7 @@
 const { CosmosClient } = require('@azure/cosmos');
-require('dotenv').config();
+const path = require('path');
+
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const missingConfig = [];
 
@@ -12,8 +14,9 @@ if (!process.env.COSMOS_TEST_DATA_CONTAINER_ID) missingConfig.push('COSMOS_TEST_
 
 if (missingConfig.length > 0) {
     console.error(`❌ Missing required Cosmos DB configuration: ${missingConfig.join(', ')}`);
-    console.error('Please check your /src/db/.env file.');
-    process.exit(1);
+    console.error('Please check your src/db/.env file.');
+
+    throw new Error(`Missing configuration`);
 }
 
 // Disable SSL verification for Azure Cosmos DB Emulator (development only)
@@ -62,10 +65,10 @@ async function getContainer(client, key) {
     try {
         await container.read();
 
-        console.log(`✅ Container "${containerId}" found and ready`);
+        console.log(`✅ Container ${containerId} found and ready`);
     } catch (error) {
         if (error.code === 404) {
-            console.error(`❌ Container "${containerId}" not found. Please run "npm run containers:setup" first.`);
+            console.error(`❌ Container ${containerId} not found. Please run "npm run containers:setup" first.`);
         }
 
         throw error;
@@ -84,10 +87,11 @@ function getContainerKeyFromArgs() {
     if (!containerKeys().includes(key)) {
         console.error(`❌ Invalid container key: ${key}`);
         console.error(`   Valid options: ${containerKeys().join(', ')}`);
-        process.exit(1);
+        
+        throw new Error(`Invalid container key: ${key}`);
     }
 
-    return containerType;
+    return key;
 }
 
 /**
@@ -102,7 +106,7 @@ function handleDatabaseError(error) {
         console.error('💡 You can download it from: https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator');
     }
 
-    process.exit(1);
+    throw new Error(`Database operation failed: ${error.message}`);
 }
 
 /**

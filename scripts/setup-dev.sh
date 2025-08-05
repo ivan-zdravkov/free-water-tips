@@ -291,7 +291,7 @@ echo "🗄️  Setting up Cosmos DB Containers..."
 # Function to setup Cosmos containers
 setup_cosmos_containers() {
     if [ -f "src/api/local.settings.json" ]; then
-        echo "📄 Using configuration from src/api/local.settings.json"
+        echo "📄 Using configuration from src/db/.env"
         
         # Extract endpoint to check if it's emulator
         COSMOS_ENDPOINT=$(grep -o '"COSMOS_ENDPOINT": "[^"]*"' src/api/local.settings.json | cut -d'"' -f4)
@@ -312,7 +312,6 @@ setup_cosmos_containers() {
         fi
         
         # Run the dedicated container setup script
-        echo "🔧 Creating optimized containers for high-performance operations..."
         if node src/db/scripts/setup-containers.js setup; then
             echo ""
             echo "✅ Container setup completed successfully"
@@ -321,6 +320,7 @@ setup_cosmos_containers() {
             echo ""
             echo "🌱 Seeding development database with initial data..."
             if npm run db:seed; then
+                echo ""
                 echo "✅ Database seeding completed successfully"
             else
                 echo "⚠️  Database seeding encountered issues, but continuing..."
@@ -344,7 +344,7 @@ setup_cosmos_containers
 echo ""
 echo "🔧 Next steps:"
 echo ""
-echo "🗄️ Database Setup:"
+echo "🗄️  Database Setup:"
 echo "   1. Emulator UI available at https://localhost:8081/_explorer/index.html"
 echo ""
 echo "🚀 API Development (Node.js Azure Functions):"

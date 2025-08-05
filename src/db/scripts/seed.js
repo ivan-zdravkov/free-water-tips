@@ -62,7 +62,7 @@ async function seedDatabase(containerKey) {
 
         console.log(`🎉 Database seeding completed!`);
         console.log(`   📊 Added: ${seeded} ${label}`);
-        console.log(`   ⏭️ Skipped: ${skipped} existing ${label}`);
+        console.log(`   ⏭️  Skipped: ${skipped} existing ${label}`);
         console.log(`   📍 Total ${label}: ${dataToSeed.length}`);
     } catch (error) {
         handleDatabaseError(error);
