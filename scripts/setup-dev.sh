@@ -320,11 +320,11 @@ setup_cosmos_containers() {
             # Seed the database with initial data
             echo ""
             echo "🌱 Seeding development database with initial data..."
-            if npm run db:seed:locations; then
+            if npm run db:seed; then
                 echo "✅ Database seeding completed successfully"
             else
                 echo "⚠️  Database seeding encountered issues, but continuing..."
-                echo "💡 You can manually run 'npm run db:seed:locations' later"
+                echo "💡 You can manually run 'npm run db:seed' later"
             fi
         else
             echo "⚠️  Container setup encountered issues, but continuing..."
@@ -367,8 +367,8 @@ echo "   - npm run web:start          Start web development server"
 echo "   - npm run api:install        Install API dependencies"
 echo "   - npm run api:start          Start Node.js Azure Functions API"
 echo "   - npm run db:install         Install database dependencies"
-echo "   - npm run db:clean           Clear all database data"
-echo "   - npm run db:seed:locations  Seed database with Sofia locations"
+echo "   - npm run db:clean           Clear database locations"
+echo "   - npm run db:seed            Seed database with Sofia locations"
 echo "   - npm run db:reset           Clean and reseed database"
 echo "   - npm run all:install        Install all dependencies for API and DB"
 echo "   - npm run all:start          Start both web and API servers"

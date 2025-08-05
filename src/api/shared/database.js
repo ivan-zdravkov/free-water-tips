@@ -17,7 +17,7 @@ class DatabaseService {
     try {
       const endpoint = process.env.COSMOS_ENDPOINT;
       const key = process.env.COSMOS_KEY;
-      const databaseName = process.env.COSMOS_DATABASE_NAME;
+      const databaseName = process.env.COSMOS_DATABASE_ID;
       
       // Select container based on type
       let containerName;

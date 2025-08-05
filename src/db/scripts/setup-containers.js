@@ -10,13 +10,13 @@
  * - RateLimits: Optimized for instant read/write operations with TTL cleanup
  * - TestData: Configured same as Locations for comprehensive testing
  */
+const {
+    endpoint,
+    databaseId,
+    createClient
+} = require('../utils/cosmos');
 
-const { CosmosClient } = require('@azure/cosmos');
-const path = require('path');
-const fs = require('fs');
-
-// Container configurations optimized for specific purposes
-const CONTAINER_CONFIGS = {
+const containers = {
   locations: {
     purpose: 'Fast geo-spatial queries and location data retrieval',
     config: {
@@ -29,7 +29,7 @@ const CONTAINER_CONFIGS = {
         indexingMode: 'consistent',
         automatic: true,
         includedPaths: [
-          { path: '/*' }  // Include all paths for emulator compatibility
+          { path: '/*' }
         ],
         spatialIndexes: [
           {
@@ -38,11 +38,14 @@ const CONTAINER_CONFIGS = {
           }
         ]
       }
-      // Note: Throughput settings removed for emulator compatibility
-      // Cloud deployment will use default throughput (400 RU/s)
-    }
+    },
+    output: [
+        `🗺️ Geo-spatial indexing: ST_DISTANCE queries enabled`,
+        `🔑 Partition key: city-country-type for geographic distribution`,
+        `📊 Composite indexes: optimized for location queries`,
+        `⚡ Throughput: Default (emulator)`
+    ]
   },
-
   ratelimits: {
     purpose: 'Instant read/write operations for rate limiting with TTL cleanup',
     config: {
@@ -56,14 +59,17 @@ const CONTAINER_CONFIGS = {
         indexingMode: 'consistent',
         automatic: true,
         includedPaths: [
-          { path: '/*' }  // Simplified for emulator compatibility
+          { path: '/*' }
         ]
       }
-      // Note: Throughput settings removed for emulator compatibility
-      // Cloud deployment will use default throughput (400 RU/s)
-    }
+    },
+    output: [
+        `⚡ Instant operations: minimal indexing for maximum speed`,
+        `🔑 Partition key: clientId for isolated rate limit data`,
+        `⏰ TTL: 1hr automatic cleanup`,
+        `📊 Throughput: Default (emulator)`
+    ]
   },
-
   testdata: {
     purpose: 'Test data container configured same as Locations for comprehensive testing',
     config: {
@@ -77,7 +83,7 @@ const CONTAINER_CONFIGS = {
         indexingMode: 'consistent',
         automatic: true,
         includedPaths: [
-          { path: '/*' }  // Include all paths for comprehensive testing
+          { path: '/*' }
         ],
         spatialIndexes: [
           {
@@ -86,9 +92,13 @@ const CONTAINER_CONFIGS = {
           }
         ]
       }
-      // Note: Throughput settings removed for emulator compatibility
-      // Cloud deployment will use default throughput (400 RU/s)
-    }
+    },
+    output: [
+        `🧪 Same as Locations: comprehensive testing capabilities`,
+        `🔑 Partition key: testType for test isolation`,
+        `⏰ TTL: 24hrs automatic test cleanup`,
+        `📊 Throughput: Default (emulator)`
+    ]
   }
 };
 
@@ -99,49 +109,18 @@ class ContainerSetup {
   }
 
   async initialize() {
-    // Load configuration from local.settings.json
-    const configPath = path.join(__dirname, '..', '..', 'api', 'local.settings.json');
-    
-    let config = {};
-    if (fs.existsSync(configPath)) {
-      try {
-        const configContent = fs.readFileSync(configPath, 'utf8');
-        const localSettings = JSON.parse(configContent);
-        config = localSettings.Values || {};
-      } catch (error) {
-        console.warn('⚠️  Could not parse local.settings.json, using environment variables');
-      }
-    }
-
-    // Use config from file or environment variables
-    const endpoint = config.COSMOS_ENDPOINT || process.env.COSMOS_ENDPOINT;
-    const key = config.COSMOS_KEY || process.env.COSMOS_KEY;
-    const databaseName = config.COSMOS_DATABASE_NAME || process.env.COSMOS_DATABASE_NAME;
-
-    if (!endpoint || !key || !databaseName) {
-      throw new Error('Missing required Cosmos DB configuration. Please check local.settings.json or environment variables.');
-    }
-
     console.log(`🔌 Connecting to Cosmos DB: ${endpoint}`);
-    console.log(`📁 Database: ${databaseName}`);
+    console.log(`📁 Database: ${databaseId}`);
 
-    // Handle local emulator SSL issues
-    const clientOptions = { endpoint, key };
-    if (endpoint.includes('127.0.0.1') || endpoint.includes('localhost')) {
-      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-      console.log('🏠 Local emulator detected - disabling SSL verification');
-    }
+    this.client = createClient();
+    this.database = this.client.database(databaseId);
 
-    this.client = new CosmosClient(clientOptions);
-    this.database = this.client.database(databaseName);
-
-    // Ensure database exists
     try {
       await this.database.read();
-      console.log(`✅ Database "${databaseName}" found`);
+      console.log(`✅ Database "${databaseId}" found`);
     } catch (error) {
       if (error.code === 404) {
-        console.log(`📁 Creating database "${databaseName}"...`);
+        console.log(`📁 Creating database "${databaseId}"...`);
         await this.client.databases.create({ id: databaseName });
         console.log(`✅ Database "${databaseName}" created`);
       } else {
@@ -150,21 +129,20 @@ class ContainerSetup {
     }
   }
 
-  async createContainer(containerType) {
-    if (!CONTAINER_CONFIGS[containerType]) {
-      throw new Error(`Unknown container type: ${containerType}`);
+  async createContainer(key) {
+    const container = containers[key];
+    
+    if (!container) {
+      console.error(`❌ Unknown container key: ${key}`);
+      console.error(`  Supported container keys: ${Object.keys(containers).join(', ')}`);
+      return;
     }
 
-    const { config } = CONTAINER_CONFIGS[containerType];
-    const containerName = config.id;
-
-    console.log(`\n🗄️  Setting up container: ${containerName}`);
-
     try {
-      // Check if container already exists
       try {
-        await this.database.container(containerName).read();
-        console.log(`✅ Container "${containerName}" already exists`);
+        console.log(`\n🗄️ Setting up container: ${container.config.id}...`);
+        await this.database.container(container.config.id).read();
+        console.log(`✅ Container "${container.config.id}" already exists`);
         return;
       } catch (error) {
         if (error.code !== 404) {
@@ -172,64 +150,29 @@ class ContainerSetup {
         }
       }
 
-      // Create container with optimized configuration
       console.log(`🔧 Creating container with optimized configuration...`);
-      await this.database.containers.create(config);
+      await this.database.containers.create(container.config);
+      console.log(`✅ Container "${container.config.id}" created successfully`);
 
-      console.log(`✅ Container "${containerName}" created successfully`);
-      
-      // Log optimization details
-      this.logOptimizationDetails(containerType, config);
-
+      console.log(`🚀 Optimization details for ${container.config.id}:`);
+      container.output.forEach(line => console.log(`   ${line}`));
     } catch (error) {
-      console.error(`❌ Failed to create container "${containerName}":`, error.message);
+      console.error(`❌ Failed to create container "${container.config.id}":`, error.message);
       throw error;
-    }
-  }
-
-  logOptimizationDetails(containerType, config) {
-    console.log(`🚀 Optimization details for ${config.id}:`);
-    
-    switch (containerType) {
-      case 'locations':
-        console.log(`   🗺️ Geo-spatial indexing: ST_DISTANCE queries enabled`);
-        console.log(`   🔑 Partition key: city-country-type for geographic distribution`);
-        console.log(`   📊 Composite indexes: optimized for location queries`);
-        console.log(`   ⚡ Throughput: Default (emulator) / 1000 RU/s (cloud) for high-performance geo queries`);
-        break;
-      case 'ratelimits':
-        console.log(`   ⚡ Instant operations: minimal indexing for maximum speed`);
-        console.log(`   🔑 Partition key: clientId for isolated rate limit data`);
-        console.log(`   ⏰ TTL: ${config.defaultTtl}s automatic cleanup`);
-        console.log(`   📊 Throughput: Default (emulator) / 400 RU/s (cloud) optimized for point operations`);
-        break;
-      case 'testdata':
-        console.log(`   🧪 Same as Locations: comprehensive testing capabilities`);
-        console.log(`   🔑 Partition key: testType for test isolation`);
-        console.log(`   ⏰ TTL: ${config.defaultTtl}s automatic test cleanup`);
-        console.log(`   📊 Throughput: Default (emulator) / 400 RU/s (cloud) for test environment`);
-        break;
     }
   }
 
   async setupAllContainers() {
     await this.initialize();
 
-    const containerTypes = ['locations', 'ratelimits', 'testdata'];
-    
-    for (const containerType of containerTypes) {
+    Object.keys(containers).forEach(async (containerKey) => {
       try {
-        await this.createContainer(containerType);
+        await this.createContainer(containerKey);
       } catch (error) {
-        console.error(`❌ Failed to setup ${containerType} container:`, error.message);
+        console.error(`❌ Failed to setup ${containerKey} container:`, error.message);
         process.exit(1);
       }
-    }
-
-    console.log('\n📊 Container Summary:');
-    console.log('   Locations  - Optimized for fast geo-spatial queries');
-    console.log('   RateLimits - Optimized for instant read/write operations');
-    console.log('   TestData   - Same as Locations for comprehensive testing');
+    });
   }
 
   async testContainerConnectivity() {
@@ -237,22 +180,19 @@ class ContainerSetup {
     
     await this.initialize();
 
-    const containerTypes = ['locations', 'ratelimits', 'testdata'];
-    
-    for (const containerType of containerTypes) {
-      const containerName = CONTAINER_CONFIGS[containerType].config.id;
+    Object.keys(containers).forEach(async (containerKey) => {
       try {
-        const container = this.database.container(containerName);
+        const containerId = containers[containerKey].config.id;
+        const container = this.database.container(containerId);
         await container.read();
-        console.log(`✅ ${containerName}: Connected successfully`);
+        console.log(`✅ ${containerId}: Connected successfully`);
       } catch (error) {
-        console.error(`❌ ${containerName}: Connection failed -`, error.message);
+        console.error(`❌ ${containerId}: Connection failed -`, error.message);
       }
-    }
+    })
   }
 }
 
-// CLI interface
 async function main() {
   const command = process.argv[2] || 'setup';
   const setup = new ContainerSetup();
@@ -272,15 +212,13 @@ async function main() {
   } catch (error) {
     console.error('❌ Setup failed:', error.message);
     console.log('\n🔧 Troubleshooting:');
-    console.log('1. Check your local.settings.json file exists and has correct Cosmos DB settings');
-    console.log('2. Verify Cosmos DB emulator is running (for local development)');
-    console.log('3. Ensure your Azure Cosmos DB account is accessible (for cloud deployment)');
-    console.log('4. Check network connectivity and firewall settings');
+    console.log('1. Check your /src/db/.env file exists and has correct Cosmos DB settings');
+    console.log('2. Verify Cosmos DB emulator is running');
+    console.log('3. Check network connectivity and firewall settings');
     process.exit(1);
   }
 }
 
-// Run if called directly
 if (require.main === module) {
   main();
 }
