@@ -11,7 +11,7 @@ namespace Utils
             "Development" => EnvironmentEnum.Development,
             "Testing" => EnvironmentEnum.Testing,
             "Production" => EnvironmentEnum.Production,
-            _ => throw new Exception($"Environment {Type} unknown.")
+            _ => throw new Exception($"Environment {Name} unknown.")
         };
 
         public static bool IsDevelopment => Type == EnvironmentEnum.Development;
