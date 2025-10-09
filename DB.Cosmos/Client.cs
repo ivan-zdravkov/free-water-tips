@@ -8,8 +8,9 @@ namespace DB.Cosmos
         private readonly ILogger<Client> logger;
         private readonly CosmosClient cosmos;
 
-        public Client()
+        public Client(ILogger<Client> logger)
         {
+            this.logger = logger;
             this.cosmos = new CosmosClient(Utils.Environment.CosmosDBEndpoint, Utils.Environment.CosmosDBKey);
         }
 
