@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - '*/*'
   pull_request:
     branches:
       - master
@@ -18,48 +19,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-shared-libraries:
+  detect-environment:
     runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.detect.outputs.environment }}
     
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '10.x'
+      - name: Detect Environment
+        id: detect
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
+            echo "environment=Production" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" =~ ^refs/heads/[^/]+/.* ]]; then
+            echo "environment=Testing" >> $GITHUB_OUTPUT
+          else
+            echo "environment=Testing" >> $GITHUB_OUTPUT
+          fi
           
-      - name: Restore dependencies for DB.Cosmos
-        run: dotnet restore DB.Cosmos/DB.Cosmos.csproj
-        
-      - name: Build DB.Cosmos
-        run: dotnet build DB.Cosmos/DB.Cosmos.csproj --configuration Release --no-restore
-        
-      - name: Restore dependencies for Utils
-        run: dotnet restore Utils/Utils.csproj
-        
-      - name: Build Utils
-        run: dotnet build Utils/Utils.csproj --configuration Release --no-restore
-        
-      - name: Run DB.Cosmos Tests
-        run: dotnet test DB.Cosmos.Tests/DB.Cosmos.Tests.csproj --configuration Release --collect:"XPlat Code Coverage" || echo "No DB.Cosmos tests found"
-        
-      - name: Run Utils Tests
-        run: dotnet test Utils.Tests/Utils.Tests.csproj --configuration Release --collect:"XPlat Code Coverage" || echo "No Utils tests found"
-        
-      - name: Upload shared libraries artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: shared-libraries-artifact
-          path: |
-            DB.Cosmos/bin/Release/net10.0/
-            Utils/bin/Release/net10.0/
-          retention-days: 30
+          echo "Detected environment: $(cat $GITHUB_OUTPUT | grep environment | cut -d= -f2)"
+          echo "Branch: ${{ github.ref }}"
 
   build-azure-functions:
     runs-on: ubuntu-latest
-    needs: build-shared-libraries
+    needs: detect-environment
+    environment: ${{ needs.detect-environment.outputs.environment }}
+    env:
+      ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
+      COSMOS_DB_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+      COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
       - name: Checkout
@@ -69,12 +56,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
-          
-      - name: Download shared libraries
-        uses: actions/download-artifact@v4
-        with:
-          name: shared-libraries-artifact
-          path: ./shared-libs
           
       - name: Restore dependencies
         run: dotnet restore AzureFunctions/AzureFunctions.csproj
@@ -97,7 +78,12 @@ jobs:
 
   build-web:
     runs-on: ubuntu-latest
-    needs: build-shared-libraries
+    needs: detect-environment
+    environment: ${{ needs.detect-environment.outputs.environment }}
+    env:
+      ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
+      COSMOS_DB_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+      COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
       - name: Checkout
@@ -111,26 +97,31 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build Web Application
+      - name: Build FreeWaterTips Web Application
         run: dotnet build Clients/Clients.csproj --configuration Release --no-restore
         
       - name: Run Tests
         run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
         
-      - name: Publish Web Application
+      - name: Publish FreeWaterTips Web Application
         run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --no-build
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Upload Web artifact
+      - name: Upload FreeWaterTips Web artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./publish/web/wwwroot
 
   build-android:
     runs-on: ubuntu-latest
-    needs: build-shared-libraries
+    needs: detect-environment
+    environment: ${{ needs.detect-environment.outputs.environment }}
+    env:
+      ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
+      COSMOS_DB_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+      COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
       - name: Checkout
@@ -150,25 +141,30 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build Android Application
+      - name: Build FreeWaterTips Android Application
         run: dotnet build Clients/Clients.csproj -f net10.0-android --configuration Release --no-restore
         
       - name: Run Tests
         run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
         
-      - name: Publish Android Application
+      - name: Publish FreeWaterTips Android Application
         run: dotnet publish Clients/Clients.csproj -f net10.0-android --configuration Release --output ./publish/android --no-build
         
-      - name: Upload Android artifact
+      - name: Upload FreeWaterTips Android artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-artifact
+          name: freewatertips-android-artifact
           path: ./publish/android
           retention-days: 30
 
   build-ios:
     runs-on: macos-latest
-    needs: build-shared-libraries
+    needs: detect-environment
+    environment: ${{ needs.detect-environment.outputs.environment }}
+    env:
+      ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
+      COSMOS_DB_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
+      COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
       - name: Checkout
@@ -190,27 +186,26 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build iOS Application
+      - name: Build FreeWaterTips iOS Application
         run: dotnet build Clients/Clients.csproj -f net10.0-ios --configuration Release --no-restore
         
       - name: Run Tests
         run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
         
-      - name: Publish iOS Application
+      - name: Publish FreeWaterTips iOS Application
         run: dotnet publish Clients/Clients.csproj -f net10.0-ios --configuration Release --output ./publish/ios --no-build
         
-      - name: Upload iOS artifact
+      - name: Upload FreeWaterTips iOS artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-artifact
+          name: freewatertips-ios-artifact
           path: ./publish/ios
           retention-days: 30
 
-  deploy-functions:
-    environment:
-      name: azure-production
+  deploy-azure-functions-to-azure:
     runs-on: ubuntu-latest
-    needs: build-azure-functions
+    needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
+    environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
       - name: Download Azure Functions artifact
@@ -230,33 +225,38 @@ jobs:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
           package: './publish'
   
-  deploy-web:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  deploy-web-to-github-pages:
     runs-on: ubuntu-latest
-    needs: build-web
-    
+    needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
+    environment: ${{ needs.detect-environment.outputs.environment }}
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-  deploy-android:
-    environment:
-      name: play-store
-    runs-on: ubuntu-latest
-    needs: build-android
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
-    
-    steps:
-      - name: Download Android artifact
+      - name: Download FreeWaterTips web artifacts
         uses: actions/download-artifact@v4
         with:
-          name: android-artifact
+          name: github-pages
+          path: ./web-output
+
+      - name: Deploy FreeWaterTips to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web-output
+          cname: ${{ secrets.WEB_DOMAIN }}
+          destination_dir: ${{ vars.WEB_DESTINATION_DIR }}
+
+  deploy-android-to-google-play:
+    runs-on: ubuntu-latest
+    needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
+    environment: ${{ needs.detect-environment.outputs.environment }}
+    
+    steps:
+      - name: Download FreeWaterTips Android artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: freewatertips-android-artifact
           path: ./publish
           
-      - name: Sign Android APK
+      - name: Sign FreeWaterTips Android APK
         uses: r0adkll/sign-android-release@v1
         with:
           releaseDirectory: ./publish
@@ -265,26 +265,24 @@ jobs:
           keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
           
-      - name: Deploy to Google Play Store
+      - name: Deploy FreeWaterTips to Google Play Store
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-          packageName: com.freewatertips.app
+          packageName: ${{ vars.ANDROID_PACKAGE_NAME }}
           releaseFiles: ./publish/*.apk
-          track: production
+          track: ${{ vars.GOOGLE_PLAY_TRACK }}
 
-  deploy-ios:
-    environment:
-      name: app-store
+  deploy-ios-to-app-store:
     runs-on: macos-latest
-    needs: build-ios
-    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
+    environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Download iOS artifact
+      - name: Download FreeWaterTips iOS artifact
         uses: actions/download-artifact@v4
         with:
-          name: ios-artifact
+          name: freewatertips-ios-artifact
           path: ./publish
           
       - name: Install Apple Certificate and Provisioning Profile
@@ -307,8 +305,8 @@ jobs:
           echo $IOS_PROVISIONING_PROFILE_BASE64 | base64 --decode > profile.mobileprovision
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-          
-      - name: Deploy to TestFlight
+            
+      - name: Deploy FreeWaterTips to App Store
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
