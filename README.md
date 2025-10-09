@@ -25,7 +25,7 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 
 ## Features
 
-- **Proximity-Based Search**: Find the nearest locations offering free drinking water using a Google Maps integration.
+- **Proximity-Based Search**: Find the nearest locations offering free drinking water using a maps integration.
 - **Cross-Platform Support**: Access the service via the web, Android, or iOS.
 - **Free and Anonymous Usage**: Use free without ever logging in.
 - **Community Contributions**: Add locations to help others.
@@ -34,7 +34,7 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 
 - **Spread the Word**: Share the project with your friends, family, and community.
 - **Add Locations**: If you know of places that serve free drinking water, add them to our database.
-- **Contribute**: Help us improve the project by contributing code, reporting issues, or suggesting features. Find out how in the [Technical Guide](./docs/technical-guide.md).
+- **Contribute**: Help us improve the project by contributing code, reporting issues, or suggesting features. Find out how in the [Contributing Guide](CONTRIBUTING.md).
 
 ## Monetization
 
@@ -48,6 +48,19 @@ Even though the applications are free, the infrastructure and developer fees cos
 * [GitHub](https://github.com/sponsors/ivan-zdravkov)
 * [Paypal](https://paypal.me/IZdravkov)
 * [Revolut](https://revolut.me/ivan_zdravkov)
+
+## Contributing
+
+We welcome contributions from the community! Whether you want to report bugs, suggest features, add water source locations, or contribute code, there are many ways to help.
+
+Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
+- How to report bugs effectively
+- Submitting feature requests
+- Development setup and code guidelines
+- Adding new water source locations
+- Community guidelines
+
+For quick bug reports, you can also use the "Report Bug" button in the [About section](https://freewater.tips/#about) of our web app.
 
 ## License
 

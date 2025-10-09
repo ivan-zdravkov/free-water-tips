@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="AzureFunctions/AzureFunctions.csproj" />
+  <Project Path="Clients/Clients.csproj">
+    <Deploy Solution="Debug|*" />
+  </Project>
+  <Project Path="DB.Cosmos/DB.Cosmos.csproj" Id="fb47195f-1dcc-4dcc-976c-f8b1919efcfe" />
+  <Project Path="Utils/Utils.csproj" />
+</Solution>
