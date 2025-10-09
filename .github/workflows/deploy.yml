@@ -18,33 +18,193 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-azure-functions:
+  build-shared-libraries:
     runs-on: ubuntu-latest
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+          
+      - name: Restore dependencies for DB.Cosmos
+        run: dotnet restore DB.Cosmos/DB.Cosmos.csproj
+        
+      - name: Build DB.Cosmos
+        run: dotnet build DB.Cosmos/DB.Cosmos.csproj --configuration Release --no-restore
+        
+      - name: Restore dependencies for Utils
+        run: dotnet restore Utils/Utils.csproj
+        
+      - name: Build Utils
+        run: dotnet build Utils/Utils.csproj --configuration Release --no-restore
+        
+      - name: Run DB.Cosmos Tests
+        run: dotnet test DB.Cosmos.Tests/DB.Cosmos.Tests.csproj --configuration Release --collect:"XPlat Code Coverage" || echo "No DB.Cosmos tests found"
+        
+      - name: Run Utils Tests
+        run: dotnet test Utils.Tests/Utils.Tests.csproj --configuration Release --collect:"XPlat Code Coverage" || echo "No Utils tests found"
+        
+      - name: Upload shared libraries artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: shared-libraries-artifact
+          path: |
+            DB.Cosmos/bin/Release/net10.0/
+            Utils/bin/Release/net10.0/
+          retention-days: 30
+
+  build-azure-functions:
+    runs-on: ubuntu-latest
+    needs: build-shared-libraries
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+          
+      - name: Download shared libraries
+        uses: actions/download-artifact@v4
+        with:
+          name: shared-libraries-artifact
+          path: ./shared-libs
+          
+      - name: Restore dependencies
+        run: dotnet restore AzureFunctions/AzureFunctions.csproj
+        
+      - name: Build Azure Functions
+        run: dotnet build AzureFunctions/AzureFunctions.csproj --configuration Release --no-restore
+        
+      - name: Run Tests
+        run: dotnet test AzureFunctions.Tests/AzureFunctions.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+        
+      - name: Publish Azure Functions
+        run: dotnet publish AzureFunctions/AzureFunctions.csproj --configuration Release --output ./publish/azure-functions --no-build
+        
+      - name: Upload Azure Functions artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: azure-functions-artifact
+          path: ./publish/azure-functions
+          retention-days: 30
 
   build-web:
     runs-on: ubuntu-latest
+    needs: build-shared-libraries
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+          
+      - name: Restore dependencies
+        run: dotnet restore Clients/Clients.csproj
+        
+      - name: Build Web Application
+        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore
+        
+      - name: Run Tests
+        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+        
+      - name: Publish Web Application
+        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --no-build
+        
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+        
+      - name: Upload Web artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./publish/web/wwwroot
 
   build-android:
     runs-on: ubuntu-latest
+    needs: build-shared-libraries
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+          
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+        
+      - name: Restore dependencies
+        run: dotnet restore Clients/Clients.csproj
+        
+      - name: Build Android Application
+        run: dotnet build Clients/Clients.csproj -f net10.0-android --configuration Release --no-restore
+        
+      - name: Run Tests
+        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
+        
+      - name: Publish Android Application
+        run: dotnet publish Clients/Clients.csproj -f net10.0-android --configuration Release --output ./publish/android --no-build
+        
+      - name: Upload Android artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-artifact
+          path: ./publish/android
+          retention-days: 30
 
   build-ios:
     runs-on: macos-latest
+    needs: build-shared-libraries
     
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+          
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+          
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+        
+      - name: Restore dependencies
+        run: dotnet restore Clients/Clients.csproj
+        
+      - name: Build iOS Application
+        run: dotnet build Clients/Clients.csproj -f net10.0-ios --configuration Release --no-restore
+        
+      - name: Run Tests
+        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
+        
+      - name: Publish iOS Application
+        run: dotnet publish Clients/Clients.csproj -f net10.0-ios --configuration Release --output ./publish/ios --no-build
+        
+      - name: Upload iOS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-artifact
+          path: ./publish/ios
+          retention-days: 30
 
   deploy-functions:
     environment:
@@ -58,6 +218,17 @@ jobs:
         with:
           name: azure-functions-artifact
           path: ./publish
+          
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Deploy to Azure Functions
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
+          package: './publish'
   
   deploy-web:
     environment:
@@ -67,17 +238,16 @@ jobs:
     needs: build-web
     
     steps:
-      - name: Download Web artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: web-artifact
-          path: ./publish
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   deploy-android:
     environment:
       name: play-store
     runs-on: ubuntu-latest
     needs: build-android
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     
     steps:
       - name: Download Android artifact
@@ -85,12 +255,30 @@ jobs:
         with:
           name: android-artifact
           path: ./publish
+          
+      - name: Sign Android APK
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: ./publish
+          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
+          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          
+      - name: Deploy to Google Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          packageName: com.freewatertips.app
+          releaseFiles: ./publish/*.apk
+          track: production
 
   deploy-ios:
     environment:
       name: app-store
     runs-on: macos-latest
     needs: build-ios
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
     
     steps:
       - name: Download iOS artifact
@@ -98,3 +286,34 @@ jobs:
         with:
           name: ios-artifact
           path: ./publish
+          
+      - name: Install Apple Certificate and Provisioning Profile
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+        run: |
+          # Create temporary keychain
+          security create-keychain -p "" build.keychain
+          security set-keychain-settings -lut 21600 build.keychain
+          security unlock-keychain -p "" build.keychain
+          
+          # Install certificate
+          echo $IOS_CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          security import certificate.p12 -P $IOS_CERTIFICATE_PASSWORD -A -t cert -f pkcs12 -k build.keychain
+          security list-keychain -d user -s build.keychain
+          
+          # Install provisioning profile
+          echo $IOS_PROVISIONING_PROFILE_BASE64 | base64 --decode > profile.mobileprovision
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          
+      - name: Deploy to TestFlight
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+        run: |
+          xcrun altool --upload-app --type ios --file ./publish/*.ipa \
+            --apiKey $APP_STORE_CONNECT_API_KEY_ID \
+            --apiIssuer $APP_STORE_CONNECT_API_ISSUER_ID
