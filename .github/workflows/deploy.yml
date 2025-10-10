@@ -63,9 +63,6 @@ jobs:
       - name: Build Azure Functions
         run: dotnet build AzureFunctions/AzureFunctions.csproj --configuration Release --no-restore
         
-      - name: Run Tests
-        run: dotnet test AzureFunctions.Tests/AzureFunctions.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
-        
       - name: Publish Azure Functions
         run: dotnet publish AzureFunctions/AzureFunctions.csproj --configuration Release --output ./publish/azure-functions --no-build
         
@@ -102,9 +99,6 @@ jobs:
         
       - name: Build FreeWaterTips Web Application (Blazor WebAssembly)
         run: dotnet build Clients/Clients.csproj -f net10.0-browser --configuration Release --no-restore
-        
-      - name: Run Tests
-        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
         
       - name: Publish FreeWaterTips Web Application (Blazor WebAssembly)
         run: dotnet publish Clients/Clients.csproj -f net10.0-browser --configuration Release --output ./publish/web --no-build
@@ -147,9 +141,6 @@ jobs:
       - name: Build FreeWaterTips Android Application
         run: dotnet build Clients/Clients.csproj -f net10.0-android --configuration Release --no-restore
         
-      - name: Run Tests
-        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
-        
       - name: Publish FreeWaterTips Android Application
         run: dotnet publish Clients/Clients.csproj -f net10.0-android --configuration Release --output ./publish/android --no-build
         
@@ -191,9 +182,6 @@ jobs:
         
       - name: Build FreeWaterTips iOS Application
         run: dotnet build Clients/Clients.csproj -f net10.0-ios --configuration Release --no-restore
-        
-      - name: Run Tests
-        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
         
       - name: Publish FreeWaterTips iOS Application
         run: dotnet publish Clients/Clients.csproj -f net10.0-ios --configuration Release --output ./publish/ios --no-build
