@@ -91,11 +91,12 @@ jobs:
         with:
           dotnet-version: '10.x'
           
-      - name: Install WebAssembly Tools workload
-        run: dotnet workload install wasm-tools
+      - name: Install required workloads
+        run: |
+          dotnet workload install wasm-tools
           
-      - name: Restore dependencies for Blazor WebAssembly
-        run: dotnet restore Clients/Clients.csproj -f net10.0-browser
+      - name: Restore dependencies
+        run: dotnet restore Clients/Clients.csproj
         
       - name: Build FreeWaterTips Web Application (Blazor WebAssembly)
         run: dotnet build Clients/Clients.csproj -f net10.0-browser --configuration Release --no-restore
