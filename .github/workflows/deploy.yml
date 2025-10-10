@@ -135,8 +135,8 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         
-      - name: Install MAUI workload
-        run: dotnet workload install maui
+      - name: Install MAUI Android workload
+        run: dotnet workload install maui-android
         
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
@@ -177,8 +177,8 @@ jobs:
         with:
           xcode-version: latest-stable
           
-      - name: Install MAUI workload
-        run: dotnet workload install maui
+      - name: Install MAUI iOS workload
+        run: dotnet workload install maui-ios
         
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
