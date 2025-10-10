@@ -94,20 +94,20 @@ jobs:
         with:
           dotnet-version: '10.x'
           
-      - name: Install MAUI workload
-        run: dotnet workload install maui
+      - name: Install WebAssembly Tools workload
+        run: dotnet workload install wasm-tools
           
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build FreeWaterTips Web Application
-        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore
+      - name: Build FreeWaterTips Web Application (Blazor WebAssembly)
+        run: dotnet build Clients/Clients.csproj -f net10.0-browser --configuration Release --no-restore
         
       - name: Run Tests
-        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --no-build --collect:"XPlat Code Coverage"
+        run: dotnet test Clients.Tests/Clients.Tests.csproj --configuration Release --collect:"XPlat Code Coverage"
         
-      - name: Publish FreeWaterTips Web Application
-        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --no-build
+      - name: Publish FreeWaterTips Web Application (Blazor WebAssembly)
+        run: dotnet publish Clients/Clients.csproj -f net10.0-browser --configuration Release --output ./publish/web --no-build
         
       - name: Setup Pages
         uses: actions/configure-pages@v4

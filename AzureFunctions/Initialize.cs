@@ -10,11 +10,10 @@ public class Initialize
     private readonly ILogger<Initialize> logger;
     private readonly DB.Cosmos.Client cosmosClient;
 
-    public Initialize(ILogger<Initialize> logger)
+    public Initialize(ILogger<Initialize> logger, DB.Cosmos.Client cosmosClient)
     {
         this.logger = logger;
-
-        this.cosmosClient = new DB.Cosmos.Client();
+        this.cosmosClient = cosmosClient;
     }
 
     [Function("Initialize")]

@@ -11,4 +11,6 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
 
+builder.Services.AddSingleton<DB.Cosmos.Client>();
+
 builder.Build().Run();
