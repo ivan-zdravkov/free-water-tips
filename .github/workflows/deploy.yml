@@ -115,7 +115,7 @@ jobs:
           path: ./publish/web/wwwroot
 
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
     env:
