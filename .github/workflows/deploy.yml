@@ -74,7 +74,7 @@ jobs:
           retention-days: 30
 
   build-web:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
     env:
@@ -91,9 +91,12 @@ jobs:
         with:
           dotnet-version: '10.x'
           
-      - name: Install required workloads
+      - name: Install all required workloads
         run: |
           dotnet workload install wasm-tools
+          dotnet workload install maui-android  
+          dotnet workload install maui-ios
+          dotnet workload install maccatalyst
           
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
