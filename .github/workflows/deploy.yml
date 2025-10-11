@@ -184,10 +184,10 @@ jobs:
         run: dotnet restore Clients/Clients.csproj
         
       - name: Build iOS Application
-        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-ios
+        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-ios -p:BuildIpa=false -p:CodesignKey="" -p:CodesignProvision=""
         
       - name: Publish iOS Application
-        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/ios --framework net10.0-ios
+        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/ios --framework net10.0-ios -p:BuildIpa=false -p:CodesignKey="" -p:CodesignProvision=""
         
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v4
