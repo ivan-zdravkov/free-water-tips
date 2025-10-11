@@ -112,7 +112,7 @@ jobs:
         with:
           path: ./publish/web/wwwroot
 
-  build-android:
+  build-android:  # Temporarily disable Android builds
     runs-on: ubuntu-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -154,6 +154,7 @@ jobs:
           retention-days: 30
 
   build-ios:
+    if: false  # Temporarily disable iOS builds
     runs-on: macos-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -239,6 +240,7 @@ jobs:
           destination_dir: ${{ vars.WEB_DESTINATION_DIR }}
 
   deploy-android-to-google-play:
+    if: false  # Temporarily disable Android deployment
     runs-on: ubuntu-latest
     needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -268,6 +270,7 @@ jobs:
           track: ${{ vars.GOOGLE_PLAY_TRACK }}
 
   deploy-ios-to-app-store:
+    if: false  # Temporarily disable iOS deployment
     runs-on: macos-latest
     needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
     environment: ${{ needs.detect-environment.outputs.environment }}
