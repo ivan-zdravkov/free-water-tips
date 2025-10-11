@@ -200,7 +200,7 @@ jobs:
 
   deploy-azure-functions-to-azure:
     runs-on: ubuntu-latest
-    needs: [detect-environment, build-azure-functions, build-web]
+    needs: [detect-environment, build-azure-functions, build-web, build-android, build-ios]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
