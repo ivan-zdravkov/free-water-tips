@@ -99,10 +99,10 @@ jobs:
         run: dotnet restore Clients/Clients.csproj
         
       - name: Build FreeWaterTips Web Application (Blazor WebAssembly)
-        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore
+        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-browser
         
       - name: Publish FreeWaterTips Web Application (Blazor WebAssembly)
-        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web
+        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --framework net10.0-browser
         
       - name: Setup Pages
         uses: actions/configure-pages@v4
@@ -141,10 +141,10 @@ jobs:
         run: dotnet restore Clients/Clients.csproj
         
       - name: Build FreeWaterTips Android Application
-        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore
+        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-android
         
       - name: Publish FreeWaterTips Android Application
-        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/android
+        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/android --framework net10.0-android
         
       - name: Upload FreeWaterTips Android artifact
         uses: actions/upload-artifact@v4
@@ -184,10 +184,10 @@ jobs:
         run: dotnet restore Clients/Clients.csproj
         
       - name: Build FreeWaterTips iOS Application
-        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore
+        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-ios
         
       - name: Publish FreeWaterTips iOS Application
-        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/ios
+        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/ios --framework net10.0-ios
         
       - name: Upload FreeWaterTips iOS artifact
         uses: actions/upload-artifact@v4
