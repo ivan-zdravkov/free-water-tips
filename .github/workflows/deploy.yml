@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - master
-      - '*/*'
+      - 'feature/*'
   pull_request:
     branches:
       - master
@@ -30,7 +30,7 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "environment=Production" >> $GITHUB_OUTPUT
-          elif [[ "${{ github.ref }}" =~ ^refs/heads/[^/]+/.* ]]; then
+          elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
             echo "environment=Testing" >> $GITHUB_OUTPUT
           else
             echo "environment=Testing" >> $GITHUB_OUTPUT
@@ -111,9 +111,10 @@ jobs:
             sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
             sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
           else
-            # Testing environment uses subdirectory
-            sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/index.html
-            sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/404.html
+            # Testing environment uses separate subdomain
+            echo "test.freewater.tips" > ./publish/web/wwwroot/CNAME
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
           fi
         
       - name: Setup Pages
@@ -262,13 +263,16 @@ jobs:
           name: github-pages
           path: ./web-output
 
-      - name: Deploy to Testing Environment (Subdirectory)
+      - name: Deploy to Testing Environment (test.freewater.tips)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web-output
-          destination_dir: testing
-          keep_files: true
+          publish_branch: gh-pages-testing
+          cname: test.freewater.tips
+          allow_empty_commit: false
+          keep_files: false
+          force_orphan: true
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
