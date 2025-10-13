@@ -120,10 +120,17 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
-      - name: Upload Web artifact
+      - name: Upload Web artifact (GitHub Pages)
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./publish/web/wwwroot
+          
+      - name: Upload Web artifact (Testing)
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-testing-artifact
+          path: ./publish/web/wwwroot
+          retention-days: 1
 
   build-android: 
     if: false # Temporarily disable Android builds at some point enable them only for production builds
@@ -257,12 +264,12 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Download web artifacts
+      - name: Download web artifacts for testing
         uses: actions/download-artifact@v4
         with:
-          name: github-pages
+          name: web-testing-artifact
           path: ./web-output
-
+          
       - name: Deploy to Testing Environment (test.freewater.tips)
         uses: peaceiris/actions-gh-pages@v3
         with:
