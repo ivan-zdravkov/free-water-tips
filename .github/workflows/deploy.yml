@@ -104,6 +104,18 @@ jobs:
       - name: Publish Web Application (Blazor WebAssembly)
         run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --framework net10.0-browser
         
+      - name: Configure domain and base href for environment
+        run: |
+          if [[ "${{ needs.detect-environment.outputs.environment }}" == "Production" ]]; then
+            echo "freewater.tips" > ./publish/web/wwwroot/CNAME
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
+          else
+            echo "test.freewater.tips" > ./publish/web/wwwroot/CNAME
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
+          fi
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
@@ -221,15 +233,36 @@ jobs:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
           package: './publish'
   
-  deploy-web-to-github-pages:
+  deploy-web-to-production:
+    if: needs.detect-environment.outputs.environment == 'Production'
     runs-on: ubuntu-latest
     needs: [detect-environment, build-web, deploy-azure-functions-to-azure]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages (Production)
         id: deployment
         uses: actions/deploy-pages@v4
+
+  deploy-web-to-testing:
+    if: needs.detect-environment.outputs.environment == 'Testing'
+    runs-on: ubuntu-latest
+    needs: [detect-environment, build-web, deploy-azure-functions-to-azure]
+    environment: ${{ needs.detect-environment.outputs.environment }}
+    
+    steps:
+      - name: Download web artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: github-pages
+          path: ./web-output
+
+      - name: Deploy to Testing Environment
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web-output
+          cname: test.freewater.tips
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
