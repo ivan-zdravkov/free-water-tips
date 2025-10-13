@@ -111,10 +111,9 @@ jobs:
             sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
             sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
           else
-            # Testing environment uses separate subdomain
-            echo "test.freewater.tips" > ./publish/web/wwwroot/CNAME
-            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
-            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
+            # Testing environment uses subdirectory on same domain
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/index.html
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/404.html
           fi
         
       - name: Setup Pages
@@ -125,7 +124,16 @@ jobs:
         with:
           path: ./publish/web/wwwroot
           
+      - name: Upload Web artifact (Production)
+        if: needs.detect-environment.outputs.environment == 'Production'
+        uses: actions/upload-artifact@v4
+        with:
+          name: web-production-artifact
+          path: ./publish/web/wwwroot
+          retention-days: 1
+          
       - name: Upload Web artifact (Testing)
+        if: needs.detect-environment.outputs.environment == 'Testing'
         uses: actions/upload-artifact@v4
         with:
           name: web-testing-artifact
@@ -248,9 +256,25 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Deploy to GitHub Pages (Production)
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Download web artifacts for production
+        uses: actions/download-artifact@v4
+        with:
+          name: web-production-artifact
+          path: ./web-output
+
+      - name: Deploy to GitHub Pages (Production - preserve testing)
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./web-output
+          publish_branch: gh-pages
+          keep_files: true
+          exclude_assets: 'testing/**'
 
   deploy-web-to-testing:
     if: needs.detect-environment.outputs.environment == 'Testing'
@@ -269,17 +293,15 @@ jobs:
         with:
           name: web-testing-artifact
           path: ./web-output
-          
-      - name: Deploy to Testing Environment (test.freewater.tips)
+
+      - name: Deploy to Testing Environment (subdirectory)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web-output
-          publish_branch: gh-pages-testing
-          cname: test.freewater.tips
-          allow_empty_commit: false
-          keep_files: false
-          force_orphan: true
+          publish_branch: gh-pages
+          destination_dir: testing
+          keep_files: true
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
