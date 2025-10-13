@@ -225,20 +225,11 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-environment, build-web, deploy-azure-functions-to-azure]
     environment: ${{ needs.detect-environment.outputs.environment }}
+    
     steps:
-      - name: Download web artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: github-pages
-          path: ./web-output
-
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web-output
-          cname: ${{ secrets.WEB_DOMAIN }}
-          destination_dir: ${{ vars.WEB_DESTINATION_DIR }}
+        id: deployment
+        uses: actions/deploy-pages@v4
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
@@ -265,9 +256,9 @@ jobs:
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
-          packageName: ${{ vars.ANDROID_PACKAGE_NAME }}
+          packageName: ${{ secrets.ANDROID_PACKAGE_NAME }}
           releaseFiles: ./publish/*.apk
-          track: ${{ vars.GOOGLE_PLAY_TRACK }}
+          track: ${{ secrets.GOOGLE_PLAY_TRACK }}
 
   deploy-ios-to-app-store:
     runs-on: macos-latest
