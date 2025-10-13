@@ -10,7 +10,7 @@ on:
       - master
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -111,9 +111,9 @@ jobs:
             sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
             sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
           else
-            echo "test.freewater.tips" > ./publish/web/wwwroot/CNAME
-            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/index.html
-            sed -i 's|<base href="/free-water-tips/" />|<base href="/" />|g' ./publish/web/wwwroot/404.html
+            # Testing environment uses subdirectory
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/index.html
+            sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/404.html
           fi
         
       - name: Setup Pages
@@ -251,18 +251,24 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
           name: github-pages
           path: ./web-output
 
-      - name: Deploy to Testing Environment
+      - name: Deploy to Testing Environment (Subdirectory)
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web-output
-          cname: test.freewater.tips
+          destination_dir: testing
+          keep_files: true
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
