@@ -25,7 +25,7 @@ jobs:
       environment: ${{ steps.detect.outputs.environment }}
     
     steps:
-      - name: Detect Environment
+      - name: Detect environment
         id: detect
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
@@ -49,10 +49,10 @@ jobs:
       COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
@@ -84,27 +84,27 @@ jobs:
       COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
           
-      - name: Install required workloads
+      - name: Install WebAssembly workloads
         run: dotnet workload install wasm-tools
           
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build Web Application (Blazor WebAssembly)
+      - name: Build web application
         run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-browser
         
-      - name: Publish Web Application (Blazor WebAssembly)
+      - name: Publish web application
         run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --framework net10.0-browser
         
-      - name: Configure domain and base href for environment
+      - name: Configure environment settings
         run: |
           if [[ "${{ needs.detect-environment.outputs.environment }}" == "Production" ]]; then
             echo "freewater.tips" > ./publish/web/wwwroot/CNAME
@@ -116,15 +116,15 @@ jobs:
             sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/404.html
           fi
         
-      - name: Setup Pages
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
         
-      - name: Upload Web artifact (GitHub Pages)
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./publish/web/wwwroot
           
-      - name: Upload Web artifact (Production)
+      - name: Upload production artifact
         if: needs.detect-environment.outputs.environment == 'Production'
         uses: actions/upload-artifact@v4
         with:
@@ -132,7 +132,7 @@ jobs:
           path: ./publish/web/wwwroot
           retention-days: 1
           
-      - name: Upload Web artifact (Testing)
+      - name: Upload testing artifact
         if: needs.detect-environment.outputs.environment == 'Testing'
         uses: actions/upload-artifact@v4
         with:
@@ -152,10 +152,10 @@ jobs:
       COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
@@ -163,16 +163,16 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         
-      - name: Install required workloads
+      - name: Install MAUI Android workloads
         run: dotnet workload install maui-android
         
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build Android Application
+      - name: Build Android application
         run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-android
         
-      - name: Publish Android Application
+      - name: Publish Android application
         run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/android --framework net10.0-android
         
       - name: Upload Android artifact
@@ -194,10 +194,10 @@ jobs:
       COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
     
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
@@ -207,16 +207,16 @@ jobs:
         with:
           xcode-version: '16.4'
           
-      - name: Install required workloads
+      - name: Install MAUI iOS workloads
         run: dotnet workload install maui-ios
         
       - name: Restore dependencies
         run: dotnet restore Clients/Clients.csproj
         
-      - name: Build iOS Application
+      - name: Build iOS application
         run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-ios -p:BuildIpa=false -p:CodesignKey="" -p:CodesignProvision=""
         
-      - name: Publish iOS Application
+      - name: Publish iOS application
         run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/ios --framework net10.0-ios -p:BuildIpa=false -p:CodesignKey="" -p:CodesignProvision=""
         
       - name: Upload iOS artifact
@@ -256,25 +256,55 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Download web artifacts for production
+      - name: Download production artifacts
         uses: actions/download-artifact@v4
         with:
           name: web-production-artifact
           path: ./web-output
 
-      - name: Deploy to GitHub Pages (Production - preserve testing)
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: ./gh-pages-checkout
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Preserve testing directory
+        run: |
+          if [ -d "./gh-pages-checkout/testing" ]; then
+            cp -r ./gh-pages-checkout/testing ./testing-backup
+            echo "Testing directory backed up"
+          else
+            echo "No testing directory found to preserve"
+          fi
+          
+      - name: Deploy to production
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web-output
           publish_branch: gh-pages
-          keep_files: true
-          exclude_assets: 'testing/**'
+          keep_files: false
+          force_orphan: false
+          
+      - name: Restore testing directory
+        run: |
+          if [ -d "./testing-backup" ]; then
+            git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./temp-gh-pages
+            cp -r ./testing-backup ./temp-gh-pages/testing
+            cd ./temp-gh-pages
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add testing/
+            git commit -m "Restore testing directory after production deployment" || echo "No changes to commit"
+            git push origin gh-pages
+            echo "Testing directory restored"
+          fi
 
   deploy-web-to-testing:
     if: needs.detect-environment.outputs.environment == 'Testing'
@@ -283,18 +313,30 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Download web artifacts for testing
+      - name: Download testing artifacts
         uses: actions/download-artifact@v4
         with:
           name: web-testing-artifact
           path: ./web-output
 
-      - name: Deploy to Testing Environment (subdirectory)
+      - name: Clean testing directory
+        run: |
+          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./temp-gh-pages || git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./temp-gh-pages --depth 1
+          cd ./temp-gh-pages
+          if [ -d "testing" ]; then
+            rm -rf testing/*
+            echo "Cleaned existing testing directory"
+          else
+            mkdir -p testing
+            echo "Created new testing directory"
+          fi
+          
+      - name: Deploy to testing environment
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -344,7 +386,7 @@ jobs:
           name: ios-artifact
           path: ./publish
           
-      - name: Install Apple Certificate and Provisioning Profile
+      - name: Install Apple certificates and provisioning profile
         env:
           IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
           IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
