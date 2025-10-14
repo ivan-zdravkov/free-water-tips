@@ -142,7 +142,6 @@ jobs:
           retention-days: 1
 
   build-android: 
-    if: false # Temporarily disable Android builds at some point enable them only for production builds
     runs-on: ubuntu-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -184,7 +183,6 @@ jobs:
           retention-days: 30
 
   build-ios:
-    if: false # Temporarily disable iOS builds at some point enable them only for production builds
     runs-on: macos-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -338,6 +336,7 @@ jobs:
           git push origin gh-pages
 
   deploy-android-to-google-play:
+    if: false # Temporarily disable Android deployments and at some point enable them only for production builds
     runs-on: ubuntu-latest
     needs: [detect-environment, build-android, deploy-azure-functions-to-azure]
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -367,6 +366,7 @@ jobs:
           track: ${{ secrets.GOOGLE_PLAY_TRACK }}
 
   deploy-ios-to-app-store:
+    if: false # Temporarily disable iOS deployments and at some point enable them only for production builds
     runs-on: macos-latest
     needs: [detect-environment, build-ios, deploy-azure-functions-to-azure]
     environment: ${{ needs.detect-environment.outputs.environment }}
