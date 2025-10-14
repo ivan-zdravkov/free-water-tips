@@ -1,4 +1,4 @@
-/* _content/Clients/Components/Layout/MainLayout.razor.rz.scp.css */
+/* /Components/Layout/MainLayout.razor.rz.scp.css */
 .page[b-m7b3vc959z] {
     position: relative;
     display: flex;
@@ -76,7 +76,7 @@ main[b-m7b3vc959z] {
         padding-right: 1.5rem !important;
     }
 }
-/* _content/Clients/Components/Layout/NavMenu.razor.rz.scp.css */
+/* /Components/Layout/NavMenu.razor.rz.scp.css */
 .navbar-toggler[b-2wluz4owvo] {
     appearance: none;
     cursor: pointer;
