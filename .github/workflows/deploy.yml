@@ -11,11 +11,10 @@ on:
 
 permissions:
   contents: write
-  pages: write
   id-token: write
 
 concurrency:
-  group: "pages"
+  group: "deploy-${{ github.ref }}"
   cancel-in-progress: false
 
 jobs:
@@ -124,13 +123,7 @@ jobs:
             sed -i 's|<title>Free Water Tips</title>|<title>Testing Free Water Tips</title>|g' ./publish/web/wwwroot/404.html
           fi
         
-      - name: Setup GitHub Pages
-        uses: actions/configure-pages@v4
-        
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./publish/web/wwwroot
+
           
       - name: Upload production artifact
         if: needs.detect-environment.outputs.environment == 'Production'
@@ -275,44 +268,36 @@ jobs:
           name: web-production-artifact
           path: ./web-output
 
-      - name: Checkout gh-pages branch
-        uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: ./gh-pages-checkout
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
-      - name: Preserve testing directory
+      - name: Deploy to production via git commit
         run: |
-          if [ -d "./gh-pages-checkout/testing" ]; then
-            cp -r ./gh-pages-checkout/testing ./testing-backup
-            echo "Testing directory backed up"
-          else
-            echo "No testing directory found to preserve"
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Clone gh-pages branch
+          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./gh-pages-temp
+          cd ./gh-pages-temp
+          
+          # Backup testing directory if it exists
+          if [ -d "testing" ]; then
+            cp -r testing ../testing-backup
           fi
           
-      - name: Deploy to production
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web-output
-          publish_branch: gh-pages
-          keep_files: false
-          force_orphan: false
+          # Clear root directory but keep .git and testing
+          find . -maxdepth 1 ! -name '.git' ! -name 'testing' -exec rm -rf {} +
           
-      - name: Restore testing directory
-        run: |
-          if [ -d "./testing-backup" ]; then
-            git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./temp-gh-pages
-            cp -r ./testing-backup ./temp-gh-pages/testing
-            cd ./temp-gh-pages
-            git config user.name "github-actions[bot]"
-            git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add testing/
-            git commit -m "Restore testing directory after production deployment" || echo "No changes to commit"
-            git push origin gh-pages
-            echo "Testing directory restored"
+          # Copy new production files
+          cp -r ../web-output/* .
+          
+          # Restore testing directory
+          if [ -d "../testing-backup" ]; then
+            cp -r ../testing-backup testing
           fi
+          
+          # Commit and push changes
+          git add .
+          git commit -m "Deploy production build from commit ${{ github.sha }}" || echo "No changes to commit"
+          git push origin gh-pages
 
   deploy-web-to-testing:
     if: needs.detect-environment.outputs.environment == 'Testing'
@@ -332,15 +317,25 @@ jobs:
           name: web-testing-artifact
           path: ./web-output
 
-      - name: Deploy to testing environment
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web-output
-          publish_branch: gh-pages
-          destination_dir: testing
-          keep_files: true
-          enable_jekyll: false
+      - name: Deploy to testing environment via git commit
+        run: |
+          # Configure git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Clone gh-pages branch
+          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./gh-pages-temp
+          cd ./gh-pages-temp
+          
+          # Create/update testing directory
+          rm -rf testing
+          mkdir -p testing
+          cp -r ../web-output/* testing/
+          
+          # Commit and push changes
+          git add testing/
+          git commit -m "Deploy testing build from commit ${{ github.sha }}" || echo "No changes to commit"
+          git push origin gh-pages
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
