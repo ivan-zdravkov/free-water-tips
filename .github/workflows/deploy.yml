@@ -93,16 +93,21 @@ jobs:
           dotnet-version: '10.x'
           
       - name: Install WebAssembly workloads
-        run: dotnet workload install wasm-tools
+        run: |
+          dotnet --info
+          dotnet workload install wasm-tools --skip-sign-check
+          dotnet workload install microsoft-net-sdk-blazorwebassembly-aot --skip-sign-check || echo "AOT workload not available"
+          dotnet workload list
           
       - name: Restore dependencies
-        run: dotnet restore Clients/Clients.csproj
+        run: dotnet restore Clients/Clients.csproj --verbosity normal
         
       - name: Build web application
-        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-browser
+        run: dotnet build Clients/Clients.csproj --configuration Release --no-restore --framework net10.0-browser --verbosity normal
         
       - name: Publish web application
-        run: dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --framework net10.0-browser
+        run: |
+          dotnet publish Clients/Clients.csproj --configuration Release --output ./publish/web --framework net10.0-browser --verbosity normal --no-restore --self-contained false
         
       - name: Configure environment settings
         run: |
@@ -114,6 +119,9 @@ jobs:
             # Testing environment uses subdirectory on same domain
             sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/index.html
             sed -i 's|<base href="/free-water-tips/" />|<base href="/testing/" />|g' ./publish/web/wwwroot/404.html
+            # Update title for testing environment
+            sed -i 's|<title>Free Water Tips</title>|<title>Testing Free Water Tips</title>|g' ./publish/web/wwwroot/index.html
+            sed -i 's|<title>Free Water Tips</title>|<title>Testing Free Water Tips</title>|g' ./publish/web/wwwroot/404.html
           fi
         
       - name: Setup GitHub Pages
@@ -324,18 +332,6 @@ jobs:
           name: web-testing-artifact
           path: ./web-output
 
-      - name: Clean testing directory
-        run: |
-          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./temp-gh-pages || git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./temp-gh-pages --depth 1
-          cd ./temp-gh-pages
-          if [ -d "testing" ]; then
-            rm -rf testing/*
-            echo "Cleaned existing testing directory"
-          else
-            mkdir -p testing
-            echo "Created new testing directory"
-          fi
-          
       - name: Deploy to testing environment
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -344,6 +340,7 @@ jobs:
           publish_branch: gh-pages
           destination_dir: testing
           keep_files: true
+          enable_jekyll: false
 
   deploy-android-to-google-play:
     runs-on: ubuntu-latest
