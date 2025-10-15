@@ -1,0 +1,18 @@
+﻿@page "/"
+@using FreeWaterTips.Shared.Services
+@using FreeWaterTips.Utils.Responses
+@inject IFormFactor FormFactor
+@inject IAzureFunctionsApiService AzureFunctionsApiService
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app running on <em>@factor</em> using <em>@platform</em>.
+Azure Functions are @health.Status, running on @health.AzureFunctionsEndpoint with a CosmosDB on @health.CosmosDBEndpoint
+
+@code {
+    private string factor => FormFactor.GetFormFactor();
+    private string platform => FormFactor.GetPlatform();
+    private HealthResponse health => AzureFunctionsApiService.GetAsync<HealthResponse>("Health").Result;
+}
