@@ -1,8 +1,6 @@
 ﻿using FreeWaterTips.Services;
 using FreeWaterTips.Shared.Services;
 using Microsoft.Extensions.Logging;
-using Environment = FreeWaterTips.Utils.Environment;
-
 
 namespace FreeWaterTips
 {
@@ -10,11 +8,6 @@ namespace FreeWaterTips
     {
         public static MauiApp CreateMauiApp()
         {
-            if (Environment.IsDevelopment)
-            {
-                DotNetEnv.LoadOptions.DEFAULT.Load("../.env.development");
-            }
-
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()

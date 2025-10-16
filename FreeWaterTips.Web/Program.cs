@@ -1,12 +1,6 @@
 using FreeWaterTips.Shared.Services;
 using FreeWaterTips.Web.Services;
 using FreeWaterTips.Web.Components;
-using Environment = FreeWaterTips.Utils.Environment;
-
-if (Environment.IsDevelopment)
-{
-    DotNetEnv.LoadOptions.DEFAULT.Load("../.env.development");
-}
 
 var builder = WebApplication.CreateBuilder(args);
 
