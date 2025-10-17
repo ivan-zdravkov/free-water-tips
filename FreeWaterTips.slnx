@@ -1,8 +1,5 @@
 <Solution>
   <Project Path="FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj" />
   <Project Path="FreeWaterTips.DB.Cosmos/FreeWaterTips.DB.Cosmos.csproj" />
-  <Project Path="FreeWaterTips.Mobile/FreeWaterTips.Mobile.csproj" />
-  <Project Path="FreeWaterTips.Shared/FreeWaterTips.Shared.csproj" />
   <Project Path="FreeWaterTips.Utils/FreeWaterTips.Utils.csproj" />
-  <Project Path="FreeWaterTips.Web/FreeWaterTips.Web.csproj" />
 </Solution>
