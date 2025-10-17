@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Launch React Native Web",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "Start React Native Web",
+      "url": "http://localhost:8090",
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
+      "sourceMaps": true
+    }
+  ],
+  "compounds": [
+    {
+      "name": "🚀 Azure Functions + React Native Web",
+      "configurations": ["Launch React Native Web"],
+      "preLaunchTask": "🚀 Start Backend + Web",
+      "presentation": {
+        "hidden": false,
+        "group": "fullstack",
+        "order": 1
+      },
+      "stopAll": true
+    },
+    {
+      "name": "🌐 React Native Web",
+      "configurations": ["Launch React Native Web"],
+      "preLaunchTask": "Start React Native Web",
+      "presentation": {
+        "hidden": false,
+        "group": "frontend",
+        "order": 2
+      }
+    }
+  ]
+}

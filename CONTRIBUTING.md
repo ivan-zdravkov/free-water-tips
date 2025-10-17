@@ -57,12 +57,12 @@ Help make the platform accessible in different languages (coming soon).
 
 ## Project Architecture
 
-**Free Water Tips** is a full-stack web application with a serverless backend:
+**Free Water Tips** is a full-stack application with a serverless backend:
 
 ### Frontend
-- **Web**: [.NET Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) with maps integration
-- **Mobile**: [.NET MAUI](https://dotnet.microsoft.com/en-us/apps/maui)
-- **Hosting**: [GitHub Pages](https://pages.github.com/) (static hosting)
+- **Cross-Platform**: [React Native](https://reactnative.dev/) with [Expo](https://expo.dev/)
+- **Platforms**: Web, iOS, and Android from a single TypeScript codebase
+- **Web Hosting**: [GitHub Pages](https://pages.github.com/) or any static hosting
 
 ### Backend  
 - **API**: [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) (C#) with HTTP triggers

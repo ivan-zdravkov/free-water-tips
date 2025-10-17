@@ -1,0 +1,203 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build Azure Functions",
+      "type": "shell",
+      "command": "dotnet",
+      "args": [
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "Run Azure Functions",
+      "type": "shell",
+      "command": "func",
+      "args": [
+        "start",
+        "--csharp"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "backend"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s+(error|warning|info)\\\\s+(TS\\\\d+)\\\\s*:\\\\s*(.*)$",
+          "file": 1,
+          "location": 2,
+          "severity": 3,
+          "code": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Azure Functions Core Tools.*$",
+          "endsPattern": "^.*Worker process started and initialized.*$"
+        }
+      }
+    },
+    {
+      "label": "Install React Native Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start React Native",
+      "type": "shell",
+      "command": "npm",
+      "args": ["start"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "frontend"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^(.*)$",
+          "line": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting.*$",
+          "endsPattern": "^.*Metro.*exp.*$"
+        }
+      }
+    },
+    {
+      "label": "Start React Native Web",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "web"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "frontend"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^(.*)$",
+          "line": 1
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting.*$",
+          "endsPattern": "^.*(Webpack|Metro).*compiled.*$|^.*Compiled successfully.*$"
+        }
+      }
+    },
+    {
+      "label": "Start React Native Android",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "android"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start React Native iOS",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "ios"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
+      },
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "group": "frontend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Start All: Backend + React Native",
+      "dependsOn": [
+        "🎯 Start Backend Only",
+        "Start React Native"
+      ],
+      "dependsOrder": "sequence",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🚀 Start Backend + Web",
+      "dependsOn": [
+        "🎯 Start Backend Only",
+        "Start React Native Web"
+      ],
+      "dependsOrder": "sequence",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🎯 Start Backend Only",
+      "dependsOn": [
+        "Build Azure Functions",
+        "Run Azure Functions"
+      ],
+      "dependsOrder": "sequence",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "📱 Start React Native Only",
+      "dependsOn": [
+        "Start React Native"
+      ],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

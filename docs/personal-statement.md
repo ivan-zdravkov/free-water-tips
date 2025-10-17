@@ -24,7 +24,7 @@ I've mostly worked within bigger teams and contributed to large enterprise syste
 2. **Learn and Grow**:
    - Deepen my knowledge of [Serverless Architecture](https://azure.microsoft.com/en-us/solutions/serverless) and **NoSQL** databases.
    - Refresh my skills in [Azure](https://azure.microsoft.com/en-us/), [GitHub Actions](https://github.com/features/actions), and **modern CI/CD pipelines**.
-   - Utilize [.NET Blazor](https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor) and [.NET MAUI](https://dotnet.microsoft.com/en-us/apps/maui) for cross-platform applications.
+   - Build cross-platform mobile applications with [React Native](https://reactnative.dev/) and [TypeScript](https://www.typescriptlang.org/).
 3. **Showcase My Expertise**:
    - Leverage my experience in **Full Stack Software Engineering**, **Application and Cloud Architectures**, and **Databases**.
    - Highlight my ability to design scalable full-stack applications and ship with **Infrastructure as Code**.
