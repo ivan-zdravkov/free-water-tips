@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 
-namespace AzureFunctions;
+namespace FreeWaterTips.API.Azure.Functions;
 
 public class Initialize
 {

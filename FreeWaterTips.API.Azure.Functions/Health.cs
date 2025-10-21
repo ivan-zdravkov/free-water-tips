@@ -6,7 +6,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Environment = FreeWaterTips.Utils.Environment;
 
-namespace AzureFunctions;
+namespace FreeWaterTips.API.Azure.Functions;
 
 public class Health
 {
