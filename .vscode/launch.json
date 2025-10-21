@@ -2,67 +2,19 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Launch React Native Web",
+      "name": "Start Backend + Web",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "Start React Native Web",
+      "preLaunchTask": "Start Backend + Web",
       "url": "http://localhost:8090",
       "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
-      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
       "sourceMaps": true
     },
     {
-        "name": "Launch React Native Android",
-        "type": "reactnative",
-        "request": "launch",
-        "platform": "android",
-        "preLaunchTask": "Start React Native Android",
-        "sourceMaps": true,
-        "outDir": "${workspaceFolder}/FreeWaterTips.ReactNative/.vscode/.react"
-    }
-  ],
-  "compounds": [
-    {
-      "name": "🚀 Azure Functions + React Native Web",
-      "configurations": ["Launch React Native Web"],
-      "preLaunchTask": "🚀 Start Backend + Web",
-      "presentation": {
-        "hidden": false,
-        "group": "fullstack",
-        "order": 1
-      },
-      "stopAll": true
+      "name": "Debug Azure Functions",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
     },
-    {
-      "name": "🌐 React Native Web",
-      "configurations": ["Launch React Native Web"],
-      "preLaunchTask": "Start React Native Web",
-      "presentation": {
-        "hidden": false,
-        "group": "frontend",
-        "order": 2
-      }
-    },
-    {
-      "name": "📱 Azure Functions + React Native Android",
-      "configurations": [],
-      "preLaunchTask": "🚀 Start Backend + Android",
-      "presentation": {
-        "hidden": false,
-        "group": "mobile",
-        "order": 3
-      },
-      "stopAll": true
-    },
-    {
-      "name": "📱 React Native Android",
-      "configurations": [],
-      "preLaunchTask": "Start React Native Android",
-      "presentation": {
-        "hidden": false,
-        "group": "mobile",
-        "order": 4
-      }
-    }
   ]
 }

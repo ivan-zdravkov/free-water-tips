@@ -1,7 +1,20 @@
+import { Platform } from 'react-native';
 import { HealthResponse } from '../types/api';
 
-// TODO: Update this with your actual Azure Functions endpoint
-const API_BASE_URL = process.env.EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT;
+// Android emulator needs 10.0.2.2 to access host's localhost
+// iOS simulator and web can use localhost
+const getApiBaseUrl = () => {
+  const envUrl = process.env.EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT || '';
+  
+  // If running on Android, replace localhost with 10.0.2.2
+  if (Platform.OS === 'android') {
+    return envUrl.replace('localhost', '10.0.2.2').replace('127.0.0.1', '10.0.2.2');
+  }
+  
+  return envUrl;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export async function getHealth(): Promise<HealthResponse> {
   try {

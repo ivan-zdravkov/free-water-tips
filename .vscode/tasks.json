@@ -5,36 +5,21 @@
       "label": "Build Azure Functions",
       "type": "shell",
       "command": "dotnet",
-      "args": [
-        "build"
-      ],
+      "args": ["build"],
       "options": {
         "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
-      },
-      "group": "build",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
       },
       "problemMatcher": "$msCompile"
     },
     {
-      "label": "Run Azure Functions",
+      "label": "Start Azure Functions",
       "type": "shell",
       "command": "func",
-      "args": [
-        "start",
-        "--csharp"
-      ],
+      "args": ["start", "--csharp"],
       "options": {
         "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
       },
       "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "backend"
-      },
       "problemMatcher": {
         "pattern": {
           "regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s+(error|warning|info)\\\\s+(TS\\\\d+)\\\\s*:\\\\s*(.*)$",
@@ -52,46 +37,6 @@
       }
     },
     {
-      "label": "Install React Native Dependencies",
-      "type": "shell",
-      "command": "npm",
-      "args": ["install"],
-      "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
-      },
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "Start React Native",
-      "type": "shell",
-      "command": "npm",
-      "args": ["start"],
-      "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
-      },
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "frontend"
-      },
-      "problemMatcher": {
-        "pattern": {
-          "regexp": "^(.*)$",
-          "line": 1
-        },
-        "background": {
-          "activeOnStart": true,
-          "beginsPattern": "^.*Starting.*$",
-          "endsPattern": "^.*Metro.*exp.*$"
-        }
-      }
-    },
-    {
       "label": "Start React Native Web",
       "type": "shell",
       "command": "npm",
@@ -100,20 +45,14 @@
         "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
       },
       "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "frontend"
-      },
       "problemMatcher": {
         "pattern": {
-          "regexp": "^(.*)$",
-          "line": 1
+          "regexp": "^$"
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Starting.*$",
-          "endsPattern": "^.*(Webpack|Metro).*compiled.*$|^.*Compiled successfully.*$"
+          "beginsPattern": "Starting Metro Bundler|Starting development server",
+          "endsPattern": "Bundling complete|Metro.*waiting|Compiled successfully|compiled successfully"
         }
       }
     },
@@ -126,91 +65,22 @@
         "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
       },
       "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "frontend"
-      },
       "problemMatcher": []
     },
     {
-      "label": "Start React Native iOS",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "ios"],
-      "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
-      },
-      "isBackground": true,
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated",
-        "group": "frontend"
-      },
-      "problemMatcher": []
+      "label": "Start Backend",
+      "dependsOn": ["Build Azure Functions", "Start Azure Functions"],
+      "dependsOrder": "sequence"
     },
     {
-      "label": "🚀 Start All: Backend + React Native",
-      "dependsOn": [
-        "🎯 Start Backend Only",
-        "Start React Native"
-      ],
-      "dependsOrder": "sequence",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
+      "label": "Start Backend + Web",
+      "dependsOn": ["Start Backend", "Start React Native Web"],
+      "dependsOrder": "sequence"
     },
     {
-      "label": "🚀 Start Backend + Web",
-      "dependsOn": [
-        "🎯 Start Backend Only",
-        "Start React Native Web"
-      ],
-      "dependsOrder": "sequence",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🚀 Start Backend + Android",
-      "dependsOn": [
-        "🎯 Start Backend Only",
-        "Start React Native Android"
-      ],
-      "dependsOrder": "sequence",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "🎯 Start Backend Only",
-      "dependsOn": [
-        "Build Azure Functions",
-        "Run Azure Functions"
-      ],
-      "dependsOrder": "sequence",
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "📱 Start React Native Only",
-      "dependsOn": [
-        "Start React Native"
-      ],
-      "presentation": {
-        "reveal": "always",
-        "panel": "dedicated"
-      },
-      "problemMatcher": []
+      "label": "Start Backend + Android",
+      "dependsOn": ["Start Backend", "Start React Native Android"],
+      "dependsOrder": "sequence"
     }
   ]
 }
