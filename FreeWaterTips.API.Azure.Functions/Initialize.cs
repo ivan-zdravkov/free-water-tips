@@ -18,7 +18,8 @@ public class Initialize
     }
 
     [Function("Initialize")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "initialize")] HttpRequest req)
     {
         this.logger.LogInformation("Initiating Functions...");
 

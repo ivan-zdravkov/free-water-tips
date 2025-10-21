@@ -107,9 +107,17 @@ jobs:
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
           
-      - name: Build web application
+      - name: Build web application for production
+        if: needs.detect-environment.outputs.environment == 'Production'
         working-directory: FreeWaterTips.ReactNative
         run: npx expo export --platform web --output-dir ./dist
+        
+      - name: Build web application for testing
+        if: needs.detect-environment.outputs.environment == 'Testing'
+        working-directory: FreeWaterTips.ReactNative
+        env:
+          EXPO_BASE_URL: /testing
+        run: npx expo export --platform web --output-dir ./dist --base-path /testing
         
       - name: Configure environment settings
         working-directory: FreeWaterTips.ReactNative/dist

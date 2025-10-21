@@ -20,7 +20,8 @@ public class Health
     }
 
     [Function("Health")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get", "post")] HttpRequest req)
+    public async Task<IActionResult> Run(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "health")] HttpRequest req)
     {
         return new OkObjectResult(new HealthResponse(
             environment: Environment.Name,
