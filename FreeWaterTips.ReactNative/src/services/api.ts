@@ -1,12 +1,10 @@
 import { Platform } from 'react-native';
 import { HealthResponse } from '../types/api';
 
-// Android emulator needs 10.0.2.2 to access host's localhost
-// iOS simulator and web can use localhost
+// Android emulator needs 10.0.2.2 to access host's localhost. iOS simulator and web can use localhost
 const getApiBaseUrl = () => {
   const envUrl = process.env.EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT || '';
   
-  // If running on Android, replace localhost with 10.0.2.2
   if (Platform.OS === 'android') {
     return envUrl.replace('localhost', '10.0.2.2').replace('127.0.0.1', '10.0.2.2');
   }
