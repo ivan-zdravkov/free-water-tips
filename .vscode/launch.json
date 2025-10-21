@@ -16,5 +16,13 @@
       "request": "attach",
       "processId": "${command:pickProcess}"
     },
+    {
+      "name": "Debug Web",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8090",
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "sourceMaps": true
+    }
   ]
 }
