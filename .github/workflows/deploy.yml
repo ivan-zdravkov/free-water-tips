@@ -124,6 +124,11 @@ jobs:
         run: |
           if [[ "${{ needs.detect-environment.outputs.environment }}" == "Production" ]]; then
             echo "freewater.tips" > CNAME
+          else
+            # Fix HTML paths for testing environment
+            find . -name "*.html" -type f -exec sed -i 's|src="/_expo/|src="/testing/_expo/|g' {} \;
+            find . -name "*.html" -type f -exec sed -i 's|href="/_expo/|href="/testing/_expo/|g' {} \;
+            find . -name "*.html" -type f -exec sed -i 's|href="/favicon.ico"|href="/testing/favicon.ico"|g' {} \;
           fi
           
       - name: Upload production artifact
