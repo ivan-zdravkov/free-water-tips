@@ -176,6 +176,19 @@
       "problemMatcher": []
     },
     {
+      "label": "🚀 Start Backend + Android",
+      "dependsOn": [
+        "🎯 Start Backend Only",
+        "Start React Native Android"
+      ],
+      "dependsOrder": "sequence",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "🎯 Start Backend Only",
       "dependsOn": [
         "Build Azure Functions",

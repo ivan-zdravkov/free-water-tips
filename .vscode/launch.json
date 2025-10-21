@@ -10,6 +10,15 @@
       "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
       "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
       "sourceMaps": true
+    },
+    {
+        "name": "Launch React Native Android",
+        "type": "reactnative",
+        "request": "launch",
+        "platform": "android",
+        "preLaunchTask": "Start React Native Android",
+        "sourceMaps": true,
+        "outDir": "${workspaceFolder}/FreeWaterTips.ReactNative/.vscode/.react"
     }
   ],
   "compounds": [
@@ -32,6 +41,27 @@
         "hidden": false,
         "group": "frontend",
         "order": 2
+      }
+    },
+    {
+      "name": "📱 Azure Functions + React Native Android",
+      "configurations": [],
+      "preLaunchTask": "🚀 Start Backend + Android",
+      "presentation": {
+        "hidden": false,
+        "group": "mobile",
+        "order": 3
+      },
+      "stopAll": true
+    },
+    {
+      "name": "📱 React Native Android",
+      "configurations": [],
+      "preLaunchTask": "Start React Native Android",
+      "presentation": {
+        "hidden": false,
+        "group": "mobile",
+        "order": 4
       }
     }
   ]
