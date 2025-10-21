@@ -117,7 +117,15 @@ jobs:
         working-directory: FreeWaterTips.ReactNative
         env:
           EXPO_WEB_BASE_PATH: /testing
-        run: npx expo export --platform web --output-dir ./dist
+        run: |
+          npx expo export --platform web --output-dir ./dist
+          
+          # Fix asset paths in HTML for /testing subdirectory
+          find ./dist -name "*.html" -type f -exec sed -i 's|href="/|href="/testing/|g' {} +
+          find ./dist -name "*.html" -type f -exec sed -i 's|src="/|src="/testing/|g' {} +
+          
+          # Fix double slashes that might occur
+          find ./dist -name "*.html" -type f -exec sed -i 's|/testing/testing/|/testing/|g' {} +
         
       - name: Configure environment settings
         working-directory: FreeWaterTips.ReactNative/dist
