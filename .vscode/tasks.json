@@ -14,8 +14,8 @@
     {
       "label": "Start Azure Functions",
       "type": "shell",
-      "command": "func",
-      "args": ["start", "--csharp"],
+      "command": "dotnet",
+      "args": ["run"],
       "options": {
         "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
       },
@@ -31,18 +31,21 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Azure Functions Core Tools.*$",
-          "endsPattern": "^.*Worker process started and initialized.*$"
+          "beginsPattern": "^.*Building.*$",
+          "endsPattern": "^.*Application started.*|.*Now listening on.*$"
         }
       }
     },
     {
-      "label": "Start React Native Web",
+      "label": "Start React Native",
       "type": "shell",
       "command": "npm",
       "args": ["run", "web"],
       "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative",
+        "env": {
+          "BROWSER": "none"
+        }
       },
       "isBackground": true,
       "problemMatcher": {
@@ -57,29 +60,13 @@
       }
     },
     {
-      "label": "Start React Native Android",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "android"],
-      "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative"
-      },
-      "isBackground": true,
-      "problemMatcher": []
-    },
-    {
       "label": "Start Backend",
       "dependsOn": ["Build Azure Functions", "Start Azure Functions"],
       "dependsOrder": "sequence"
     },
     {
-      "label": "Start Backend + Web",
-      "dependsOn": ["Start Backend", "Start React Native Web"],
-      "dependsOrder": "sequence"
-    },
-    {
-      "label": "Start Backend + Android",
-      "dependsOn": ["Start Backend", "Start React Native Android"],
+      "label": "Start Backend + Frontend",
+      "dependsOn": ["Start Backend", "Start React Native"],
       "dependsOrder": "sequence"
     }
   ]

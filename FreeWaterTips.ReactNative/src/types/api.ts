@@ -1,6 +1,5 @@
 export interface HealthResponse {
   status: string;
-  azureFunctionsEndpoint: string;
   cosmosDBEndpoint: string;
 }
 

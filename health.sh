@@ -81,7 +81,7 @@ get_install_instructions() {
                     echo "Install: Download from Mac App Store"
                     ;;
                 azure-functions-core-tools)
-                    echo "Install: brew install azure-functions-core-tools@4"
+                    echo "Install: brew tap azure/functions && brew install azure-functions-core-tools@4"
                     ;;
                 cosmos-emulator)
                     echo "Install: Use Docker - docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
@@ -193,6 +193,15 @@ if command -v docker &> /dev/null; then
     # Check if Cosmos emulator image exists
     if docker images | grep -q "azure-cosmos-emulator"; then
         print_status 0 "Cosmos DB Emulator Image" "(available)"
+        
+        # Check if Cosmos emulator is running
+        if docker ps | grep -q "azure-cosmos-emulator"; then
+            print_status 0 "Cosmos DB Emulator" "(running on https://localhost:8081)"
+        else
+            echo -e "${YELLOW}${WARNING}${NC} Cosmos DB Emulator ${YELLOW}not running${NC}"
+            echo -e "  ${YELLOW}→${NC} Start with: docker run -p 8081:8081 -p 10250-10255:10250-10255 --name=cosmos-emulator -d mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+            echo -e "  ${YELLOW}→${NC} Or on macOS: docker run -p 8081:8081 -p 10250-10255:10250-10255 --memory 3g --cpus=2 --name=cosmos-emulator -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true -d mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+        fi
     else
         print_status 1 "Cosmos DB Emulator Image" "" "$(get_install_instructions cosmos-emulator)"
     fi
@@ -208,8 +217,16 @@ echo ""
 
 # Check if expo is available (can be installed locally in project)
 if command -v npx &> /dev/null; then
-    if [ -f "FreeWaterTips.ReactNative/node_modules/.bin/expo" ] || command -v expo &> /dev/null; then
-        EXPO_VERSION=$(npx expo --version 2>/dev/null || echo "local")
+    if [ -f "FreeWaterTips.ReactNative/node_modules/.bin/expo" ]; then
+        # Use timeout to prevent hanging
+        EXPO_VERSION=$(timeout 5 npx expo --version 2>/dev/null || echo "installed")
+        if [ $? -eq 124 ]; then
+            print_status 0 "Expo CLI" "(installed locally)"
+        else
+            print_status 0 "Expo CLI" "v${EXPO_VERSION}"
+        fi
+    elif command -v expo &> /dev/null; then
+        EXPO_VERSION=$(timeout 5 expo --version 2>/dev/null || echo "installed")
         print_status 0 "Expo CLI" "v${EXPO_VERSION}"
     else
         print_status 1 "Expo CLI" "" "Install: cd FreeWaterTips.ReactNative && npm install"

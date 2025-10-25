@@ -25,8 +25,5 @@ namespace FreeWaterTips.Utils
 
         public static string CosmosDBKey => System.Environment.GetEnvironmentVariable("COSMOS_DB_KEY") ??
             throw new Exception("Environment variable 'COSMOS_DB_KEY' missing.");
-
-        public static string AzureFunctionsEndpoint => System.Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENDPOINT") ??
-            throw new Exception("Environment variable 'AZURE_FUNCTIONS_ENDPOINT' missing.");
     }
 }

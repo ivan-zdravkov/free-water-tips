@@ -25,7 +25,6 @@ public class Health
     {
         return new OkObjectResult(new HealthResponse(
             environment: Environment.Name,
-            azureFunctionsEndpoint: Environment.AzureFunctionsEndpoint,
             cosmosDBEndpoint: Environment.CosmosDBEndpoint
         ));
     }

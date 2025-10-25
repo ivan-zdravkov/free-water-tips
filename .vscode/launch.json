@@ -2,10 +2,10 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Start Backend + Web",
+      "name": "Start Backend + Frontend",
       "type": "chrome",
       "request": "launch",
-      "preLaunchTask": "Start Backend + Web",
+      "preLaunchTask": "Start Backend + Frontend",
       "url": "http://localhost:8090",
       "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
       "sourceMaps": true

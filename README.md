@@ -49,34 +49,15 @@ Even though the applications are free, the infrastructure and developer fees cos
 * [Paypal](https://paypal.me/IZdravkov)
 * [Revolut](https://revolut.me/ivan_zdravkov)
 
-## Development Environment Setup
-
-Before you start development, make sure your environment has all the required dependencies installed.
-
-Run the health check script to verify your setup:
-
-```bash
-./health.sh
-```
-
-This script will check for:
-- Core development tools (Git, Node.js v22+, .NET SDK v10+)
-- Azure Functions Core Tools
-- Cosmos DB Emulator (via Docker)
-- Expo & React Native dependencies
-- Platform-specific tools (Android SDK, Xcode for iOS on macOS)
-- Project dependencies
-
-The script provides clear installation instructions for any missing dependencies based on your operating system.
-
 ## Contributing
 
 We welcome contributions from the community! Whether you want to report bugs, suggest features, add water source locations, or contribute code, there are many ways to help.
 
 Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
+- Development environment setup
 - How to report bugs effectively
 - Submitting feature requests
-- Development setup and code guidelines
+- Code guidelines and workflow
 - Adding new water source locations
 - Community guidelines
 

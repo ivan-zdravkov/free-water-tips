@@ -76,7 +76,66 @@ Help make the platform accessible in different languages (coming soon).
 
 
 ## Development Setup
-ToDo:
+
+Before you start development, make sure your environment has all the required dependencies installed.
+
+### 1. Run the health check script
+
+```bash
+./health.sh
+```
+
+This script will check for:
+- Core development tools (Git, Node.js v22+, .NET SDK v10+)
+- Azure Functions Core Tools
+- Cosmos DB Emulator (via Docker)
+- Expo & React Native dependencies
+- Platform-specific tools (Android SDK, Xcode for iOS on macOS)
+- Project dependencies
+
+The script provides clear installation instructions for any missing dependencies based on your operating system.
+
+### 2. Configure local settings
+
+Copy the template file to create your local settings:
+
+```bash
+cp FreeWaterTips.API.Azure.Functions/local.settings.json.template FreeWaterTips.API.Azure.Functions/local.settings.json
+```
+
+The default configuration uses the Cosmos DB Emulator running on `https://localhost:8081`. Adjust the settings if needed for your environment.
+
+### 3. Install project dependencies
+
+```bash
+# Install React Native dependencies
+cd FreeWaterTips.ReactNative
+npm install
+cd ..
+
+# Restore .NET packages
+cd FreeWaterTips.API.Azure.Functions
+dotnet restore
+cd ..
+```
+
+### 4. Start development servers
+
+You can use VS Code tasks to start the development environment:
+
+- **Start Backend + Web**: Runs Azure Functions and React Native
+
+Or start services manually:
+
+```bash
+# Start Azure Functions
+cd FreeWaterTips.API.Azure.Functions
+dotnet run
+
+# In another terminal, start React Native Web
+cd FreeWaterTips.ReactNative
+npm run web
+```
 
 ## Code Contributions
 
@@ -92,7 +151,7 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
    ```
 
 2. **Setup Development Environment**
-   ToDo:
+   See [Development Setup](#development-setup) section above.
 
 3. **Create Feature Branch**
    ```bash
@@ -100,7 +159,11 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
    ```
 
 4. **Make Changes and Test**
-   ToDo:
+   Run the health check script to ensure your environment is properly configured:
+   ```bash
+   ./health.sh
+   ```
+   Test your changes locally before committing.
 
 5. **Commit and Push**
    ```bash

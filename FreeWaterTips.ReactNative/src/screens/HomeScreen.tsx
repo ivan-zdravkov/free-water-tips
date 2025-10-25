@@ -46,8 +46,7 @@ export default function HomeScreen({ navigation }: Props) {
           <Text style={styles.errorText}>{error}</Text>
         ) : health ? (
           <Text style={styles.statusText}>
-            Azure Functions are {health.status}, running on {health.azureFunctionsEndpoint} 
-            with a CosmosDB on {health.cosmosDBEndpoint}
+            Azure Functions are {health.status}, with a CosmosDB on {health.cosmosDBEndpoint}
           </Text>
         ) : null}
       </View>
