@@ -1,0 +1,343 @@
+#!/usr/bin/env bash
+
+# Free Water Tips - Development Environment Health Check
+# This script checks if your development environment is ready to run all applications
+
+set -e
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Icons
+CHECK="✓"
+CROSS="✗"
+WARNING="⚠"
+
+# Detect OS
+OS="$(uname -s)"
+case "${OS}" in
+    Linux*)     MACHINE=Linux;;
+    Darwin*)    MACHINE=Mac;;
+    CYGWIN*)    MACHINE=Cygwin;;
+    MINGW*)     MACHINE=MinGw;;
+    MSYS*)      MACHINE=Git;;
+    *)          MACHINE="UNKNOWN:${OS}"
+esac
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Free Water Tips - Development Environment Health Check"
+echo "  Detected OS: ${MACHINE}"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Track overall status
+OVERALL_STATUS=0
+
+# Function to print status
+print_status() {
+    local status=$1
+    local name=$2
+    local version=$3
+    local instruction=$4
+    
+    if [ $status -eq 0 ]; then
+        echo -e "${GREEN}${CHECK}${NC} ${name} ${BLUE}${version}${NC}"
+    else
+        echo -e "${RED}${CROSS}${NC} ${name} ${RED}not found${NC}"
+        if [ -n "$instruction" ]; then
+            echo -e "  ${YELLOW}→${NC} ${instruction}"
+        fi
+        OVERALL_STATUS=1
+    fi
+}
+
+# Function to get installation instructions
+get_install_instructions() {
+    local tool=$1
+    case "${MACHINE}" in
+        Mac)
+            case "${tool}" in
+                git)
+                    echo "Install: brew install git OR download from https://git-scm.com/downloads"
+                    ;;
+                node)
+                    echo "Install: brew install node@22 OR download from https://nodejs.org/"
+                    ;;
+                dotnet)
+                    echo "Install: brew install dotnet-sdk OR download from https://dotnet.microsoft.com/download/dotnet/10.0"
+                    ;;
+                watchman)
+                    echo "Install: brew install watchman"
+                    ;;
+                cocoapods)
+                    echo "Install: sudo gem install cocoapods OR brew install cocoapods"
+                    ;;
+                xcode)
+                    echo "Install: Download from Mac App Store"
+                    ;;
+                azure-functions-core-tools)
+                    echo "Install: brew install azure-functions-core-tools@4"
+                    ;;
+                cosmos-emulator)
+                    echo "Install: Use Docker - docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+                    echo "  OR visit: https://learn.microsoft.com/azure/cosmos-db/docker-emulator-linux"
+                    ;;
+            esac
+            ;;
+        Linux)
+            case "${tool}" in
+                git)
+                    echo "Install: sudo apt-get install git (Debian/Ubuntu) OR sudo yum install git (RHEL/CentOS)"
+                    ;;
+                node)
+                    echo "Install: curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs"
+                    ;;
+                dotnet)
+                    echo "Install: https://dotnet.microsoft.com/download/dotnet/10.0"
+                    ;;
+                watchman)
+                    echo "Install: Follow instructions at https://facebook.github.io/watchman/docs/install.html"
+                    ;;
+                azure-functions-core-tools)
+                    echo "Install: Follow instructions at https://learn.microsoft.com/azure/azure-functions/functions-run-local"
+                    ;;
+                cosmos-emulator)
+                    echo "Install: docker pull mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+                    echo "  Visit: https://learn.microsoft.com/azure/cosmos-db/docker-emulator-linux"
+                    ;;
+            esac
+            ;;
+        *)
+            echo "Please visit the official website for installation instructions"
+            ;;
+    esac
+}
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Core Development Tools"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check Git
+if command -v git &> /dev/null; then
+    GIT_VERSION=$(git --version | cut -d' ' -f3)
+    print_status 0 "Git" "v${GIT_VERSION}"
+else
+    print_status 1 "Git" "" "$(get_install_instructions git)"
+fi
+
+# Check Node.js (required version 22)
+if command -v node &> /dev/null; then
+    NODE_VERSION=$(node --version)
+    NODE_MAJOR=$(node --version | cut -d'.' -f1 | sed 's/v//')
+    if [ "$NODE_MAJOR" -ge 22 ]; then
+        print_status 0 "Node.js" "${NODE_VERSION}"
+    else
+        print_status 1 "Node.js" "${NODE_VERSION}" "Node.js v22 or higher is required. $(get_install_instructions node)"
+    fi
+else
+    print_status 1 "Node.js" "" "$(get_install_instructions node)"
+fi
+
+# Check npm
+if command -v npm &> /dev/null; then
+    NPM_VERSION=$(npm --version)
+    print_status 0 "npm" "v${NPM_VERSION}"
+else
+    print_status 1 "npm" "" "npm is usually installed with Node.js"
+fi
+
+# Check .NET SDK (required version 10.0)
+if command -v dotnet &> /dev/null; then
+    DOTNET_VERSION=$(dotnet --version)
+    DOTNET_MAJOR=$(echo $DOTNET_VERSION | cut -d'.' -f1)
+    if [ "$DOTNET_MAJOR" -ge 10 ]; then
+        print_status 0 ".NET SDK" "v${DOTNET_VERSION}"
+    else
+        print_status 1 ".NET SDK" "v${DOTNET_VERSION}" ".NET SDK v10.0 or higher is required. $(get_install_instructions dotnet)"
+    fi
+else
+    print_status 1 ".NET SDK" "" "$(get_install_instructions dotnet)"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Azure Functions Tools"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check Azure Functions Core Tools
+if command -v func &> /dev/null; then
+    FUNC_VERSION=$(func --version)
+    print_status 0 "Azure Functions Core Tools" "v${FUNC_VERSION}"
+else
+    print_status 1 "Azure Functions Core Tools" "" "$(get_install_instructions azure-functions-core-tools)"
+fi
+
+# Check Cosmos DB Emulator (Docker check)
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Database Tools"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+if command -v docker &> /dev/null; then
+    DOCKER_VERSION=$(docker --version | cut -d' ' -f3 | sed 's/,//')
+    print_status 0 "Docker" "v${DOCKER_VERSION}"
+    
+    # Check if Cosmos emulator image exists
+    if docker images | grep -q "azure-cosmos-emulator"; then
+        print_status 0 "Cosmos DB Emulator Image" "(available)"
+    else
+        print_status 1 "Cosmos DB Emulator Image" "" "$(get_install_instructions cosmos-emulator)"
+    fi
+else
+    print_status 1 "Docker" "" "Docker is required for Cosmos DB Emulator. Install from https://www.docker.com/products/docker-desktop"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Expo & React Native Tools"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check if expo is available (can be installed locally in project)
+if command -v npx &> /dev/null; then
+    if [ -f "FreeWaterTips.ReactNative/node_modules/.bin/expo" ] || command -v expo &> /dev/null; then
+        EXPO_VERSION=$(npx expo --version 2>/dev/null || echo "local")
+        print_status 0 "Expo CLI" "v${EXPO_VERSION}"
+    else
+        print_status 1 "Expo CLI" "" "Install: cd FreeWaterTips.ReactNative && npm install"
+    fi
+else
+    print_status 1 "npx" "" "npx is required and comes with npm"
+fi
+
+# Check Watchman (recommended for React Native)
+if command -v watchman &> /dev/null; then
+    WATCHMAN_VERSION=$(watchman --version)
+    print_status 0 "Watchman" "v${WATCHMAN_VERSION}"
+else
+    echo -e "${YELLOW}${WARNING}${NC} Watchman ${YELLOW}not found (optional but recommended)${NC}"
+    echo -e "  ${YELLOW}→${NC} $(get_install_instructions watchman)"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Platform-Specific Tools"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Web Development (always available if Node.js is installed)
+echo -e "${GREEN}${CHECK}${NC} Web Development ${BLUE}(ready with Node.js)${NC}"
+
+# Android Development
+echo ""
+echo "Android Development:"
+if command -v adb &> /dev/null; then
+    ADB_VERSION=$(adb --version | head -n1 | cut -d' ' -f5)
+    print_status 0 "  Android Debug Bridge (adb)" "v${ADB_VERSION}"
+else
+    echo -e "${YELLOW}${WARNING}${NC}   Android SDK/adb ${YELLOW}not found${NC}"
+    echo -e "  ${YELLOW}→${NC} For Android development, install Android Studio"
+    echo -e "  ${YELLOW}→${NC} https://docs.expo.dev/workflow/android-studio-emulator/"
+fi
+
+if [ -n "$ANDROID_HOME" ] || [ -n "$ANDROID_SDK_ROOT" ]; then
+    SDK_ROOT="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+    print_status 0 "  ANDROID_HOME" "${SDK_ROOT}"
+else
+    echo -e "${YELLOW}${WARNING}${NC}   ANDROID_HOME ${YELLOW}not set${NC}"
+    echo -e "  ${YELLOW}→${NC} Set ANDROID_HOME environment variable"
+    echo -e "  ${YELLOW}→${NC} https://docs.expo.dev/workflow/android-studio-emulator/"
+fi
+
+# iOS Development (macOS only)
+echo ""
+if [ "${MACHINE}" == "Mac" ]; then
+    echo "iOS Development:"
+    if command -v xcodebuild &> /dev/null; then
+        XCODE_VERSION=$(xcodebuild -version | head -n1 | cut -d' ' -f2)
+        print_status 0 "  Xcode" "v${XCODE_VERSION}"
+    else
+        print_status 1 "  Xcode" "" "$(get_install_instructions xcode)"
+    fi
+    
+    if command -v pod &> /dev/null; then
+        POD_VERSION=$(pod --version)
+        print_status 0 "  CocoaPods" "v${POD_VERSION}"
+    else
+        print_status 1 "  CocoaPods" "" "$(get_install_instructions cocoapods)"
+    fi
+    
+    # Check iOS Simulator
+    if command -v xcrun &> /dev/null; then
+        if xcrun simctl list devices | grep -q "Booted\|Shutdown"; then
+            print_status 0 "  iOS Simulator" "(available)"
+        else
+            echo -e "${YELLOW}${WARNING}${NC}   iOS Simulator ${YELLOW}status unknown${NC}"
+        fi
+    fi
+else
+    echo "iOS Development: ${YELLOW}(macOS only)${NC}"
+    echo -e "  ${YELLOW}→${NC} iOS development requires macOS with Xcode installed"
+    echo -e "  ${YELLOW}→${NC} https://docs.expo.dev/workflow/ios-simulator/"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Project Dependencies"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check if project dependencies are installed
+if [ -f "FreeWaterTips.ReactNative/package.json" ]; then
+    if [ -d "FreeWaterTips.ReactNative/node_modules" ]; then
+        print_status 0 "React Native Dependencies" "(installed)"
+    else
+        print_status 1 "React Native Dependencies" "" "Run: cd FreeWaterTips.ReactNative && npm install"
+    fi
+fi
+
+# Check if .NET packages are restored
+if [ -d "FreeWaterTips.API.Azure.Functions/obj" ]; then
+    print_status 0 ".NET Packages" "(restored)"
+else
+    print_status 1 ".NET Packages" "" "Run: cd FreeWaterTips.API.Azure.Functions && dotnet restore"
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Documentation References"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+echo "📚 Expo Development Documentation:"
+echo "   • Setup Guide: https://docs.expo.dev/get-started/installation/"
+echo "   • Android Emulator: https://docs.expo.dev/workflow/android-studio-emulator/"
+echo "   • iOS Simulator: https://docs.expo.dev/workflow/ios-simulator/"
+echo "   • Web Development: https://docs.expo.dev/workflow/web/"
+echo ""
+echo "🔧 Azure Functions:"
+echo "   • Local Development: https://learn.microsoft.com/azure/azure-functions/functions-run-local"
+echo ""
+echo "💾 Cosmos DB Emulator:"
+echo "   • Docker Setup: https://learn.microsoft.com/azure/cosmos-db/docker-emulator-linux"
+echo ""
+
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+if [ $OVERALL_STATUS -eq 0 ]; then
+    echo -e "${GREEN}${CHECK} All required dependencies are installed!${NC}"
+    echo -e "${GREEN}  Your development environment is ready!${NC}"
+else
+    echo -e "${RED}${CROSS} Some dependencies are missing.${NC}"
+    echo -e "${YELLOW}  Please install the missing dependencies listed above.${NC}"
+fi
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+exit $OVERALL_STATUS
