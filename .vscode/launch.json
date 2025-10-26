@@ -11,6 +11,22 @@
       "sourceMaps": true
     },
     {
+      "name": "Start Backend",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "Start Backend",
+      "name": "Start Backend"
+    },
+    {
+      "name": "Start Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "Start React Native",
+      "url": "http://localhost:8090",
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "sourceMaps": true
+    },
+    {
       "name": "Debug Azure Functions",
       "type": "coreclr",
       "request": "attach",
