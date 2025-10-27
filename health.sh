@@ -22,9 +22,9 @@ OS="$(uname -s)"
 case "${OS}" in
     Linux*)     MACHINE=Linux;;
     Darwin*)    MACHINE=Mac;;
-    CYGWIN*)    MACHINE=Cygwin;;
-    MINGW*)     MACHINE=MinGw;;
-    MSYS*)      MACHINE=Git;;
+    CYGWIN*)    MACHINE=Windows;;
+    MINGW*)     MACHINE=Windows;;
+    MSYS*)      MACHINE=Windows;;
     *)          MACHINE="UNKNOWN:${OS}"
 esac
 
@@ -112,6 +112,33 @@ get_install_instructions() {
                     ;;
             esac
             ;;
+        Windows)
+            case "${tool}" in
+                git)
+                    echo "Install: Download from https://git-scm.com/downloads"
+                    ;;
+                node)
+                    echo "Install: Download from https://nodejs.org/"
+                    ;;
+                dotnet)
+                    echo "Install: Download from https://dotnet.microsoft.com/download/dotnet/10.0"
+                    ;;
+                watchman)
+                    echo "Install: choco install watchman (using Chocolatey)"
+                    ;;
+                azure-functions-core-tools)
+                    echo "Install: npm install -g azure-functions-core-tools@4 --unsafe-perm true"
+                    echo "  OR: choco install azure-functions-core-tools"
+                    ;;
+                cosmos-emulator)
+                    echo "Install: Download the native Azure Cosmos DB Emulator from:"
+                    echo "  https://aka.ms/cosmosdb-emulator"
+                    echo "  After installation, run 'CosmosDB.Emulator.exe' from:"
+                    echo "  C:\\Program Files\\Azure Cosmos DB Emulator\\CosmosDB.Emulator.exe"
+                    echo "  The emulator will be available at: https://localhost:8081"
+                    ;;
+            esac
+            ;;
         *)
             echo "Please visit the official website for installation instructions"
             ;;
@@ -179,34 +206,58 @@ else
     print_status 1 "Azure Functions Core Tools" "" "$(get_install_instructions azure-functions-core-tools)"
 fi
 
-# Check Cosmos DB Emulator (Docker check)
+# Check Cosmos DB Emulator
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Database Tools"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-if command -v docker &> /dev/null; then
-    DOCKER_VERSION=$(docker --version | cut -d' ' -f3 | sed 's/,//')
-    print_status 0 "Docker" "v${DOCKER_VERSION}"
+if [ "${MACHINE}" == "Windows" ]; then
+    # Windows: Check for native Cosmos DB Emulator
+    COSMOS_EMULATOR_PATH="/c/Program Files/Azure Cosmos DB Emulator/CosmosDB.Emulator.exe"
     
-    # Check if Cosmos emulator image exists
-    if docker images | grep -q "azure-cosmos-emulator"; then
-        print_status 0 "Cosmos DB Emulator Image" "(available)"
+    if [ -f "$COSMOS_EMULATOR_PATH" ]; then
+        print_status 0 "Cosmos DB Emulator" "(installed)"
         
-        # Check if Cosmos emulator is running
-        if docker ps | grep -q "azure-cosmos-emulator"; then
-            print_status 0 "Cosmos DB Emulator" "(running on https://localhost:8081)"
+        # Check if the emulator is running by testing the endpoint
+        if curl -k -s -o /dev/null -w "%{http_code}" https://localhost:8081/_explorer/index.html 2>/dev/null | grep -q "200\|302"; then
+            print_status 0 "Cosmos DB Emulator Status" "(running on https://localhost:8081)"
         else
             echo -e "${YELLOW}${WARNING}${NC} Cosmos DB Emulator ${YELLOW}not running${NC}"
-            echo -e "  ${YELLOW}→${NC} Start with: docker run -p 8081:8081 -p 10250-10255:10250-10255 --name=cosmos-emulator -d mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
-            echo -e "  ${YELLOW}→${NC} Or on macOS: docker run -p 8081:8081 -p 10250-10255:10250-10255 --memory 3g --cpus=2 --name=cosmos-emulator -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true -d mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+            echo -e "  ${YELLOW}→${NC} Start the emulator from Start Menu or run:"
+            echo -e "  ${YELLOW}→${NC} \"C:\\Program Files\\Azure Cosmos DB Emulator\\CosmosDB.Emulator.exe\""
+            echo -e "  ${YELLOW}→${NC} Or run as administrator: PowerShell -Command \"Start-Process 'C:\\Program Files\\Azure Cosmos DB Emulator\\CosmosDB.Emulator.exe'\""
         fi
     else
-        print_status 1 "Cosmos DB Emulator Image" "" "$(get_install_instructions cosmos-emulator)"
+        print_status 1 "Cosmos DB Emulator" "" "$(get_install_instructions cosmos-emulator)"
     fi
 else
-    print_status 1 "Docker" "" "Docker is required for Cosmos DB Emulator. Install from https://www.docker.com/products/docker-desktop"
+    # macOS/Linux: Check for Docker-based Cosmos DB Emulator
+    if command -v docker &> /dev/null; then
+        DOCKER_VERSION=$(docker --version | cut -d' ' -f3 | sed 's/,//')
+        print_status 0 "Docker" "v${DOCKER_VERSION}"
+        
+        # Check if Cosmos emulator image exists
+        if docker images | grep -q "azure-cosmos-emulator"; then
+            print_status 0 "Cosmos DB Emulator Image" "(available)"
+            
+            # Check if Cosmos emulator is running
+            if docker ps | grep -q "azure-cosmos-emulator"; then
+                print_status 0 "Cosmos DB Emulator" "(running on https://localhost:8081)"
+            else
+                echo -e "${YELLOW}${WARNING}${NC} Cosmos DB Emulator ${YELLOW}not running${NC}"
+                echo -e "  ${YELLOW}→${NC} Start with: docker run -p 8081:8081 -p 10250-10255:10250-10255 --name=cosmos-emulator -d mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+                if [ "${MACHINE}" == "Mac" ]; then
+                    echo -e "  ${YELLOW}→${NC} Or on macOS: docker run -p 8081:8081 -p 10250-10255:10250-10255 --memory 3g --cpus=2 --name=cosmos-emulator -e AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10 -e AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true -d mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator"
+                fi
+            fi
+        else
+            print_status 1 "Cosmos DB Emulator Image" "" "$(get_install_instructions cosmos-emulator)"
+        fi
+    else
+        print_status 1 "Docker" "" "Docker is required for Cosmos DB Emulator. Install from https://www.docker.com/products/docker-desktop"
+    fi
 fi
 
 echo ""
@@ -343,7 +394,12 @@ echo "🔧 Azure Functions:"
 echo "   • Local Development: https://learn.microsoft.com/azure/azure-functions/functions-run-local"
 echo ""
 echo "💾 Cosmos DB Emulator:"
-echo "   • Docker Setup: https://learn.microsoft.com/azure/cosmos-db/docker-emulator-linux"
+if [ "${MACHINE}" == "Windows" ]; then
+    echo "   • Windows Native Emulator: https://aka.ms/cosmosdb-emulator"
+    echo "   • Installation Guide: https://learn.microsoft.com/azure/cosmos-db/emulator"
+else
+    echo "   • Docker Setup: https://learn.microsoft.com/azure/cosmos-db/docker-emulator-linux"
+fi
 echo ""
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
