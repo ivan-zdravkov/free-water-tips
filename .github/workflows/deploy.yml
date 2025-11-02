@@ -215,6 +215,9 @@ jobs:
       - name: Install CocoaPods
         run: sudo gem install cocoapods
         
+      - name: Install xcpretty
+        run: sudo gem install xcpretty
+        
       - name: Run Expo prebuild for iOS
         working-directory: FreeWaterTips.ReactNative
         run: npx expo prebuild --platform ios --clean
@@ -241,14 +244,24 @@ jobs:
           echo "Using workspace: $WORKSPACE"
           echo "Using scheme: $SCHEME"
           
+          # Build and archive
+          set -o pipefail
           xcodebuild -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
-            -quiet \
-            -hideShellScriptEnvironment \
-            archive | grep -A 5 "error:\|warning:\|succeeded\|failed" || true
+            archive 2>&1 | tee build.log | xcpretty --color || cat build.log
+          
+          # Verify archive was created
+          if [ ! -d "$PWD/build/FreeWaterTips.xcarchive" ]; then
+            echo "ERROR: Archive not found at $PWD/build/FreeWaterTips.xcarchive"
+            echo "Build directory contents:"
+            ls -la $PWD/build/ || echo "Build directory does not exist"
+            exit 1
+          fi
+          
+          echo "Archive created successfully"
           
       - name: Export IPA
         working-directory: FreeWaterTips.ReactNative/ios
