@@ -424,11 +424,82 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Download iOS artifact
         uses: actions/download-artifact@v4
         with:
           name: ios-artifact
-          path: ./publish
+          path: ./artifacts
+      
+      - name: Install Apple Certificate
+        env:
+          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
+          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Import certificate from secrets
+          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-default $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+      
+      - name: Re-sign and Export for App Store
+        working-directory: ./artifacts
+        run: |
+          # Create App Store export options
+          cat > exportOptions-appstore.plist << EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>method</key>
+              <string>app-store-connect</string>
+              <key>teamID</key>
+              <string>${{ secrets.APPLE_TEAM_ID }}</string>
+              <key>uploadBitcode</key>
+              <false/>
+              <key>uploadSymbols</key>
+              <true/>
+              <key>compileBitcode</key>
+              <false/>
+              <key>signingStyle</key>
+              <string>manual</string>
+              <key>provisioningProfiles</key>
+              <dict>
+                  <key>tips.freewater.app</key>
+                  <string>${{ secrets.PROVISIONING_PROFILE_NAME }}</string>
+              </dict>
+          </dict>
+          </plist>
+          EOF
+          
+          # Find the IPA
+          IPA_PATH=$(find . -name "*.ipa" | head -n 1)
+          
+          # Unzip the IPA
+          unzip "$IPA_PATH" -d extracted
+          
+          # Re-sign the app
+          /usr/bin/codesign --force --sign "${{ secrets.APPLE_SIGNING_IDENTITY }}" \
+            --entitlements extracted/Payload/*.app/archived-expanded-entitlements.xcent \
+            extracted/Payload/*.app
+          
+          # Repackage as IPA
+          cd extracted
+          zip -r ../FreeWaterTips-signed.ipa Payload
+          cd ..
             
       - name: Deploy to App Store
         env:
@@ -436,6 +507,6 @@ jobs:
           APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
           APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
         run: |
-          xcrun altool --upload-app --type ios --file ./publish/*.ipa \
+          xcrun altool --upload-app --type ios --file ./artifacts/FreeWaterTips-signed.ipa \
             --apiKey $APP_STORE_CONNECT_API_KEY_ID \
             --apiIssuer $APP_STORE_CONNECT_API_ISSUER_ID
