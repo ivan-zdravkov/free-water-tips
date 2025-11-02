@@ -224,13 +224,20 @@ jobs:
         
       - name: List iOS workspace files
         working-directory: FreeWaterTips.ReactNative/ios
-        run: ls -la *.xcworkspace || ls -la
+        run: |
+          echo "Listing iOS directory:"
+          ls -la
+          echo "Looking for .xcworkspace:"
+          find . -maxdepth 1 -name "*.xcworkspace" -type d
         
       - name: Build iOS App
         working-directory: FreeWaterTips.ReactNative/ios
         run: |
-          WORKSPACE=$(ls *.xcworkspace | head -n 1)
+          WORKSPACE=$(find . -maxdepth 1 -name "*.xcworkspace" -type d | head -n 1 | sed 's|^\./||')
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          
+          echo "Using workspace: $WORKSPACE"
+          echo "Using scheme: $SCHEME"
           
           xcodebuild -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
