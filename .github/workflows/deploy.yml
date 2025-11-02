@@ -34,9 +34,9 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "environment=Production" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
-            echo "environment=Testing" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
           else
-            echo "environment=Testing" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
           fi
           
           echo "Detected environment: $(cat $GITHUB_OUTPUT | grep environment | cut -d= -f2)"
@@ -279,6 +279,9 @@ jobs:
           # Copy new production files from Expo web build
           cp -r ../web-output/* .
           
+          # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
+          touch .nojekyll
+          
           # Commit and push changes
           git add .
           git commit -m "Deploy production build from commit ${{ github.sha }}" || echo "No changes to commit"
@@ -314,6 +317,9 @@ jobs:
           
           # Copy new testing files from Expo web build
           cp -r ../web-output/* .
+          
+          # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
+          touch .nojekyll
           
           # Add CNAME file for custom domain
           echo "test.freewater.tips" > CNAME
