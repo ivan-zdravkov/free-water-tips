@@ -159,28 +159,32 @@ jobs:
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
           
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
+      - name: Setup Java
+        uses: actions/setup-java@v4
         with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
+          distribution: 'temurin'
+          java-version: '17'
           
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
         
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - name: Run Expo prebuild for Android
+        working-directory: FreeWaterTips.ReactNative
+        run: npx expo prebuild --platform android --clean
         
       - name: Build Android APK
-        working-directory: FreeWaterTips.ReactNative
-        run: eas build --platform android --profile production --non-interactive --no-wait
+        working-directory: FreeWaterTips.ReactNative/android
+        run: ./gradlew assembleRelease --no-daemon
         
       - name: Upload Android artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-artifact
-          path: FreeWaterTips.ReactNative/*.apk
+          path: FreeWaterTips.ReactNative/android/app/build/outputs/apk/release/*.apk
           retention-days: 30
           if-no-files-found: warn
 
@@ -203,28 +207,44 @@ jobs:
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
           
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          expo-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-          
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
         
-      - name: Install EAS CLI
-        run: npm install -g eas-cli
+      - name: Install CocoaPods
+        run: sudo gem install cocoapods
         
-      - name: Build iOS IPA
+      - name: Run Expo prebuild for iOS
         working-directory: FreeWaterTips.ReactNative
-        run: eas build --platform ios --profile production --non-interactive --no-wait
+        run: npx expo prebuild --platform ios --clean
+        
+      - name: Install iOS dependencies
+        working-directory: FreeWaterTips.ReactNative/ios
+        run: pod install
+        
+      - name: Build iOS App
+        working-directory: FreeWaterTips.ReactNative/ios
+        run: |
+          xcodebuild -workspace freewwatertips.xcworkspace \
+            -scheme freewwatertips \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $PWD/build/FreeWaterTips.xcarchive \
+            archive
+          
+      - name: Export IPA
+        working-directory: FreeWaterTips.ReactNative/ios
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath $PWD/build/FreeWaterTips.xcarchive \
+            -exportPath $PWD/build \
+            -exportOptionsPlist $PWD/exportOptions.plist
         
       - name: Upload iOS artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-artifact
-          path: FreeWaterTips.ReactNative/*.ipa
+          path: FreeWaterTips.ReactNative/ios/build/*.ipa
           retention-days: 30
           if-no-files-found: warn
 

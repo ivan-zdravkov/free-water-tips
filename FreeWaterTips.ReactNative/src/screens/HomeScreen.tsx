@@ -45,9 +45,20 @@ export default function HomeScreen({ navigation }: Props) {
         ) : error ? (
           <Text style={styles.errorText}>{error}</Text>
         ) : health ? (
-          <Text style={styles.statusText}>
-            Azure Functions are {health.status}, with a CosmosDB on {health.cosmosDBEndpoint}
-          </Text>
+          <>
+            <Text style={styles.statusText}>
+              Status: {health.status}
+            </Text>
+            <Text style={styles.statusText}>
+              Environment: {health.environment}
+            </Text>
+            <Text style={styles.statusText}>
+              Cosmos DB: {health.cosmosConnected ? '✓ Connected' : '✗ Disconnected'}
+            </Text>
+            <Text style={styles.timestampText}>
+              Last checked: {new Date(health.timestamp).toLocaleString()}
+            </Text>
+          </>
         ) : null}
       </View>
 
@@ -91,13 +102,23 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     marginBottom: 30,
-    minHeight: 60,
+    minHeight: 100,
     justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 15,
+    borderRadius: 8,
   },
   statusText: {
     fontSize: 14,
     color: '#333',
     textAlign: 'center',
+    marginBottom: 5,
+  },
+  timestampText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    marginTop: 10,
   },
   errorText: {
     fontSize: 14,
