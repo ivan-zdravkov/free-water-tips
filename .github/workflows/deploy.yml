@@ -222,11 +222,18 @@ jobs:
         working-directory: FreeWaterTips.ReactNative/ios
         run: pod install
         
+      - name: List iOS workspace files
+        working-directory: FreeWaterTips.ReactNative/ios
+        run: ls -la *.xcworkspace || ls -la
+        
       - name: Build iOS App
         working-directory: FreeWaterTips.ReactNative/ios
         run: |
-          xcodebuild -workspace freewwatertips.xcworkspace \
-            -scheme freewwatertips \
+          WORKSPACE=$(ls *.xcworkspace | head -n 1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          
+          xcodebuild -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
