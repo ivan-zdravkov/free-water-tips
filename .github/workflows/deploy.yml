@@ -274,7 +274,7 @@ jobs:
           cd ./gh-pages-temp
           
           # Clear root directory but keep .git
-          find . -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
           
           # Copy new production files from Expo web build
           cp -r ../web-output/* .
@@ -308,7 +308,7 @@ jobs:
           cd ./gh-pages-test
           
           # Clear root directory but keep .git
-          find . -maxdepth 1 ! -name '.git' -exec rm -rf {} +
+          find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
           
           # Copy new testing files from Expo web build
           cp -r ../web-output/* .
