@@ -298,13 +298,15 @@ jobs:
           path: ./web-output
 
       - name: Deploy to testing repository via git commit
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Clone gh-pages branch of the test repository
-          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GH_PAT }}@github.com/ivan-zdravkov/free-water-tips-test.git ./gh-pages-test
+          git clone --single-branch --branch gh-pages https://${GH_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git ./gh-pages-test
           cd ./gh-pages-test
           
           # Clear root directory but keep .git
@@ -319,7 +321,7 @@ jobs:
           # Commit and push changes
           git add .
           git commit -m "Deploy testing build from commit ${{ github.sha }}" || echo "No changes to commit"
-          git push origin gh-pages
+          git push https://${GH_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git gh-pages
 
   deploy-android-to-google-play:
     if: false # Temporarily disable Android deployments - enable for production builds when ready
