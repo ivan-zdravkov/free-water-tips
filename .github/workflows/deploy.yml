@@ -244,14 +244,24 @@ jobs:
           echo "Using workspace: $WORKSPACE"
           echo "Using scheme: $SCHEME"
           
-          # Build and archive
+          # Build and archive - show full output on failure
           set -o pipefail
-          xcodebuild -workspace "$WORKSPACE" \
+          if ! xcodebuild -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
-            archive 2>&1 | tee build.log | xcpretty --color || cat build.log
+            -allowProvisioningUpdates \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            archive 2>&1 | tee build.log; then
+            echo "================================"
+            echo "BUILD FAILED - Full error log:"
+            echo "================================"
+            cat build.log
+            exit 1
+          fi
           
           # Verify archive was created
           if [ ! -d "$PWD/build/FreeWaterTips.xcarchive" ]; then
