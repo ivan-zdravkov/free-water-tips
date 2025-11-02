@@ -27,8 +27,7 @@ module.exports = {
     },
     web: {
       favicon: "./assets/favicon.png",
-      bundler: "metro",
-      baseUrl: process.env.EXPO_WEB_BASE_PATH || "/"
+      bundler: "metro"
     },
     extra: {
       apiUrl: process.env.EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT

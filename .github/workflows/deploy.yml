@@ -115,17 +115,7 @@ jobs:
       - name: Build web application for testing
         if: needs.detect-environment.outputs.environment == 'Testing'
         working-directory: FreeWaterTips.ReactNative
-        env:
-          EXPO_WEB_BASE_PATH: /testing
-        run: |
-          npx expo export --platform web --output-dir ./dist
-          
-          # Fix asset paths in HTML for /testing subdirectory
-          find ./dist -name "*.html" -type f -exec sed -i 's|href="/|href="/testing/|g' {} +
-          find ./dist -name "*.html" -type f -exec sed -i 's|src="/|src="/testing/|g' {} +
-          
-          # Fix double slashes that might occur
-          find ./dist -name "*.html" -type f -exec sed -i 's|/testing/testing/|/testing/|g' {} +
+        run: npx expo export --platform web --output-dir ./dist
         
       - name: Configure environment settings
         working-directory: FreeWaterTips.ReactNative/dist
@@ -283,21 +273,11 @@ jobs:
           git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./gh-pages-temp
           cd ./gh-pages-temp
           
-          # Backup testing directory if it exists
-          if [ -d "testing" ]; then
-            cp -r testing ../testing-backup
-          fi
-          
-          # Clear root directory but keep .git and testing
-          find . -maxdepth 1 ! -name '.git' ! -name 'testing' -exec rm -rf {} +
+          # Clear root directory but keep .git
+          find . -maxdepth 1 ! -name '.git' -exec rm -rf {} +
           
           # Copy new production files from Expo web build
           cp -r ../web-output/* .
-          
-          # Restore testing directory
-          if [ -d "../testing-backup" ]; then
-            cp -r ../testing-backup testing
-          fi
           
           # Commit and push changes
           git add .
@@ -311,36 +291,33 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          
       - name: Download testing artifacts
         uses: actions/download-artifact@v4
         with:
           name: web-testing-artifact
           path: ./web-output
 
-      - name: Deploy to testing environment via git commit
+      - name: Deploy to testing repository via git commit
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Clone gh-pages branch
-          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./gh-pages-temp
-          cd ./gh-pages-temp
+          # Clone gh-pages branch of the test repository
+          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GH_PAT }}@github.com/ivan-zdravkov/free-water-tips-test.git ./gh-pages-test
+          cd ./gh-pages-test
           
-          # Create/update testing directory
-          rm -rf testing
-          mkdir -p testing
+          # Clear root directory but keep .git
+          find . -maxdepth 1 ! -name '.git' -exec rm -rf {} +
           
           # Copy new testing files from Expo web build
-          cp -r ../web-output/* testing/
+          cp -r ../web-output/* .
+          
+          # Add CNAME file for custom domain
+          echo "test.freewater.tips" > CNAME
           
           # Commit and push changes
-          git add testing/
+          git add .
           git commit -m "Deploy testing build from commit ${{ github.sha }}" || echo "No changes to commit"
           git push origin gh-pages
 
