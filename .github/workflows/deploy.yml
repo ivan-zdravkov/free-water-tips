@@ -232,6 +232,7 @@ jobs:
         
       - name: Build iOS App
         working-directory: FreeWaterTips.ReactNative/ios
+        timeout-minutes: 30
         run: |
           WORKSPACE=$(find . -maxdepth 1 -name "*.xcworkspace" -type d | head -n 1 | sed 's|^\./||')
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
@@ -244,7 +245,9 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
-            archive
+            -quiet \
+            -hideShellScriptEnvironment \
+            archive | grep -A 5 "error:\|warning:\|succeeded\|failed" || true
           
       - name: Export IPA
         working-directory: FreeWaterTips.ReactNative/ios
