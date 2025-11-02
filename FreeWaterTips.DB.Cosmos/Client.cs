@@ -19,5 +19,19 @@ namespace FreeWaterTips.DB.Cosmos
         {
 
         }
+
+        public async Task<bool> IsConnected()
+        {
+            try
+            {
+                bool isConnected = await cosmos.ReadAccountAsync() != null;
+
+                return isConnected;
+            }
+            catch (Exception _)
+            {
+                return false;
+            }
+        }
     }
 }

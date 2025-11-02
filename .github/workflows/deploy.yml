@@ -169,6 +169,9 @@ jobs:
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
         
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
+        
       - name: Build Android APK
         working-directory: FreeWaterTips.ReactNative
         run: eas build --platform android --profile production --non-interactive --no-wait
@@ -209,6 +212,9 @@ jobs:
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
+        
+      - name: Install EAS CLI
+        run: npm install -g eas-cli
         
       - name: Build iOS IPA
         working-directory: FreeWaterTips.ReactNative
