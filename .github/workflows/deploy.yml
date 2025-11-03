@@ -4,6 +4,127 @@ name: Deploy Full Stack Application
 # - FreeWaterTips.API.Azure.Functions/ - Azure Functions backend (.NET)
 # - FreeWaterTips.ReactNative/ - React Native with Expo (Web, Android & iOS)
 
+# ====================================================================================================
+# ENVIRONMENT SECRETS AND VARIABLES DOCUMENTATION
+# ====================================================================================================
+#
+# The following secrets and variables must be configured in GitHub repository settings:
+# Settings -> Secrets and variables -> Actions
+#
+# --- AZURE BACKEND SECRETS (✓ Implemented) ---
+#
+# ✓ COSMOS_DB_ENDPOINT
+#   Description: Azure Cosmos DB endpoint URL for the database connection
+#   How to obtain: Azure Portal -> Cosmos DB account -> Keys -> URI
+#   Example: https://your-cosmosdb-account.documents.azure.com:443/
+#
+# ✓ COSMOS_DB_KEY
+#   Description: Primary or secondary key for authenticating with Azure Cosmos DB
+#   How to obtain: Azure Portal -> Cosmos DB account -> Keys -> Primary Key or Secondary Key
+#   Security: Keep this secret secure; rotate periodically
+#
+# ✓ AZURE_CREDENTIALS
+#   Description: JSON credentials for Azure service principal authentication
+#   How to obtain: Run `az ad sp create-for-rbac --name "github-actions" --role contributor --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} --sdk-auth`
+#   Format: JSON object with clientId, clientSecret, subscriptionId, tenantId
+#   Docs: https://github.com/Azure/login#configure-a-service-principal-with-a-secret
+#
+# ✓ AZURE_FUNCTION_APP_NAME
+#   Description: Name of the Azure Function App to deploy to
+#   How to obtain: Azure Portal -> Function App -> Overview -> Name
+#   Example: free-water-tips-api
+#
+# ✓ AZURE_FUNCTIONS_ENDPOINT
+#   Description: Public endpoint URL of the deployed Azure Functions API
+#   How to obtain: Azure Portal -> Function App -> Overview -> URL
+#   Example: https://free-water-tips-api.azurewebsites.net
+#   Usage: Used as EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT in React Native builds
+#
+# --- WEB DEPLOYMENT SECRETS (✓ Implemented) ---
+#
+# ✓ GITHUB_TOKEN
+#   Description: Automatically provided by GitHub Actions for repository access
+#   How to obtain: Automatically available in workflows (no configuration needed)
+#   Usage: Used for deploying to gh-pages branch
+#
+# ✓ REPOSITORY_PAT
+#   Description: Personal Access Token for deploying to external testing repository
+#   How to obtain: GitHub Settings -> Developer settings -> Personal access tokens -> Generate new token
+#   Required scopes: repo (full control of private repositories)
+#   Usage: Deploy to ivan-zdravkov/free-water-tips-test repository
+#
+# --- ANDROID BUILD & DEPLOYMENT SECRETS (✗ TODO - Not yet implemented) ---
+#
+# ✗ ANDROID_KEYSTORE_BASE64
+#   Description: Base64-encoded Android keystore file for signing APK/AAB files
+#   How to obtain: Generate keystore with `keytool -genkey -v -keystore release.keystore -alias release -keyalg RSA -keysize 2048 -validity 10000`
+#                  Then encode: `base64 -i release.keystore | tr -d '\n'`
+#   Docs: https://developer.android.com/studio/publish/app-signing
+#
+# ✗ ANDROID_KEYSTORE_PASSWORD
+#   Description: Password for the Android keystore file
+#   How to obtain: Use the password you set when generating the keystore
+#
+# ✗ ANDROID_KEY_ALIAS
+#   Description: Alias name for the signing key in the keystore
+#   How to obtain: Use the alias you set when generating the keystore (e.g., "release")
+#
+# ✗ ANDROID_KEY_PASSWORD
+#   Description: Password for the specific key in the keystore
+#   How to obtain: Use the key password you set when generating the keystore
+#
+# ✗ GOOGLE_PLAY_SERVICE_ACCOUNT
+#   Description: JSON key file for Google Play Console service account
+#   How to obtain: Google Play Console -> Setup -> API access -> Create service account -> Create and download JSON key
+#   Docs: https://developers.google.com/android-publisher/getting_started
+#
+# ✗ GOOGLE_PLAY_TRACK
+#   Description: Release track for Google Play deployment (internal, alpha, beta, production)
+#   How to obtain: Choose the appropriate track based on deployment strategy
+#   Example: "internal" for testing, "production" for live releases
+#
+# --- iOS BUILD & DEPLOYMENT SECRETS (✗ TODO - Not yet implemented) ---
+#
+# ✗ IOS_CERTIFICATE_BASE64
+#   Description: Base64-encoded Apple distribution certificate (.p12 file)
+#   How to obtain: Apple Developer -> Certificates -> Create distribution certificate -> Export as .p12
+#                  Then encode: `base64 -i certificate.p12 | tr -d '\n'`
+#   Docs: https://developer.apple.com/documentation/xcode/distributing-your-app-for-beta-testing-and-releases
+#
+# ✗ IOS_CERTIFICATE_PASSWORD
+#   Description: Password for the .p12 certificate file
+#   How to obtain: Use the password you set when exporting the certificate
+#
+# ✗ IOS_PROVISIONING_PROFILE_BASE64
+#   Description: Base64-encoded Apple provisioning profile (.mobileprovision file)
+#   How to obtain: Apple Developer -> Profiles -> Create App Store distribution profile -> Download
+#                  Then encode: `base64 -i profile.mobileprovision | tr -d '\n'`
+#
+# ✗ IOS_KEYCHAIN_PASSWORD
+#   Description: Temporary password for the GitHub Actions keychain (can be any secure random string)
+#   How to obtain: Generate a random password (e.g., using password generator)
+#   Security: Used only during build process, doesn't need to match any existing password
+#
+# ✗ APPLE_TEAM_ID
+#   Description: Apple Developer Team ID for code signing
+#   How to obtain: Apple Developer -> Membership -> Team ID
+#   Example: "A1B2C3D4E5"
+#
+# ✗ APPLE_APP_STORE_API_KEY_ID
+#   Description: Key ID for App Store Connect API authentication
+#   How to obtain: App Store Connect -> Users and Access -> Keys -> Generate API Key
+#   Docs: https://developer.apple.com/documentation/appstoreconnectapi/creating_api_keys_for_app_store_connect_api
+#
+# ✗ APPLE_APP_STORE_API_ISSUER_ID
+#   Description: Issuer ID for App Store Connect API authentication
+#   How to obtain: App Store Connect -> Users and Access -> Keys -> Copy Issuer ID (at the top)
+#
+# ✗ APPLE_APP_STORE_API_KEY_BASE64
+#   Description: Base64-encoded App Store Connect API key (.p8 file)
+#   How to obtain: Download .p8 file when creating API key, then encode: `base64 -i AuthKey_XXX.p8 | tr -d '\n'`
+#
+# ====================================================================================================
+
 on:
   push:
     branches:
@@ -26,6 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       environment: ${{ steps.detect.outputs.environment }}
+      should_deploy: ${{ steps.detect.outputs.should_deploy }}
     
     steps:
       - name: Detect environment
@@ -33,13 +155,17 @@ jobs:
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
             echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
             echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
             echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
           
           echo "Detected environment: $(cat $GITHUB_OUTPUT | grep environment | cut -d= -f2)"
+          echo "Should deploy: $(cat $GITHUB_OUTPUT | grep should_deploy | cut -d= -f2)"
           echo "Branch: ${{ github.ref }}"
 
   build-azure-functions:
@@ -82,7 +208,7 @@ jobs:
         with:
           name: azure-functions-artifact
           path: ./publish/azure-functions
-          retention-days: 30
+          retention-days: 3
 
   build-web:
     runs-on: ubuntu-latest
@@ -107,41 +233,19 @@ jobs:
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
           
-      - name: Build web application for production
-        if: needs.detect-environment.outputs.environment == 'Production'
+      - name: Build web application
         working-directory: FreeWaterTips.ReactNative
         run: npx expo export --platform web --output-dir ./dist
-        
-      - name: Build web application for testing
-        if: needs.detect-environment.outputs.environment == 'Testing'
-        working-directory: FreeWaterTips.ReactNative
-        run: npx expo export --platform web --output-dir ./dist
-        
-      - name: Configure environment settings
-        working-directory: FreeWaterTips.ReactNative/dist
-        run: |
-          if [[ "${{ needs.detect-environment.outputs.environment }}" == "Production" ]]; then
-            echo "freewater.tips" > CNAME
-          fi
           
-      - name: Upload production artifact
-        if: needs.detect-environment.outputs.environment == 'Production'
+      - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-production-artifact
+          name: web-${{ lower(needs.detect-environment.outputs.environment) }}-artifact
           path: FreeWaterTips.ReactNative/dist
-          retention-days: 1
-          
-      - name: Upload testing artifact
-        if: needs.detect-environment.outputs.environment == 'Testing'
-        uses: actions/upload-artifact@v4
-        with:
-          name: web-testing-artifact
-          path: FreeWaterTips.ReactNative/dist
-          retention-days: 1
+          retention-days: 3
 
   build-android: 
-    if: false # Temporarily disable Android builds - enable when ready
+    if: false # Temporarily disable Android builds - enable for production builds when ready to use
     runs-on: ubuntu-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -166,30 +270,42 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
           
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
+        
+      - name: Decode and setup Android keystore
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > FreeWaterTips.ReactNative/android/app/release.keystore
         
       - name: Run Expo prebuild for Android
         working-directory: FreeWaterTips.ReactNative
         run: npx expo prebuild --platform android --clean
         
-      - name: Build Android APK
+      - name: Build signed Android App Bundle (AAB)
         working-directory: FreeWaterTips.ReactNative/android
-        run: ./gradlew assembleRelease --no-daemon
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          ./gradlew bundleRelease \
+            -Pandroid.injected.signing.store.file=$PWD/app/release.keystore \
+            -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
+            -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
+            -Pandroid.injected.signing.key.password=$KEY_PASSWORD
         
-      - name: Upload Android artifact
+      - name: Upload signed Android AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-artifact
-          path: FreeWaterTips.ReactNative/android/app/build/outputs/apk/release/*.apk
-          retention-days: 30
-          if-no-files-found: warn
+          path: FreeWaterTips.ReactNative/android/app/build/outputs/bundle/release/*.aab
+          retention-days: 3
 
   build-ios:
+    if: false # Temporarily disable iOS builds - enable for production builds when ready to use
     runs-on: macos-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -215,8 +331,34 @@ jobs:
       - name: Install CocoaPods
         run: sudo gem install cocoapods
         
-      - name: Install xcpretty
-        run: sudo gem install xcpretty
+      - name: Setup Apple certificates and provisioning profiles
+        env:
+          IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
+          IOS_CERTIFICATE_PASSWORD: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          PP_PATH=$RUNNER_TEMP/build_pp.mobileprovision
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+
+          # Decode certificate and provisioning profile
+          echo -n "$IOS_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
+          echo -n "$IOS_PROVISIONING_PROFILE_BASE64" | base64 --decode -o $PP_PATH
+
+          # Create temporary keychain
+          security create-keychain -p "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-default $KEYCHAIN_PATH
+          security unlock-keychain -p "$IOS_KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$IOS_CERTIFICATE_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+
+          # Install provisioning profile
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
         
       - name: Run Expo prebuild for iOS
         working-directory: FreeWaterTips.ReactNative
@@ -226,70 +368,45 @@ jobs:
         working-directory: FreeWaterTips.ReactNative/ios
         run: pod install
         
-      - name: List iOS workspace files
+      - name: Build and archive iOS app
         working-directory: FreeWaterTips.ReactNative/ios
-        run: |
-          echo "Listing iOS directory:"
-          ls -la
-          echo "Looking for .xcworkspace:"
-          find . -maxdepth 1 -name "*.xcworkspace" -type d
-        
-      - name: Build iOS App
-        working-directory: FreeWaterTips.ReactNative/ios
-        timeout-minutes: 30
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           WORKSPACE=$(find . -maxdepth 1 -name "*.xcworkspace" -type d | head -n 1 | sed 's|^\./||')
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
           
-          echo "Using workspace: $WORKSPACE"
-          echo "Using scheme: $SCHEME"
-          
-          # Build and archive - show full output on failure
-          set -o pipefail
-          if ! xcodebuild -workspace "$WORKSPACE" \
+          xcodebuild -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
             -sdk iphoneos \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
             -allowProvisioningUpdates \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO \
-            archive 2>&1 | tee build.log; then
-            echo "================================"
-            echo "BUILD FAILED - Full error log:"
-            echo "================================"
-            cat build.log
-            exit 1
-          fi
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            archive
           
-          # Verify archive was created
-          if [ ! -d "$PWD/build/FreeWaterTips.xcarchive" ]; then
-            echo "ERROR: Archive not found at $PWD/build/FreeWaterTips.xcarchive"
-            echo "Build directory contents:"
-            ls -la $PWD/build/ || echo "Build directory does not exist"
-            exit 1
-          fi
-          
-          echo "Archive created successfully"
-          
-      - name: Export IPA
+      - name: Export signed IPA
         working-directory: FreeWaterTips.ReactNative/ios
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          # Replace team ID placeholder in exportOptions.plist
+          sed "s/\$(APPLE_TEAM_ID)/$APPLE_TEAM_ID/g" ../exportOptions.plist > exportOptions-final.plist
+          
           xcodebuild -exportArchive \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
             -exportPath $PWD/build \
-            -exportOptionsPlist ../exportOptions.plist
+            -exportOptionsPlist exportOptions-final.plist
         
-      - name: Upload iOS artifact
+      - name: Upload signed iOS IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-artifact
           path: FreeWaterTips.ReactNative/ios/build/*.ipa
-          retention-days: 30
-          if-no-files-found: warn
+          retention-days: 3
 
-  deploy-azure-functions-to-azure:
+  deploy-azure-functions:
+    if: needs.detect-environment.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
     needs: [detect-environment, build-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
@@ -312,25 +429,27 @@ jobs:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
           package: './publish'
   
-  deploy-web-to-production:
-    if: needs.detect-environment.outputs.environment == 'Production'
+  deploy-web:
+    if: needs.detect-environment.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
-    needs: [detect-environment, build-web, deploy-azure-functions-to-azure]
+    needs: [detect-environment, build-web, deploy-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
       - name: Checkout code
+        if: needs.detect-environment.outputs.environment == 'Production'
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - name: Download production artifacts
+      - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
-          name: web-production-artifact
+          name: web-${{ lower(needs.detect-environment.outputs.environment) }}-artifact
           path: ./web-output
 
-      - name: Deploy to production via git commit
+      - name: Deploy to production
+        if: needs.detect-environment.outputs.environment == 'Production'
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
@@ -349,34 +468,25 @@ jobs:
           # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
           touch .nojekyll
           
+          # Add CNAME file for custom domain
+          echo "freewater.tips" > CNAME
+          
           # Commit and push changes
           git add .
           git commit -m "Deploy production build from commit ${{ github.sha }}" || echo "No changes to commit"
           git push origin gh-pages
 
-  deploy-web-to-testing:
-    if: needs.detect-environment.outputs.environment == 'Testing'
-    runs-on: ubuntu-latest
-    needs: [detect-environment, build-web, deploy-azure-functions-to-azure]
-    environment: ${{ needs.detect-environment.outputs.environment }}
-    
-    steps:
-      - name: Download testing artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: web-testing-artifact
-          path: ./web-output
-
-      - name: Deploy to testing repository via git commit
+      - name: Deploy to testing
+        if: needs.detect-environment.outputs.environment == 'Testing'
         env:
-          GH_PAT: ${{ secrets.GH_PAT }}
+          REPOSITORY_PAT: ${{ secrets.REPOSITORY_PAT }}
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
           # Clone gh-pages branch of the test repository
-          git clone --single-branch --branch gh-pages https://${GH_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git ./gh-pages-test
+          git clone --single-branch --branch gh-pages https://${REPOSITORY_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git ./gh-pages-test
           cd ./gh-pages-test
           
           # Clear root directory but keep .git
@@ -394,12 +504,14 @@ jobs:
           # Commit and push changes
           git add .
           git commit -m "Deploy testing build from commit ${{ github.sha }}" || echo "No changes to commit"
-          git push https://${GH_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git gh-pages
+          git push https://${REPOSITORY_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git gh-pages
 
-  deploy-android-to-google-play:
-    if: false # Temporarily disable Android deployments - enable for production builds when ready
+  deploy-android:
+    # Temporarily disable Android builds / deployments - enable for production builds when ready to use
+    # When enabled, also check: needs.detect-environment.outputs.should_deploy == 'true'
+    if: false
     runs-on: ubuntu-latest
-    needs: [detect-environment, build-android, deploy-azure-functions-to-azure]
+    needs: [detect-environment, build-android, deploy-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
@@ -407,106 +519,43 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: android-artifact
-          path: ./publish
+          path: ./android-release
           
-      - name: Deploy to Google Play Store
+      - name: Upload to Google Play Store
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: tips.freewater.app
-          releaseFiles: ./publish/*.apk
+          releaseFiles: ./android-release/*.aab
           track: ${{ secrets.GOOGLE_PLAY_TRACK }}
 
-  deploy-ios-to-app-store:
-    if: false # Temporarily disable iOS deployments - enable for production builds when ready
+  deploy-ios:
+    # Temporarily disable iOS builds / deployments - enable for production builds when ready to use
+    # When enabled, also check: needs.detect-environment.outputs.should_deploy == 'true'
+    if: false
     runs-on: macos-latest
-    needs: [detect-environment, build-ios, deploy-azure-functions-to-azure]
+    needs: [detect-environment, build-ios, deploy-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
       - name: Download iOS artifact
         uses: actions/download-artifact@v4
         with:
           name: ios-artifact
-          path: ./artifacts
-      
-      - name: Install Apple Certificate
-        env:
-          BUILD_CERTIFICATE_BASE64: ${{ secrets.BUILD_CERTIFICATE_BASE64 }}
-          P12_PASSWORD: ${{ secrets.P12_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-        run: |
-          # Create variables
-          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
-          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
-
-          # Import certificate from secrets
-          echo -n "$BUILD_CERTIFICATE_BASE64" | base64 --decode -o $CERTIFICATE_PATH
-
-          # Create temporary keychain
-          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-          security set-keychain-default $KEYCHAIN_PATH
-          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
-
-          # Import certificate to keychain
-          security import $CERTIFICATE_PATH -P "$P12_PASSWORD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
-          security list-keychain -d user -s $KEYCHAIN_PATH
-      
-      - name: Re-sign and Export for App Store
-        working-directory: ./artifacts
-        run: |
-          # Create App Store export options
-          cat > exportOptions-appstore.plist << EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>method</key>
-              <string>app-store-connect</string>
-              <key>teamID</key>
-              <string>${{ secrets.APPLE_TEAM_ID }}</string>
-              <key>uploadBitcode</key>
-              <false/>
-              <key>uploadSymbols</key>
-              <true/>
-              <key>compileBitcode</key>
-              <false/>
-              <key>signingStyle</key>
-              <string>manual</string>
-              <key>provisioningProfiles</key>
-              <dict>
-                  <key>tips.freewater.app</key>
-                  <string>${{ secrets.PROVISIONING_PROFILE_NAME }}</string>
-              </dict>
-          </dict>
-          </plist>
-          EOF
-          
-          # Find the IPA
-          IPA_PATH=$(find . -name "*.ipa" | head -n 1)
-          
-          # Unzip the IPA
-          unzip "$IPA_PATH" -d extracted
-          
-          # Re-sign the app
-          /usr/bin/codesign --force --sign "${{ secrets.APPLE_SIGNING_IDENTITY }}" \
-            --entitlements extracted/Payload/*.app/archived-expanded-entitlements.xcent \
-            extracted/Payload/*.app
-          
-          # Repackage as IPA
-          cd extracted
-          zip -r ../FreeWaterTips-signed.ipa Payload
-          cd ..
+          path: ./ios-release
             
-      - name: Deploy to App Store
+      - name: Upload to App Store Connect
         env:
-          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-          APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
-          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}
+          APPLE_APP_STORE_API_KEY_ID: ${{ secrets.APPLE_APP_STORE_API_KEY_ID }}
+          APPLE_APP_STORE_API_ISSUER_ID: ${{ secrets.APPLE_APP_STORE_API_ISSUER_ID }}
+          APPLE_APP_STORE_API_KEY_BASE64: ${{ secrets.APPLE_APP_STORE_API_KEY_BASE64 }}
         run: |
-          xcrun altool --upload-app --type ios --file ./artifacts/FreeWaterTips-signed.ipa \
-            --apiKey $APP_STORE_CONNECT_API_KEY_ID \
-            --apiIssuer $APP_STORE_CONNECT_API_ISSUER_ID
+          # Decode and save API key to file
+          echo -n "$APPLE_APP_STORE_API_KEY_BASE64" | base64 --decode > AuthKey.p8
+          
+          # Upload IPA to App Store Connect
+          xcrun altool --upload-app \
+            --type ios \
+            --file ./ios-release/*.ipa \
+            --apiKey "$APPLE_APP_STORE_API_KEY_ID" \
+            --apiIssuer "$APPLE_APP_STORE_API_ISSUER_ID"

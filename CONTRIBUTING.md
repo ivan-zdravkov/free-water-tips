@@ -57,12 +57,13 @@ Help make the platform accessible in different languages (coming soon).
 
 ## Project Architecture
 
-**Free Water Tips** is a full-stack application with a serverless backend:
+**Free Water Tips** is a full-stack Progressive Web App (PWA) with a serverless backend:
 
 ### Frontend
-- **Cross-Platform**: [React Native](https://reactnative.dev/) with [Expo](https://expo.dev/)
-- **Platforms**: Web, iOS, and Android from a single TypeScript codebase
+- **Framework**: [React Native](https://reactnative.dev/) with [Expo](https://expo.dev/)
+- **Platform**: Progressive Web App (PWA) with TypeScript
 - **Web Hosting**: [GitHub Pages](https://pages.github.com/) or any static hosting
+- **Future Plans**: Native mobile apps for iOS and Android may be considered based on community demand
 
 ### Backend  
 - **API**: [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) (C#) with HTTP triggers
@@ -90,7 +91,6 @@ This script will check for:
 - Azure Functions Core Tools
 - Cosmos DB Emulator (via Docker)
 - Expo & React Native dependencies
-- Platform-specific tools (Android SDK, Xcode for iOS on macOS)
 - Project dependencies
 
 The script provides clear installation instructions for any missing dependencies based on your operating system.
@@ -123,7 +123,7 @@ cd ..
 
 You can use VS Code tasks to start the development environment:
 
-- **Start Backend + Web**: Runs Azure Functions and React Native
+- **Start Backend + Frontend**: Runs Azure Functions and React Native PWA
 
 Or start services manually:
 

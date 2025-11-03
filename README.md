@@ -10,7 +10,9 @@ Our mission is to make it easier for people to find **places that serve safe dri
 
 ## About the Project
 
-The [Free Water Tips](/README.md) project consists of a [Web App](freewater.tips), an [Android App](), and an [iOS App]() all of which offer user-friendly ways of finding where free and safe drinking water is served.
+The [Free Water Tips](./README.md) project is a Progressive Web App (PWA) built with React Native, offering a user-friendly way to find where free and safe drinking water is served. The PWA works seamlessly across all devices and platforms.
+
+**Note**: While the current implementation focuses on web as a PWA, the project is built with React Native to allow for future native mobile applications for Android and iOS if there is community demand.
 
 More about how the project came to be you can find in the [Personal Statement](./docs/personal-statement.md) of the creator [Ivan Zdravkov](https://zdravkov.dev).
 
@@ -26,7 +28,7 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 ## Features
 
 - **Proximity-Based Search**: Find the nearest locations offering free drinking water using a maps integration.
-- **Cross-Platform Support**: Access the service via the web, Android, or iOS.
+- **Progressive Web App (PWA)**: Access the service on any device through your web browser with app-like experience.
 - **Free and Anonymous Usage**: Use free without ever logging in.
 - **Community Contributions**: Add locations to help others.
 

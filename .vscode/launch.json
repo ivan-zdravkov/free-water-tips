@@ -27,13 +27,13 @@
       "sourceMaps": true
     },
     {
-      "name": "Debug Azure Functions",
+      "name": "Debug Backend",
       "type": "coreclr",
       "request": "attach",
       "processId": "${command:pickProcess}"
     },
     {
-      "name": "Debug Web",
+      "name": "Debug Frontend",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:8090",
