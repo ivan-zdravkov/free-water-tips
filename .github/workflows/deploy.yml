@@ -1,5 +1,3 @@
-name: Deploy Full Stack Application
-
 # Project Structure:
 # - FreeWaterTips.API.Azure.Functions/ - Azure Functions backend (.NET)
 # - FreeWaterTips.ReactNative/ - React Native with Expo (Web, Android & iOS)
@@ -125,6 +123,7 @@ name: Deploy Full Stack Application
 #
 # ====================================================================================================
 
+name: Deploy Full Stack Application
 on:
   push:
     branches:
