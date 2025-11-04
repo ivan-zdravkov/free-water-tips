@@ -522,7 +522,7 @@ jobs:
     # When enabled, also check: needs.detect-environment.outputs.should_deploy == 'true'
     if: false
     runs-on: ubuntu-latest
-    needs: [detect-environment, build-android, deploy-azure-functions]
+    needs: [detect-environment, build-android]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
@@ -545,7 +545,7 @@ jobs:
     # When enabled, also check: needs.detect-environment.outputs.should_deploy == 'true'
     if: false
     runs-on: macos-latest
-    needs: [detect-environment, build-ios, deploy-azure-functions]
+    needs: [detect-environment, build-ios]
     environment: ${{ needs.detect-environment.outputs.environment }}
     
     steps:
