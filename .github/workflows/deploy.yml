@@ -154,13 +154,13 @@ jobs:
         id: detect
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
           
@@ -240,7 +240,7 @@ jobs:
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-${{ lower(needs.detect-environment.outputs.environment) }}-artifact
+          name: web-${{ needs.detect-environment.outputs.environment }}-artifact
           path: FreeWaterTips.ReactNative/dist
           retention-days: 3
 
@@ -437,7 +437,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        if: needs.detect-environment.outputs.environment == 'Production'
+        if: needs.detect-environment.outputs.environment == 'production'
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -445,11 +445,11 @@ jobs:
       - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
-          name: web-${{ lower(needs.detect-environment.outputs.environment) }}-artifact
+          name: web-${{ needs.detect-environment.outputs.environment }}-artifact
           path: ./web-output
 
       - name: Deploy to production
-        if: needs.detect-environment.outputs.environment == 'Production'
+        if: needs.detect-environment.outputs.environment == 'production'
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
@@ -477,7 +477,7 @@ jobs:
           git push origin gh-pages
 
       - name: Deploy to testing
-        if: needs.detect-environment.outputs.environment == 'Testing'
+        if: needs.detect-environment.outputs.environment == 'testing'
         env:
           REPOSITORY_PAT: ${{ secrets.REPOSITORY_PAT }}
         run: |
