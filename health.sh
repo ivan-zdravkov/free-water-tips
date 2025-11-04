@@ -379,6 +379,13 @@ else
     print_status 1 ".NET Packages" "" "Run: cd FreeWaterTips.API.Azure.Functions && dotnet restore"
 fi
 
+# Check if local.settings.json exists
+if [ -f "FreeWaterTips.API.Azure.Functions/local.settings.json" ]; then
+    print_status 0 "Azure Functions local.settings.json" "(configured)"
+else
+    print_status 1 "Azure Functions local.settings.json" "" "Run: cp FreeWaterTips.API.Azure.Functions/local.settings.json.template FreeWaterTips.API.Azure.Functions/local.settings.json"
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Documentation References"
