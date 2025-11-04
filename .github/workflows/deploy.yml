@@ -154,13 +154,13 @@ jobs:
         id: detect
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/master" ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
-            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
-            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
           
@@ -201,13 +201,13 @@ jobs:
         run: dotnet build FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --no-restore
         
       - name: Publish Azure Functions
-        run: dotnet publish FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --output ./publish/azure-functions --no-build
+        run: dotnet publish FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --output ./artifacts/azure-functions --no-build
         
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
         with:
           name: azure-functions-artifact
-          path: ./publish/azure-functions
+          path: ./artifacts/azure-functions
           retention-days: 3
 
   build-web:
@@ -235,13 +235,13 @@ jobs:
           
       - name: Build web application
         working-directory: FreeWaterTips.ReactNative
-        run: npx expo export --platform web --output-dir ./dist
+        run: npx expo export --platform web --output-dir ./artifacts/web
           
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-${{ needs.detect-environment.outputs.environment }}-artifact
-          path: FreeWaterTips.ReactNative/dist
+          name: web-artifact
+          path: FreeWaterTips.ReactNative/artifacts/web
           retention-days: 3
 
   build-android: 
@@ -297,11 +297,16 @@ jobs:
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
         
+      - name: Copy Android artifact to artifacts directory
+        run: |
+          mkdir -p ./artifacts/android
+          cp FreeWaterTips.ReactNative/android/app/build/outputs/bundle/release/*.aab ./artifacts/android/
+        
       - name: Upload signed Android AAB artifact
         uses: actions/upload-artifact@v4
         with:
           name: android-artifact
-          path: FreeWaterTips.ReactNative/android/app/build/outputs/bundle/release/*.aab
+          path: ./artifacts/android
           retention-days: 3
 
   build-ios:
@@ -398,11 +403,17 @@ jobs:
             -exportPath $PWD/build \
             -exportOptionsPlist exportOptions-final.plist
         
+      - name: Copy iOS artifact to artifacts directory
+        working-directory: FreeWaterTips.ReactNative
+        run: |
+          mkdir -p ./artifacts/ios
+          cp ios/build/*.ipa ./artifacts/ios/
+        
       - name: Upload signed iOS IPA artifact
         uses: actions/upload-artifact@v4
         with:
           name: ios-artifact
-          path: FreeWaterTips.ReactNative/ios/build/*.ipa
+          path: FreeWaterTips.ReactNative/artifacts/ios
           retention-days: 3
 
   deploy-azure-functions:
@@ -416,7 +427,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: azure-functions-artifact
-          path: ./publish
+          path: ./artifacts/azure-functions
           
       - name: Login to Azure
         uses: azure/login@v2
@@ -427,7 +438,7 @@ jobs:
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
-          package: './publish'
+          package: './artifacts/azure-functions'
   
   deploy-web:
     if: needs.detect-environment.outputs.should_deploy == 'true'
@@ -437,7 +448,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        if: needs.detect-environment.outputs.environment == 'production'
+        if: needs.detect-environment.outputs.environment == 'Production'
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -445,11 +456,11 @@ jobs:
       - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
-          name: web-${{ needs.detect-environment.outputs.environment }}-artifact
-          path: ./web-output
+          name: web-artifact
+          path: ./artifacts/web
 
       - name: Deploy to production
-        if: needs.detect-environment.outputs.environment == 'production'
+        if: needs.detect-environment.outputs.environment == 'Production'
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
@@ -463,7 +474,7 @@ jobs:
           find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
           
           # Copy new production files from Expo web build
-          cp -r ../web-output/* .
+          cp -r ../artifacts/web/* .
           
           # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
           touch .nojekyll
@@ -477,7 +488,7 @@ jobs:
           git push origin gh-pages
 
       - name: Deploy to testing
-        if: needs.detect-environment.outputs.environment == 'testing'
+        if: needs.detect-environment.outputs.environment == 'Testing'
         env:
           REPOSITORY_PAT: ${{ secrets.REPOSITORY_PAT }}
         run: |
@@ -493,7 +504,7 @@ jobs:
           find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
           
           # Copy new testing files from Expo web build
-          cp -r ../web-output/* .
+          cp -r ../artifacts/web/* .
           
           # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
           touch .nojekyll
@@ -519,14 +530,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: android-artifact
-          path: ./android-release
+          path: ./artifacts/android
           
       - name: Upload to Google Play Store
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: tips.freewater.app
-          releaseFiles: ./android-release/*.aab
+          releaseFiles: ./artifacts/android/*.aab
           track: ${{ secrets.GOOGLE_PLAY_TRACK }}
 
   deploy-ios:
@@ -542,7 +553,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ios-artifact
-          path: ./ios-release
+          path: ./artifacts/ios
             
       - name: Upload to App Store Connect
         env:
@@ -556,6 +567,6 @@ jobs:
           # Upload IPA to App Store Connect
           xcrun altool --upload-app \
             --type ios \
-            --file ./ios-release/*.ipa \
+            --file ./artifacts/ios/*.ipa \
             --apiKey "$APPLE_APP_STORE_API_KEY_ID" \
             --apiIssuer "$APPLE_APP_STORE_API_ISSUER_ID"

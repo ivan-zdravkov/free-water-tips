@@ -8,9 +8,9 @@ namespace FreeWaterTips.Utils
 
         public static EnvironmentEnum Type => Name switch
         {
-            "development" => EnvironmentEnum.Development,
-            "testing" => EnvironmentEnum.Testing,
-            "production" => EnvironmentEnum.Production,
+            "Development" => EnvironmentEnum.Development,
+            "Testing" => EnvironmentEnum.Testing,
+            "Production" => EnvironmentEnum.Production,
             _ => EnvironmentEnum.Development
         };
 
