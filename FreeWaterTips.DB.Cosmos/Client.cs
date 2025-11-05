@@ -24,12 +24,14 @@ namespace FreeWaterTips.DB.Cosmos
         {
             try
             {
-                bool isConnected = await cosmos.ReadAccountAsync() != null;
+                AccountProperties account = await cosmos.ReadAccountAsync();
 
-                return isConnected;
+                return account != null;
             }
-            catch (Exception _)
+            catch (Exception ex)
             {
+                this.logger.LogError(ex, "Cosmos DB connection check failed.");
+
                 return false;
             }
         }
