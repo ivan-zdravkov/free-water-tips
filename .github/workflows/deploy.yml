@@ -139,7 +139,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: "deploy-${{ github.ref }}"
+  group: 'deploy-${{ github.ref }}'
   cancel-in-progress: false
 
 jobs:
@@ -148,7 +148,7 @@ jobs:
     outputs:
       environment: ${{ steps.detect.outputs.environment }}
       should_deploy: ${{ steps.detect.outputs.should_deploy }}
-    
+
     steps:
       - name: Detect environment
         id: detect
@@ -157,13 +157,13 @@ jobs:
             echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=Testing" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=Testing" >> $GITHUB_OUTPUT
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
-          
+
           echo "Detected environment: $(cat $GITHUB_OUTPUT | grep environment | cut -d= -f2)"
           echo "Should deploy: $(cat $GITHUB_OUTPUT | grep should_deploy | cut -d= -f2)"
           echo "Branch: ${{ github.ref }}"
@@ -176,16 +176,16 @@ jobs:
       ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
       COSMOS_DB_ENDPOINT: ${{ secrets.COSMOS_DB_ENDPOINT }}
       COSMOS_DB_KEY: ${{ secrets.COSMOS_DB_KEY }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.x'
-          
+
       - name: Cache .NET packages
         uses: actions/cache@v4
         with:
@@ -193,16 +193,16 @@ jobs:
           key: azure-functions-${{ runner.os }}-nuget-${{ hashFiles('**/FreeWaterTips.API.Azure.Functions.csproj', '**/FreeWaterTips.DB.Cosmos.csproj', '**/FreeWaterTips.Utils.csproj') }}
           restore-keys: |
             azure-functions-${{ runner.os }}-nuget-
-          
+
       - name: Restore dependencies
         run: dotnet restore FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj
-        
+
       - name: Build Azure Functions
         run: dotnet build FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --no-restore
-        
+
       - name: Publish Azure Functions
         run: dotnet publish FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --output ./artifacts/azure-functions --no-build
-        
+
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
         with:
@@ -217,26 +217,26 @@ jobs:
     env:
       ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
       EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT: ${{ secrets.AZURE_FUNCTIONS_ENDPOINT }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
-          
+
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
-          
+
       - name: Build web application
         working-directory: FreeWaterTips.ReactNative
         run: npx expo export --platform web --output-dir ./artifacts/web
-          
+
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
@@ -244,7 +244,7 @@ jobs:
           path: FreeWaterTips.ReactNative/artifacts/web
           retention-days: 3
 
-  build-android: 
+  build-android:
     if: false # Temporarily disable Android builds - enable for production builds when ready to use
     runs-on: ubuntu-latest
     needs: detect-environment
@@ -252,38 +252,38 @@ jobs:
     env:
       ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
       EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT: ${{ secrets.AZURE_FUNCTIONS_ENDPOINT }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
-          
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-          
+
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
-        
+
       - name: Decode and setup Android keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > FreeWaterTips.ReactNative/android/app/release.keystore
-        
+
       - name: Run Expo prebuild for Android
         working-directory: FreeWaterTips.ReactNative
         run: npx expo prebuild --platform android --clean
-        
+
       - name: Build signed Android App Bundle (AAB)
         working-directory: FreeWaterTips.ReactNative/android
         env:
@@ -296,12 +296,12 @@ jobs:
             -Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$KEY_PASSWORD
-        
+
       - name: Copy Android artifact to artifacts directory
         run: |
           mkdir -p ./artifacts/android
           cp FreeWaterTips.ReactNative/android/app/build/outputs/bundle/release/*.aab ./artifacts/android/
-        
+
       - name: Upload signed Android AAB artifact
         uses: actions/upload-artifact@v4
         with:
@@ -317,25 +317,25 @@ jobs:
     env:
       ENVIRONMENT: ${{ needs.detect-environment.outputs.environment }}
       EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT: ${{ secrets.AZURE_FUNCTIONS_ENDPOINT }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22'
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
-          
+
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
         run: npm ci
-        
+
       - name: Install CocoaPods
         run: sudo gem install cocoapods
-        
+
       - name: Setup Apple certificates and provisioning profiles
         env:
           IOS_CERTIFICATE_BASE64: ${{ secrets.IOS_CERTIFICATE_BASE64 }}
@@ -364,15 +364,15 @@ jobs:
           # Install provisioning profile
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
-        
+
       - name: Run Expo prebuild for iOS
         working-directory: FreeWaterTips.ReactNative
         run: npx expo prebuild --platform ios --clean
-        
+
       - name: Install iOS dependencies
         working-directory: FreeWaterTips.ReactNative/ios
         run: pod install
-        
+
       - name: Build and archive iOS app
         working-directory: FreeWaterTips.ReactNative/ios
         env:
@@ -380,7 +380,7 @@ jobs:
         run: |
           WORKSPACE=$(find . -maxdepth 1 -name "*.xcworkspace" -type d | head -n 1 | sed 's|^\./||')
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
-          
+
           xcodebuild -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
             -configuration Release \
@@ -389,7 +389,7 @@ jobs:
             -allowProvisioningUpdates \
             DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
             archive
-          
+
       - name: Export signed IPA
         working-directory: FreeWaterTips.ReactNative/ios
         env:
@@ -397,18 +397,18 @@ jobs:
         run: |
           # Replace team ID placeholder in exportOptions.plist
           sed "s/\$(APPLE_TEAM_ID)/$APPLE_TEAM_ID/g" ../exportOptions.plist > exportOptions-final.plist
-          
+
           xcodebuild -exportArchive \
             -archivePath $PWD/build/FreeWaterTips.xcarchive \
             -exportPath $PWD/build \
             -exportOptionsPlist exportOptions-final.plist
-        
+
       - name: Copy iOS artifact to artifacts directory
         working-directory: FreeWaterTips.ReactNative
         run: |
           mkdir -p ./artifacts/ios
           cp ios/build/*.ipa ./artifacts/ios/
-        
+
       - name: Upload signed iOS IPA artifact
         uses: actions/upload-artifact@v4
         with:
@@ -421,38 +421,38 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-environment, build-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
-    
+
     steps:
       - name: Download Azure Functions artifact
         uses: actions/download-artifact@v4
         with:
           name: azure-functions-artifact
           path: ./artifacts/azure-functions
-          
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
+
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
         with:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
           package: './artifacts/azure-functions'
-  
+
   deploy-web:
     if: needs.detect-environment.outputs.should_deploy == 'true'
     runs-on: ubuntu-latest
     needs: [detect-environment, build-web, deploy-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
-    
+
     steps:
       - name: Checkout code
         if: needs.detect-environment.outputs.environment == 'Production'
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
@@ -465,23 +465,23 @@ jobs:
           # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # Clone gh-pages branch
           git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./gh-pages-temp
           cd ./gh-pages-temp
-          
+
           # Clear root directory but keep .git
           find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
-          
+
           # Copy new production files from Expo web build
           cp -r ../artifacts/web/* .
-          
+
           # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
           touch .nojekyll
-          
+
           # Add CNAME file for custom domain
           echo "freewater.tips" > CNAME
-          
+
           # Commit and push changes
           git add .
           git commit -m "Deploy production build from commit ${{ github.sha }}" || echo "No changes to commit"
@@ -495,23 +495,23 @@ jobs:
           # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           # Clone gh-pages branch of the test repository
           git clone --single-branch --branch gh-pages https://${REPOSITORY_PAT}@github.com/ivan-zdravkov/free-water-tips-test.git ./gh-pages-test
           cd ./gh-pages-test
-          
+
           # Clear root directory but keep .git
           find . -maxdepth 1 ! -name '.git' ! -name '.' ! -name '..' -exec rm -rf {} +
-          
+
           # Copy new testing files from Expo web build
           cp -r ../artifacts/web/* .
-          
+
           # Add .nojekyll file to disable Jekyll processing (allows _expo directory)
           touch .nojekyll
-          
+
           # Add CNAME file for custom domain
           echo "test.freewater.tips" > CNAME
-          
+
           # Commit and push changes
           git add .
           git commit -m "Deploy testing build from commit ${{ github.sha }}" || echo "No changes to commit"
@@ -524,14 +524,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [detect-environment, build-android]
     environment: ${{ needs.detect-environment.outputs.environment }}
-    
+
     steps:
       - name: Download Android artifact
         uses: actions/download-artifact@v4
         with:
           name: android-artifact
           path: ./artifacts/android
-          
+
       - name: Upload to Google Play Store
         uses: r0adkll/upload-google-play@v1.1.3
         with:
@@ -547,14 +547,14 @@ jobs:
     runs-on: macos-latest
     needs: [detect-environment, build-ios]
     environment: ${{ needs.detect-environment.outputs.environment }}
-    
+
     steps:
       - name: Download iOS artifact
         uses: actions/download-artifact@v4
         with:
           name: ios-artifact
           path: ./artifacts/ios
-            
+
       - name: Upload to App Store Connect
         env:
           APPLE_APP_STORE_API_KEY_ID: ${{ secrets.APPLE_APP_STORE_API_KEY_ID }}
@@ -563,7 +563,7 @@ jobs:
         run: |
           # Decode and save API key to file
           echo -n "$APPLE_APP_STORE_API_KEY_BASE64" | base64 --decode > AuthKey.p8
-          
+
           # Upload IPA to App Store Connect
           xcrun altool --upload-app \
             --type ios \
