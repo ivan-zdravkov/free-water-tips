@@ -2,17 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build Azure Functions",
-      "type": "shell",
-      "command": "dotnet",
-      "args": ["build"],
-      "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
-      },
-      "problemMatcher": "$msCompile"
-    },
-    {
-      "label": "Start Azure Functions",
+      "label": "Start Backend",
       "type": "shell",
       "command": "dotnet",
       "args": ["run"],
@@ -22,7 +12,7 @@
       "isBackground": true,
       "problemMatcher": {
         "pattern": {
-          "regexp": "^([^\\\\s].*)\\\\((\\\\d+,\\\\d+)\\\\):\\\\s+(error|warning|info)\\\\s+(TS\\\\d+)\\\\s*:\\\\s*(.*)$",
+          "regexp": "^([^\\s].*)\\((\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
           "file": 1,
           "location": 2,
           "severity": 3,
@@ -37,7 +27,7 @@
       }
     },
     {
-      "label": "Start React Native",
+      "label": "Start Frontend",
       "type": "shell",
       "command": "npm",
       "args": ["run", "web"],
@@ -60,14 +50,9 @@
       }
     },
     {
-      "label": "Start Backend",
-      "dependsOn": ["Build Azure Functions", "Start Azure Functions"],
-      "dependsOrder": "sequence"
-    },
-    {
       "label": "Start Backend + Frontend",
-      "dependsOn": ["Start Backend", "Start React Native"],
-      "dependsOrder": "sequence"
+      "dependsOn": ["Start Backend", "Start Frontend"],
+      "dependsOrder": "parallel"
     }
   ]
 }
