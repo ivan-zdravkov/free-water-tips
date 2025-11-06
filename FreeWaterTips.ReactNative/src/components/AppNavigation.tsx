@@ -18,38 +18,26 @@ export default function AppNavigation() {
     <View style={styles.container}>
       <View style={styles.navContent}>
         <Text style={styles.logo}>Free Water Tips</Text>
-        
+
         <View style={styles.navButtons}>
           <TouchableOpacity
-            style={[
-              styles.navButton,
-              isActive('Map') && styles.navButtonActive
-            ]}
+            style={[styles.navButton, isActive('Map') && styles.navButtonActive]}
             onPress={() => navigation.navigate('Map')}
             accessibilityLabel="Navigate to Map"
             accessibilityRole="button"
           >
-            <Text style={[
-              styles.navButtonText,
-              isActive('Map') && styles.navButtonTextActive
-            ]}>
+            <Text style={[styles.navButtonText, isActive('Map') && styles.navButtonTextActive]}>
               🗺️ Map
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.navButton,
-              isActive('About') && styles.navButtonActive
-            ]}
+            style={[styles.navButton, isActive('About') && styles.navButtonActive]}
             onPress={() => navigation.navigate('About')}
             accessibilityLabel="Navigate to About"
             accessibilityRole="button"
           >
-            <Text style={[
-              styles.navButtonText,
-              isActive('About') && styles.navButtonTextActive
-            ]}>
+            <Text style={[styles.navButtonText, isActive('About') && styles.navButtonTextActive]}>
               ℹ️ About
             </Text>
           </TouchableOpacity>

@@ -6,11 +6,11 @@ Thank you for your interest in contributing to [Free Water Tips](https://freewat
 
 - [Getting Started](#getting-started)
 - [Ways to Contribute](#ways-to-contribute)
-   - [Adding Water Sources](#adding-water-sources)
-   - [Suggesting Features](#suggesting-features)
-   - [Reporting Bugs](#reporting-bugs)
-   - [Contributing Code](#contributing-code)
-   - [Translating](#translating)
+  - [Adding Water Sources](#adding-water-sources)
+  - [Suggesting Features](#suggesting-features)
+  - [Reporting Bugs](#reporting-bugs)
+  - [Contributing Code](#contributing-code)
+  - [Translating](#translating)
 - [Project Architecture](#project-architecture)
 - [Development Setup](#development-setup)
   - [Quick Setup (Recommended)](#quick-setup-recommended)
@@ -30,6 +30,7 @@ Free Water Tips is a community-driven platform that helps people find free drink
 ## Ways to Contribute
 
 ### 📍 Add Water Sources
+
 Help expand our database by adding new water source locations.
 
 1. **Use the Contribute page** on the web or mobile apps
@@ -39,6 +40,7 @@ Help expand our database by adding new water source locations.
 5. **Add photos**: If possible, include photos of the water source
 
 ### 💡 Suggest Features
+
 Share ideas for new features or improvements.
 
 1. **Check existing issues** to see if it's already been suggested
@@ -47,12 +49,15 @@ Share ideas for new features or improvements.
 4. **Consider implementation complexity** and user impact
 
 ### 🐛 Report Bugs
+
 Help us improve by reporting issues you encounter. See [Reporting Bugs](/docs/reporting-bugs.md) for details.
 
 ### 💻 Contributing Code
+
 Contribute to the web app, mobile apps, or backend services, improve documentation or guides. See [Development Setup](#development-setup) to get started.
 
 ### 🌍 Translating
+
 Help make the platform accessible in different languages (coming soon).
 
 ## Project Architecture
@@ -60,21 +65,23 @@ Help make the platform accessible in different languages (coming soon).
 **Free Water Tips** is a full-stack Progressive Web App (PWA) with a serverless backend:
 
 ### Frontend
+
 - **Framework**: [React Native](https://reactnative.dev/) with [Expo](https://expo.dev/)
 - **Platform**: Progressive Web App (PWA) with TypeScript
 - **Web Hosting**: [GitHub Pages](https://pages.github.com/) or any static hosting
 - **Future Plans**: Native mobile apps for iOS and Android may be considered based on community demand
 
-### Backend  
+### Backend
+
 - **API**: [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) (C#) with HTTP triggers
 - **Database**: [Azure Cosmos DB](https://azure.microsoft.com/en-us/products/cosmos-db) with JSON documents and geo location data.
 - **Deployment**: [GitHub Actions](https://github.com/features/actions) to [Azure](https://azure.microsoft.com/en-us/products/functions)
 
 ### Development Stack
+
 - **IDE**: [Visual Studio 2026 Insiders](https://visualstudio.microsoft.com/insiders/)
 - **Languages**: [C# 14](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-14)
 - **Local Database**: [Azure Cosmos DB Local Emulator](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator)
-
 
 ## Development Setup
 
@@ -87,6 +94,7 @@ Before you start development, make sure your environment has all the required de
 ```
 
 This script will check for:
+
 - Core development tools (Git, Node.js v22+, .NET SDK v10+)
 - Azure Functions Core Tools
 - Cosmos DB Emulator (via Docker)
@@ -144,6 +152,7 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
 ### Development Workflow
 
 1. **Fork and Clone**
+
    ```bash
    git clone https://github.com/your-username/free-water-tips.git
    cd free-water-tips
@@ -154,18 +163,22 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
    See [Development Setup](#development-setup) section above.
 
 3. **Create Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
 4. **Make Changes and Test**
    Run the health check script to ensure your environment is properly configured:
+
    ```bash
    ./health.sh
    ```
+
    Test your changes locally before committing.
 
 5. **Commit and Push**
+
    ```bash
    git add .
    git commit -m "feat: add your feature description"
@@ -177,6 +190,23 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
    - Follow the PR template
    - Wait for automated checks and review
 
+### Code Formatting
+
+This project uses automated code formatters for consistent style across all file types.
+
+**Setup**
+
+- Install recommended VS Code extensions when prompted (Prettier, C# Dev Kit)
+- Format on save is enabled automatically via `.vscode/settings.json`
+
+**Configuration Files**
+
+- `.prettierrc.json` - Prettier settings (TS/JS/JSON/YAML/HTML/CSS)
+- `.editorconfig` - C# formatting rules
+- `.vscode/settings.json` - Format on save config
+
+Run `./health.sh` to verify formatters are properly configured.
+
 ### Code Quality
 
 - **Languages**: Follow latest C# best practices
@@ -187,24 +217,29 @@ We follow the [GitHub Flow](https://docs.github.com/en/get-started/using-github/
 ## Pull Request Process
 
 ### Pre-submission Checklist
+
 The full PR checklist is automatically added to every pull request via our [PR Template](.github/pull_request_template.md).
 
 ### Automated Quality Checks
+
 - GitHub Actions automatically run comprehensive quality checks on every PR
 - All status checks must pass before merging is allowed
 - See [PR Quality Checks](.github/workflows/pr-quality-checks.yml) workflow for details. To be added...
 
 ### Review Process
+
 - At least one code review required from [code owners](.github/CODEOWNERS)
 - Automated CI/CD checks must pass
 - Feature branch environment testing completed (when available)
 
 ### Merge Requirements
+
 - All conversations resolved
 - CI/CD pipeline successful
 - Branch up-to-date with master
 
 ### Steps to Submit a PR
+
 1. **Update documentation** if needed
 2. **Test your changes** thoroughly
 3. **Follow the PR template**
@@ -215,17 +250,20 @@ The full PR checklist is automatically added to every pull request via our [PR T
 ## Community Guidelines
 
 ### Be Respectful
+
 - Use inclusive language
 - Be constructive in feedback
 - Respect different perspectives
 - Help newcomers feel welcome
 
 ### Be Collaborative
+
 - Share knowledge and resources
 - Give credit where due
 - Work together towards common goals
 
 ### Be Professional
+
 - Keep discussions focused and relevant
 - Avoid spam or self-promotion
 - Follow GitHub's community guidelines

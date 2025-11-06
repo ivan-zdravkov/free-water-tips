@@ -388,6 +388,54 @@ fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo "  Code Formatting Setup"
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+echo ""
+
+# Check if Prettier is installed
+if [ -f "FreeWaterTips.ReactNative/node_modules/.bin/prettier" ]; then
+    PRETTIER_VERSION=$(cd FreeWaterTips.ReactNative && npx prettier --version 2>/dev/null || echo "installed")
+    print_status 0 "Prettier" "v${PRETTIER_VERSION}"
+else
+    print_status 1 "Prettier" "" "Run: cd FreeWaterTips.ReactNative && npm install"
+fi
+
+# Check if Prettier config exists
+if [ -f ".prettierrc.json" ]; then
+    print_status 0 "Prettier Config" "(.prettierrc.json)"
+else
+    print_status 1 "Prettier Config" "" "Missing .prettierrc.json configuration file"
+fi
+
+# Check if EditorConfig exists
+if [ -f ".editorconfig" ]; then
+    print_status 0 "EditorConfig" "(.editorconfig)"
+else
+    print_status 1 "EditorConfig" "" "Missing .editorconfig for C# formatting"
+fi
+
+# Check if VS Code settings exist
+if [ -f ".vscode/settings.json" ]; then
+    print_status 0 "VS Code Format on Save" "(configured)"
+else
+    echo -e "${YELLOW}${WARNING}${NC} VS Code settings.json ${YELLOW}not found${NC}"
+    echo -e "  ${YELLOW}→${NC} Format on save may not be enabled"
+fi
+
+# Check formatting (non-blocking)
+if [ -d "FreeWaterTips.ReactNative/node_modules" ]; then
+    if cd FreeWaterTips.ReactNative && npm run format:check > /dev/null 2>&1; then
+        print_status 0 "Code Formatting" "(all files formatted)"
+        cd - > /dev/null
+    else
+        echo -e "${YELLOW}${WARNING}${NC} Some files need formatting ${YELLOW}(non-critical)${NC}"
+        echo -e "  ${YELLOW}→${NC} Run: cd FreeWaterTips.ReactNative && npm run format"
+        cd - > /dev/null 2>&1
+    fi
+fi
+
+echo ""
+echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "  Documentation References"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""

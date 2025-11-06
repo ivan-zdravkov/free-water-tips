@@ -1,6 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, Linking } from 'react-native';
-import { Card, Title, Paragraph, Button, List, ActivityIndicator, Divider, Chip, Text } from 'react-native-paper';
+import {
+  Card,
+  Title,
+  Paragraph,
+  Button,
+  List,
+  ActivityIndicator,
+  Divider,
+  Chip,
+  Text,
+} from 'react-native-paper';
 import { getHealth } from '../services/api';
 import { HealthResponse } from '../types/api';
 
@@ -16,7 +26,7 @@ export default function AboutScreen() {
     totalLocations: 0,
     totalContributors: 0,
     countriesServed: 0,
-    lastUpdated: 'Loading...'
+    lastUpdated: 'Loading...',
   });
 
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -30,7 +40,7 @@ export default function AboutScreen() {
       totalLocations: 0,
       totalContributors: 0,
       countriesServed: 0,
-      lastUpdated: new Date().toLocaleDateString()
+      lastUpdated: new Date().toLocaleDateString(),
     });
 
     loadHealthStatus();
@@ -57,7 +67,7 @@ export default function AboutScreen() {
   const shareOnPlatform = (platform: string) => {
     const url = 'https://freewater.tips';
     const text = 'Check out Free Water Tips - Find free drinking water sources near you!';
-    
+
     const shareUrls: { [key: string]: string } = {
       x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
@@ -90,17 +100,20 @@ export default function AboutScreen() {
           <Title>Our Mission</Title>
           <Paragraph>
             The UN believes that water is a{' '}
-            <Text 
+            <Text
               style={{ color: '#0066cc', textDecorationLine: 'underline' }}
-              onPress={() => openLink('https://www.unwater.org/water-facts/human-rights-water-and-sanitation')}
+              onPress={() =>
+                openLink('https://www.unwater.org/water-facts/human-rights-water-and-sanitation')
+              }
             >
               fundamental human right
-            </Text>
-            {' '}and should not be treated as a commodity.
+            </Text>{' '}
+            and should not be treated as a commodity.
           </Paragraph>
           <Paragraph>
-            Our mission is to make it easier for people to find places that serve safe drinking water 
-            not burdened by a product or service tax, promoting sustainability and reducing plastic waste.
+            Our mission is to make it easier for people to find places that serve safe drinking
+            water not burdened by a product or service tax, promoting sustainability and reducing
+            plastic waste.
           </Paragraph>
         </Card.Content>
       </Card>
@@ -138,25 +151,22 @@ export default function AboutScreen() {
           <Title>Created by Ivan Zdravkov</Title>
           <Paragraph>
             This project was created by{' '}
-            <Text 
+            <Text
               style={{ color: '#0066cc', textDecorationLine: 'underline' }}
               onPress={() => openLink('https://zdravkov.dev')}
             >
               Ivan Zdravkov
             </Text>
-            , a passionate developer dedicated to making clean drinking water more accessible to everyone.
+            , a passionate developer dedicated to making clean drinking water more accessible to
+            everyone.
           </Paragraph>
         </Card.Content>
         <Card.Actions>
-          <Button onPress={() => openLink('https://github.com/ivan-zdravkov')}>
-            GitHub
-          </Button>
+          <Button onPress={() => openLink('https://github.com/ivan-zdravkov')}>GitHub</Button>
           <Button onPress={() => openLink('https://www.linkedin.com/in/ivan-zdravkov/')}>
             LinkedIn
           </Button>
-          <Button onPress={() => openLink('https://zdravkov.dev')}>
-            Website
-          </Button>
+          <Button onPress={() => openLink('https://zdravkov.dev')}>Website</Button>
         </Card.Actions>
       </Card>
 
@@ -165,20 +175,16 @@ export default function AboutScreen() {
         <Card.Content>
           <Title>Support the Project</Title>
           <Paragraph>
-            This project is and always will be free and open-source. 
-            If you find it useful and want to support the mission, consider making a donation:
+            This project is and always will be free and open-source. If you find it useful and want
+            to support the mission, consider making a donation:
           </Paragraph>
         </Card.Content>
         <Card.Actions>
           <Button onPress={() => openLink('https://github.com/sponsors/ivan-zdravkov')}>
             GitHub Sponsors
           </Button>
-          <Button onPress={() => openLink('https://paypal.me/IZdravkov')}>
-            PayPal
-          </Button>
-          <Button onPress={() => openLink('https://revolut.me/ivan_zdravkov')}>
-            Revolut
-          </Button>
+          <Button onPress={() => openLink('https://paypal.me/IZdravkov')}>PayPal</Button>
+          <Button onPress={() => openLink('https://revolut.me/ivan_zdravkov')}>Revolut</Button>
         </Card.Actions>
       </Card>
 
@@ -188,28 +194,36 @@ export default function AboutScreen() {
           <Title>Open Source</Title>
           <Paragraph>
             This project is licensed under the{' '}
-            <Text 
+            <Text
               style={{ color: '#0066cc', textDecorationLine: 'underline' }}
-              onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips?tab=GPL-3.0-1-ov-file')}
+              onPress={() =>
+                openLink('https://github.com/ivan-zdravkov/free-water-tips?tab=GPL-3.0-1-ov-file')
+              }
             >
               GNU General Public License v3.0
             </Text>
-            . The source code is available on GitHub and contributions are welcome! 
-            Found a bug? Please{' '}
-            <Text 
+            . The source code is available on GitHub and contributions are welcome! Found a bug?
+            Please{' '}
+            <Text
               style={{ color: '#0066cc', textDecorationLine: 'underline' }}
-              onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips/blob/main/CONTRIBUTING.md#reporting-bugs')}
+              onPress={() =>
+                openLink(
+                  'https://github.com/ivan-zdravkov/free-water-tips/blob/main/CONTRIBUTING.md#reporting-bugs'
+                )
+              }
             >
               follow our bug reporting guidelines
-            </Text>
-            {' '}to help us improve the platform.
+            </Text>{' '}
+            to help us improve the platform.
           </Paragraph>
         </Card.Content>
         <Card.Actions>
           <Button onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips')}>
             Source Code
           </Button>
-          <Button onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips/issues')}>
+          <Button
+            onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips/issues')}
+          >
             Report Bug
           </Button>
         </Card.Actions>
@@ -234,9 +248,7 @@ export default function AboutScreen() {
             description="Countries Served"
             left={props => <List.Icon {...props} icon="earth" />}
           />
-          <Paragraph style={{ marginTop: 8 }}>
-            Last updated: {stats.lastUpdated}
-          </Paragraph>
+          <Paragraph style={{ marginTop: 8 }}>Last updated: {stats.lastUpdated}</Paragraph>
         </Card.Content>
       </Card>
 
@@ -245,8 +257,8 @@ export default function AboutScreen() {
         <Card.Content>
           <Title>Share Free Water Tips</Title>
           <Paragraph>
-            Help spread the word about free water access! Share this project with your friends and community 
-            to help more people discover free water sources.
+            Help spread the word about free water access! Share this project with your friends and
+            community to help more people discover free water sources.
           </Paragraph>
         </Card.Content>
         <Card.Actions style={{ flexWrap: 'wrap' }}>
@@ -269,18 +281,17 @@ export default function AboutScreen() {
             <Paragraph>{healthError}</Paragraph>
           ) : health ? (
             <>
-              <List.Item
-                title="Status"
-                description={health.status}
-              />
-              <List.Item
-                title="Environment"
-                description={health.environment}
-              />
+              <List.Item title="Status" description={health.status} />
+              <List.Item title="Environment" description={health.environment} />
               <List.Item
                 title="Cosmos DB"
                 description={health.cosmosConnected ? 'Connected' : 'Disconnected'}
-                left={props => <List.Icon {...props} icon={health.cosmosConnected ? 'check-circle' : 'close-circle'} />}
+                left={props => (
+                  <List.Icon
+                    {...props}
+                    icon={health.cosmosConnected ? 'check-circle' : 'close-circle'}
+                  />
+                )}
               />
               <Divider />
               <Paragraph style={{ marginTop: 8 }}>

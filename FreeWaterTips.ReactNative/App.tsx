@@ -35,14 +35,8 @@ export default function App() {
             cardStyle: { flex: 1 },
           }}
         >
-          <Stack.Screen 
-            name="Map" 
-            component={HomeScreen}
-          />
-          <Stack.Screen 
-            name="About" 
-            component={AboutScreen}
-          />
+          <Stack.Screen name="Map" component={HomeScreen} />
+          <Stack.Screen name="About" component={AboutScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </PaperProvider>

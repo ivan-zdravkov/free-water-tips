@@ -10,9 +10,5 @@ interface Props {
 }
 
 export default function HomeScreen({ navigation }: Props) {
-  return (
-    <View style={{ flex: 1 }}>
-      {/* Map will be added here */}
-    </View>
-  );
+  return <View style={{ flex: 1 }}>{/* Map will be added here */}</View>;
 }
