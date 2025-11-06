@@ -38,6 +38,18 @@
 #   Example: https://free-water-tips-api.azurewebsites.net
 #   Usage: Used as EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT in React Native builds
 #
+# ✓ AZURE_RESOURCE_GROUP_NAME
+#   Description: Name of the Azure Resource Group containing the Function App
+#   How to obtain: Azure Portal -> Resource groups -> Your resource group -> Overview -> Resource group name
+#   Example: rg-free-water-tips
+#   Usage: Required for configuring Function App settings via Azure CLI
+#
+# ✓ AZURE_STORAGE_CONNECTION_STRING
+#   Description: Connection string for Azure Storage Account used by Azure Functions
+#   How to obtain: Azure Portal -> Storage accounts -> Your storage account -> Security + networking -> Access keys -> Connection string
+#   Example: DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net
+#   Security: Keep this secret secure; required for Azure Functions runtime (AzureWebJobsStorage)
+#
 # --- WEB DEPLOYMENT SECRETS (✓ Implemented) ---
 #
 # ✓ GITHUB_TOKEN
@@ -433,6 +445,19 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Configure Azure Function App Settings
+        run: |
+          az functionapp config appsettings set \
+            --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} \
+            --settings \
+              "AzureWebJobsStorage=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+              "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated" \
+              "FUNCTIONS_EXTENSION_VERSION=~4" \
+              "WEBSITE_RUN_FROM_PACKAGE=1" \
+              "COSMOS_DB_ENDPOINT=${{ secrets.COSMOS_DB_ENDPOINT }}" \
+              "COSMOS_DB_KEY=${{ secrets.COSMOS_DB_KEY }}"
 
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
