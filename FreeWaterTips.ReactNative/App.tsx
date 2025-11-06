@@ -13,9 +13,19 @@ export type RootStackParamList = {
 
 const Stack = createStackNavigator<RootStackParamList>();
 
+const linking = {
+  prefixes: ['https://freewater.tips', 'https://test.freewater.tips'],
+  config: {
+    screens: {
+      Map: '',
+      About: 'about',
+    },
+  },
+};
+
 export default function App() {
   return (
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
       <Stack.Navigator
         initialRouteName="Map"
         screenOptions={{
