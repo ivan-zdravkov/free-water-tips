@@ -1,4 +1,41 @@
 {
   "version": "0.2.0",
-  "configurations": []
+  "configurations": [
+    {
+      "name": "Start and Attach to Backend",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "preLaunchTask": "Start Backend"
+    },
+    {
+      "name": "Start and Attach to Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8090",
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "preLaunchTask": "Start Frontend"
+    },
+    {
+      "name": "Attach to Backend",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    },
+    {
+      "name": "Attach to Frontend",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "urlFilter": "http://localhost:8090/*"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Start and Attach to Backend + Frontend (Compound)",
+      "configurations": ["Start and Attach to Backend", "Start and Attach to Frontend"],
+      "stopAll": true
+    }
+  ]
 }
