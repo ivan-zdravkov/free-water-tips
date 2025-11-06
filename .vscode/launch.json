@@ -1,44 +1,4 @@
 {
   "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "Start Backend + Frontend",
-      "type": "chrome",
-      "request": "launch",
-      "preLaunchTask": "Start Backend + Frontend",
-      "url": "http://localhost:8090",
-      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
-      "sourceMaps": true
-    },
-    {
-      "name": "Start Backend",
-      "type": "node",
-      "request": "launch",
-      "preLaunchTask": "Start Backend",
-      "name": "Start Backend"
-    },
-    {
-      "name": "Start Frontend",
-      "type": "chrome",
-      "request": "launch",
-      "preLaunchTask": "Start React Native",
-      "url": "http://localhost:8090",
-      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
-      "sourceMaps": true
-    },
-    {
-      "name": "Debug Backend",
-      "type": "coreclr",
-      "request": "attach",
-      "processId": "${command:pickProcess}"
-    },
-    {
-      "name": "Debug Frontend",
-      "type": "chrome",
-      "request": "launch",
-      "url": "http://localhost:8090",
-      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
-      "sourceMaps": true
-    }
-  ]
+  "configurations": []
 }
