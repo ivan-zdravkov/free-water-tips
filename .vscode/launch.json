@@ -6,7 +6,8 @@
       "type": "coreclr",
       "request": "attach",
       "processId": "${command:pickProcess}",
-      "preLaunchTask": "Start Backend"
+      "preLaunchTask": "Start Backend",
+      "postDebugTask": "Terminate Backend"
     },
     {
       "name": "Start and Attach to Frontend",
@@ -14,7 +15,8 @@
       "request": "launch",
       "url": "http://localhost:8090",
       "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
-      "preLaunchTask": "Start Frontend"
+      "preLaunchTask": "Start Frontend",
+      "postDebugTask": "Terminate Frontend"
     },
     {
       "name": "Attach to Backend",
@@ -33,9 +35,11 @@
   ],
   "compounds": [
     {
-      "name": "Start and Attach to Backend + Frontend (Compound)",
+      "name": "Start and Attach to Backend + Frontend",
       "configurations": ["Start and Attach to Backend", "Start and Attach to Frontend"],
-      "stopAll": true
+      "stopAll": true,
+      "preLaunchTask": "Start Backend + Frontend",
+      "postDebugTask": "Terminate Backend + Frontend"
     }
   ]
 }
