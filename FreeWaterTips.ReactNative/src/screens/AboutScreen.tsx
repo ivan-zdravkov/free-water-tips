@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, Linking, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
+import { ScrollView, Linking } from 'react-native';
+import { Card, Title, Paragraph, Button, List, ActivityIndicator, Divider, Chip, Text } from 'react-native-paper';
 import { getHealth } from '../services/api';
 import { HealthResponse } from '../types/api';
 
@@ -72,138 +73,123 @@ export default function AboutScreen() {
   };
 
   return (
-    <ScrollView 
-      style={styles.container} 
-      contentContainerStyle={styles.contentContainer}
-    >
+    <ScrollView style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
       {/* Header */}
-      <View style={styles.card}>
-        <Text style={styles.title}>About Free Water Tips</Text>
-        <Text style={styles.subtitle}>Water is a right, not a product.</Text>
-      </View>
+      <Card style={{ margin: 16 }}>
+        <Card.Content>
+          <Title style={{ textAlign: 'center' }}>About Free Water Tips</Title>
+          <Paragraph style={{ textAlign: 'center', fontStyle: 'italic' }}>
+            Water is a right, not a product.
+          </Paragraph>
+        </Card.Content>
+      </Card>
 
-        {/* Our Mission */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Our Mission</Text>
-          <Text>
+      {/* Our Mission */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Our Mission</Title>
+          <Paragraph>
             The UN believes that water is a{' '}
             <Text 
+              style={{ color: '#0066cc', textDecorationLine: 'underline' }}
               onPress={() => openLink('https://www.unwater.org/water-facts/human-rights-water-and-sanitation')}
             >
               fundamental human right
             </Text>
             {' '}and should not be treated as a commodity.
-          </Text>
-          <Text>
+          </Paragraph>
+          <Paragraph>
             Our mission is to make it easier for people to find places that serve safe drinking water 
             not burdened by a product or service tax, promoting sustainability and reducing plastic waste.
-          </Text>
-        </View>
+          </Paragraph>
+        </Card.Content>
+      </Card>
 
-        {/* Why This Matters */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Why This Matters</Text>
-          
-          <View>
-            <Text>🌱</Text>
-            <View>
-              <Text>Environmental Impact</Text>
-              <Text> Reduce plastic waste</Text>
-            </View>
-          </View>
+      {/* Why This Matters */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Why This Matters</Title>
+          <List.Item
+            title="Environmental Impact"
+            description="Reduce plastic waste"
+            left={props => <List.Icon {...props} icon="leaf" />}
+          />
+          <List.Item
+            title="Save Money"
+            description="Avoid unnecessary expenses on bottled water"
+            left={props => <List.Icon {...props} icon="cash" />}
+          />
+          <List.Item
+            title="Community"
+            description="Encourage businesses to provide free water"
+            left={props => <List.Icon {...props} icon="account-group" />}
+          />
+          <List.Item
+            title="Human Rights"
+            description="Promote water as a shared resource"
+            left={props => <List.Icon {...props} icon="earth" />}
+          />
+        </Card.Content>
+      </Card>
 
-          <View>
-            <Text>💰</Text>
-            <View>
-              <Text>Save Money</Text>
-              <Text> Avoid unnecessary expenses on bottled water</Text>
-            </View>
-          </View>
-
-          <View>
-            <Text>👥</Text>
-            <View>
-              <Text>Community</Text>
-              <Text> Encourage businesses to provide free water</Text>
-            </View>
-          </View>
-
-          <View>
-            <Text>🌍</Text>
-            <View>
-              <Text>Human Rights</Text>
-              <Text> Promote water as a shared resource</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Created by Ivan Zdravkov */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Created by Ivan Zdravkov</Text>
-          <Text>
+      {/* Created by Ivan Zdravkov */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Created by Ivan Zdravkov</Title>
+          <Paragraph>
             This project was created by{' '}
-            <Text onPress={() => openLink('https://zdravkov.dev')}>
+            <Text 
+              style={{ color: '#0066cc', textDecorationLine: 'underline' }}
+              onPress={() => openLink('https://zdravkov.dev')}
+            >
               Ivan Zdravkov
             </Text>
             , a passionate developer dedicated to making clean drinking water more accessible to everyone.
-          </Text>
-          
-          <View>
-            <TouchableOpacity 
-              onPress={() => openLink('https://github.com/ivan-zdravkov')}
-            >
-              <Text>🔗 GitHub Profile</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => openLink('https://www.linkedin.com/in/ivan-zdravkov/')}
-            >
-              <Text>🔗 LinkedIn Profile</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => openLink('https://zdravkov.dev')}
-            >
-              <Text>🌐 Personal Website</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </Paragraph>
+        </Card.Content>
+        <Card.Actions>
+          <Button onPress={() => openLink('https://github.com/ivan-zdravkov')}>
+            GitHub
+          </Button>
+          <Button onPress={() => openLink('https://www.linkedin.com/in/ivan-zdravkov/')}>
+            LinkedIn
+          </Button>
+          <Button onPress={() => openLink('https://zdravkov.dev')}>
+            Website
+          </Button>
+        </Card.Actions>
+      </Card>
 
-        {/* Support the Project */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Support the Project</Text>
-          <Text>
+      {/* Support the Project */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Support the Project</Title>
+          <Paragraph>
             This project is and always will be free and open-source. 
             If you find it useful and want to support the mission, consider making a donation:
-          </Text>
-          
-          <View>
-            <TouchableOpacity 
-              onPress={() => openLink('https://github.com/sponsors/ivan-zdravkov')}
-            >
-              <Text>💝 GitHub Sponsors</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => openLink('https://paypal.me/IZdravkov')}
-            >
-              <Text>💳 PayPal</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => openLink('https://revolut.me/ivan_zdravkov')}
-            >
-              <Text>💷 Revolut</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </Paragraph>
+        </Card.Content>
+        <Card.Actions>
+          <Button onPress={() => openLink('https://github.com/sponsors/ivan-zdravkov')}>
+            GitHub Sponsors
+          </Button>
+          <Button onPress={() => openLink('https://paypal.me/IZdravkov')}>
+            PayPal
+          </Button>
+          <Button onPress={() => openLink('https://revolut.me/ivan_zdravkov')}>
+            Revolut
+          </Button>
+        </Card.Actions>
+      </Card>
 
-        {/* Open Source */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Open Source</Text>
-          <Text>
+      {/* Open Source */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Open Source</Title>
+          <Paragraph>
             This project is licensed under the{' '}
             <Text 
+              style={{ color: '#0066cc', textDecorationLine: 'underline' }}
               onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips?tab=GPL-3.0-1-ov-file')}
             >
               GNU General Public License v3.0
@@ -211,178 +197,99 @@ export default function AboutScreen() {
             . The source code is available on GitHub and contributions are welcome! 
             Found a bug? Please{' '}
             <Text 
+              style={{ color: '#0066cc', textDecorationLine: 'underline' }}
               onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips/blob/main/CONTRIBUTING.md#reporting-bugs')}
             >
               follow our bug reporting guidelines
             </Text>
             {' '}to help us improve the platform.
-          </Text>
-          
-          <View>
-            <TouchableOpacity 
-              onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips')}
-            >
-              <Text>📦 Source Code</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips/issues')}
-            >
-              <Text>🐛 Report Bug</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </Paragraph>
+        </Card.Content>
+        <Card.Actions>
+          <Button onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips')}>
+            Source Code
+          </Button>
+          <Button onPress={() => openLink('https://github.com/ivan-zdravkov/free-water-tips/issues')}>
+            Report Bug
+          </Button>
+        </Card.Actions>
+      </Card>
 
-        {/* Community Impact Stats */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Community Impact</Text>
-          
-          <View>
-            <View>
-              <Text>💧</Text>
-              <Text>{stats.totalLocations}</Text>
-              <Text>Water Sources</Text>
-            </View>
-            
-            <View>
-              <Text>👥</Text>
-              <Text>{stats.totalContributors}</Text>
-              <Text>Contributors</Text>
-            </View>
-            
-            <View>
-              <Text>🌍</Text>
-              <Text>{stats.countriesServed}</Text>
-              <Text>Countries Served</Text>
-            </View>
-          </View>
-          
-          <Text>Last updated: {stats.lastUpdated}</Text>
-        </View>
+      {/* Community Impact Stats */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Community Impact</Title>
+          <List.Item
+            title={stats.totalLocations.toString()}
+            description="Water Sources"
+            left={props => <List.Icon {...props} icon="water" />}
+          />
+          <List.Item
+            title={stats.totalContributors.toString()}
+            description="Contributors"
+            left={props => <List.Icon {...props} icon="account-group" />}
+          />
+          <List.Item
+            title={stats.countriesServed.toString()}
+            description="Countries Served"
+            left={props => <List.Icon {...props} icon="earth" />}
+          />
+          <Paragraph style={{ marginTop: 8 }}>
+            Last updated: {stats.lastUpdated}
+          </Paragraph>
+        </Card.Content>
+      </Card>
 
-        {/* Mobile App Section - Hidden for now since we're PWA only */}
-        {/* Future native apps would be shown here */}
-
-        {/* Share Free Water Tips */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Share Free Water Tips</Text>
-          <Text>
+      {/* Share Free Water Tips */}
+      <Card style={{ margin: 16, marginTop: 0 }}>
+        <Card.Content>
+          <Title>Share Free Water Tips</Title>
+          <Paragraph>
             Help spread the word about free water access! Share this project with your friends and community 
             to help more people discover free water sources.
-          </Text>
-          
-          <View>
-            <TouchableOpacity 
-              onPress={() => shareOnPlatform('x')}
-            >
-              <Text>🐦 X</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => shareOnPlatform('facebook')}
-            >
-              <Text>📘 Facebook</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => shareOnPlatform('linkedin')}
-            >
-              <Text>💼 LinkedIn</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => shareOnPlatform('reddit')}
-            >
-              <Text>🤖 Reddit</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => shareOnPlatform('whatsapp')}
-            >
-              <Text>💬 WhatsApp</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-              onPress={() => shareOnPlatform('telegram')}
-            >
-              <Text>✈️ Telegram</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+          </Paragraph>
+        </Card.Content>
+        <Card.Actions style={{ flexWrap: 'wrap' }}>
+          <Button onPress={() => shareOnPlatform('x')}>X</Button>
+          <Button onPress={() => shareOnPlatform('facebook')}>Facebook</Button>
+          <Button onPress={() => shareOnPlatform('linkedin')}>LinkedIn</Button>
+          <Button onPress={() => shareOnPlatform('reddit')}>Reddit</Button>
+          <Button onPress={() => shareOnPlatform('whatsapp')}>WhatsApp</Button>
+          <Button onPress={() => shareOnPlatform('telegram')}>Telegram</Button>
+        </Card.Actions>
+      </Card>
 
-        {/* System Health Status */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>System Health</Text>
+      {/* System Health Status */}
+      <Card style={{ margin: 16, marginTop: 0, marginBottom: 32 }}>
+        <Card.Content>
+          <Title>System Health</Title>
           {healthLoading ? (
             <ActivityIndicator />
           ) : healthError ? (
-            <Text>{healthError}</Text>
+            <Paragraph>{healthError}</Paragraph>
           ) : health ? (
-            <View>
-              <View>
-                <Text>Status:</Text>
-                <Text>{health.status}</Text>
-              </View>
-              <View>
-                <Text>Environment:</Text>
-                <Text>{health.environment}</Text>
-              </View>
-              <View>
-                <Text>Cosmos DB:</Text>
-                <Text>
-                  {health.cosmosConnected ? '✓ Connected' : '✗ Disconnected'}
-                </Text>
-              </View>
-              <Text>
+            <>
+              <List.Item
+                title="Status"
+                description={health.status}
+              />
+              <List.Item
+                title="Environment"
+                description={health.environment}
+              />
+              <List.Item
+                title="Cosmos DB"
+                description={health.cosmosConnected ? 'Connected' : 'Disconnected'}
+                left={props => <List.Icon {...props} icon={health.cosmosConnected ? 'check-circle' : 'close-circle'} />}
+              />
+              <Divider />
+              <Paragraph style={{ marginTop: 8 }}>
                 Last checked: {new Date(health.timestamp).toLocaleString()}
-              </Text>
-            </View>
+              </Paragraph>
+            </>
           ) : null}
-        </View>
+        </Card.Content>
+      </Card>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  contentContainer: {
-    padding: 16,
-    paddingBottom: 32,
-    maxWidth: 800,
-    alignSelf: 'center',
-    width: '100%',
-  },
-  card: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    color: '#212529',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    textAlign: 'center',
-    color: '#6c757d',
-    fontStyle: 'italic',
-  },
-  cardTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#0d6efd',
-    marginBottom: 12,
-  },
-});
