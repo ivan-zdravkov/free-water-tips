@@ -456,6 +456,10 @@ jobs:
               FUNCTIONS_WORKER_RUNTIME="dotnet-isolated" \
               FUNCTIONS_EXTENSION_VERSION="~4" \
               WEBSITE_RUN_FROM_PACKAGE="1" \
+              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
+              WEBSITE_CONTENTSHARE="${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
+              AzureWebJobsSecretStorageType="files" \
+              WEBSITE_ENABLE_SYNC_UPDATE_SITE="true" \
               COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
               COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}"
 
@@ -472,6 +476,20 @@ jobs:
         with:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
           package: './artifacts/azure-functions'
+
+      - name: Final restart to ensure functions are loaded
+        run: |
+          echo "Performing final restart to ensure functions are properly loaded..."
+          az functionapp restart \
+            --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+          echo "Final restart completed"
+
+          # Wait a moment for the app to come back online
+          sleep 30
+
+          echo "Verifying function endpoints are available..."
+          curl -f https://${{ secrets.AZURE_FUNCTION_APP_NAME }}.azurewebsites.net/api/health || echo "Health endpoint not yet available"
 
   deploy-web:
     if: needs.detect-environment.outputs.should_deploy == 'true'
