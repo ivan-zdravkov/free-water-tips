@@ -448,6 +448,9 @@ jobs:
 
       - name: Configure Azure Function App Settings
         run: |
+          echo "Configuring Function App settings for: ${{ secrets.AZURE_FUNCTION_APP_NAME }}"
+          echo "Resource Group: ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}"
+
           az functionapp config appsettings set \
             --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} \
@@ -458,6 +461,13 @@ jobs:
               WEBSITE_RUN_FROM_PACKAGE="1" \
               COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
               COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}"
+              
+          echo "Configuration completed. Verifying settings..."
+          az functionapp config appsettings list \
+            --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
+            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} \
+            --query "[?name=='COSMOS_DB_ENDPOINT' || name=='COSMOS_DB_KEY' || name=='AzureWebJobsStorage'].{name:name, value:value}" \
+            --output table
 
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
