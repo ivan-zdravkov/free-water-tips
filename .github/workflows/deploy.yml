@@ -457,7 +457,7 @@ jobs:
               FUNCTIONS_EXTENSION_VERSION="~4" \
               WEBSITE_RUN_FROM_PACKAGE="1" \
               WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              WEBSITE_CONTENTSHARE="${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
+              WEBSITE_CONTENTSHARE="fwt-${{ needs.detect-environment.outputs.environment == 'Production' && 'prod' || 'test' }}" \
               AzureWebJobsSecretStorageType="files" \
               WEBSITE_ENABLE_SYNC_UPDATE_SITE="true" \
               COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
