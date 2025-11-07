@@ -447,17 +447,42 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Configure Azure Function App Settings
-        run: |
-          az functionapp config appsettings set \
-            --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} \
-            --settings \
-              "AzureWebJobsStorage=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              "FUNCTIONS_WORKER_RUNTIME=dotnet-isolated" \
-              "FUNCTIONS_EXTENSION_VERSION=~4" \
-              "WEBSITE_RUN_FROM_PACKAGE=1" \
-              "COSMOS_DB_ENDPOINT=${{ secrets.COSMOS_DB_ENDPOINT }}" \
-              "COSMOS_DB_KEY=${{ secrets.COSMOS_DB_KEY }}"
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
+          app-settings-json: |
+            [
+              {
+                "name": "AzureWebJobsStorage",
+                "value": "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}",
+                "slotSetting": false
+              },
+              {
+                "name": "FUNCTIONS_WORKER_RUNTIME",
+                "value": "dotnet-isolated",
+                "slotSetting": false
+              },
+              {
+                "name": "FUNCTIONS_EXTENSION_VERSION",
+                "value": "~4",
+                "slotSetting": false
+              },
+              {
+                "name": "WEBSITE_RUN_FROM_PACKAGE",
+                "value": "1",
+                "slotSetting": false
+              },
+              {
+                "name": "COSMOS_DB_ENDPOINT",
+                "value": "${{ secrets.COSMOS_DB_ENDPOINT }}",
+                "slotSetting": false
+              },
+              {
+                "name": "COSMOS_DB_KEY",
+                "value": "${{ secrets.COSMOS_DB_KEY }}",
+                "slotSetting": false
+              }
+            ]
 
       - name: Deploy to Azure Functions
         uses: Azure/functions-action@v1
