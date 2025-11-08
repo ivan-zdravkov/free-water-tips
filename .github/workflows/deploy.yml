@@ -202,7 +202,7 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '10.0.0-preview.5.24306.7'
           include-prerelease: true
 
       - name: Cache .NET packages
@@ -214,7 +214,7 @@ jobs:
             azure-functions-${{ runner.os }}-nuget-
 
       - name: Restore dependencies with runtime
-        run: dotnet restore FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --runtime win-x64
+        run: dotnet restore FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj
 
       - name: Publish Azure Functions (Self-Contained)
         run: |
@@ -222,8 +222,6 @@ jobs:
             --configuration Release \
             --output ./artifacts/azure-functions \
             --verbosity normal \
-            --self-contained true \
-            --runtime win-x64 \
             /property:GenerateFullPaths=true \
             /consoleloggerparameters:NoSummary
 
