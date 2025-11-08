@@ -213,18 +213,14 @@ jobs:
           restore-keys: |
             azure-functions-${{ runner.os }}-nuget-
 
-      - name: Restore dependencies
-        run: dotnet restore FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj
-
-      - name: Build Azure Functions
-        run: dotnet build FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --no-restore
+      - name: Restore dependencies with runtime
+        run: dotnet restore FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --runtime win-x64
 
       - name: Publish Azure Functions (Self-Contained)
         run: |
           dotnet publish FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj \
             --configuration Release \
             --output ./artifacts/azure-functions \
-            --no-build \
             --verbosity normal \
             --self-contained true \
             --runtime win-x64 \
