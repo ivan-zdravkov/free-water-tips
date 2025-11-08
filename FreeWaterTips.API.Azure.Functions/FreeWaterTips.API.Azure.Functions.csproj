@@ -22,10 +22,10 @@
     <ProjectReference Include="..\FreeWaterTips.Utils\FreeWaterTips.Utils.csproj" />
   </ItemGroup>
 
-  <Target Name="GenerateTypeScriptTypes" AfterTargets="Build">
+  <Target Name="GenerateTypeScriptTypes" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug' AND Exists('$(ProjectDir)..\scripts\generate-types.js')">
     <Message Text="Generating TypeScript types from C# Response classes..." Importance="high" />
     <Exec Command="node &quot;$(ProjectDir)..\scripts\generate-types.js&quot;" 
-          ContinueOnError="false"
+          ContinueOnError="true"
           WorkingDirectory="$(ProjectDir).." />
   </Target>
 
