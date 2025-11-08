@@ -219,13 +219,15 @@ jobs:
       - name: Build Azure Functions
         run: dotnet build FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --no-restore
 
-      - name: Publish Azure Functions
+      - name: Publish Azure Functions (Self-Contained)
         run: |
           dotnet publish FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj \
             --configuration Release \
             --output ./artifacts/azure-functions \
             --no-build \
             --verbosity normal \
+            --self-contained true \
+            --runtime win-x64 \
             /property:GenerateFullPaths=true \
             /consoleloggerparameters:NoSummary
 
