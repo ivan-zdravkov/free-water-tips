@@ -202,7 +202,8 @@ jobs:
       - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.x'
+          dotnet-version: '10.0.x'
+          include-prerelease: true
 
       - name: Cache .NET packages
         uses: actions/cache@v4
@@ -224,7 +225,9 @@ jobs:
             --configuration Release \
             --output ./artifacts/azure-functions \
             --no-build \
-            --verbosity normal
+            --verbosity normal \
+            /property:GenerateFullPaths=true \
+            /consoleloggerparameters:NoSummary
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4

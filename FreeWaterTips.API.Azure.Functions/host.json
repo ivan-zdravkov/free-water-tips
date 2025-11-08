@@ -6,11 +6,7 @@
         "isEnabled": true,
         "excludedTypes": "Request"
       },
-      "enableLiveMetricsFilters": true,
-      "console": {
-        "isEnabled": true,
-        "level": "Information"
-      }
+      "enableLiveMetricsFilters": true
     }
   },
   "extensions": {
