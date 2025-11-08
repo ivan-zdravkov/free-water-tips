@@ -50,6 +50,12 @@
 #   Example: DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net
 #   Security: Keep this secret secure; required for Azure Functions runtime (AzureWebJobsStorage)
 #
+# ✓ AZURE_APPINSIGHTS_CONNECTION_STRING
+#   Description: Application Insights connection string for telemetry and monitoring
+#   How to obtain: Azure Portal -> Application Insights -> Overview -> Connection String
+#   Example: InstrumentationKey=...;IngestionEndpoint=...;LiveEndpoint=...;ApplicationId=...
+#   Security: Keep this secret secure; used for function app monitoring and diagnostics
+#
 # --- WEB DEPLOYMENT SECRETS (✓ Implemented) ---
 #
 # ✓ GITHUB_TOKEN
@@ -464,6 +470,7 @@ jobs:
               WEBSITE_RUN_FROM_PACKAGE="1" \
               WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
               WEBSITE_CONTENTSHARE="fwt-${{ needs.detect-environment.outputs.environment == 'Production' && 'prod' || 'test' }}" \
+              APPINSIGHTS_CONNECTION_STRING="${{ secrets.AZURE_APPINSIGHTS_CONNECTION_STRING }}" \
               COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
               COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}"
 
