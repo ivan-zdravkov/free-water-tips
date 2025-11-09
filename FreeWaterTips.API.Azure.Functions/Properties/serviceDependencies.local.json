@@ -6,6 +6,10 @@
     "storage1": {
       "type": "storage.emulator",
       "connectionId": "AzureWebJobsStorage"
+    },
+    "cosmosdb1": {
+      "type": "cosmosdb.emulator",
+      "connectionId": "COSMOS_DB_ENDPOINT"
     }
   }
 }
