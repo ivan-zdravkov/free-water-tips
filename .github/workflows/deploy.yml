@@ -222,8 +222,35 @@ jobs:
       - name: Publish Azure Functions project
         shell: pwsh
         run: |
-          # Publish the Azure Functions project with explicit project references
-          dotnet publish '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}\FreeWaterTips.API.Azure.Functions.csproj' --configuration Release --output './artifacts/azure-functions' --framework net10.0 --runtime win-x64 --self-contained false --verbosity normal
+          # First, clean any previous Azure Functions artifacts specifically
+          Remove-Item -Path './artifacts/azure-functions' -Recurse -Force -ErrorAction SilentlyContinue
+
+          # Publish with restore to ensure all dependencies are resolved
+          dotnet publish '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}\FreeWaterTips.API.Azure.Functions.csproj' `
+            --configuration Release `
+            --output './artifacts/azure-functions' `
+            --framework net10.0 `
+            --runtime win-x64 `
+            --self-contained false `
+            --verbosity detailed `
+            --force
+
+      - name: Debug - List published files
+        shell: pwsh
+        run: |
+          Write-Host "=== Contents of ./artifacts/azure-functions ==="
+          Get-ChildItem -Path './artifacts/azure-functions' -Recurse | Format-Table Name, Length, LastWriteTime -AutoSize
+
+          Write-Host "`n=== Looking specifically for FreeWaterTips DLLs ==="
+          $dlls = Get-ChildItem -Path './artifacts/azure-functions' -Filter "FreeWaterTips*.dll" -Recurse
+          if ($dlls) {
+            $dlls | Format-Table Name, FullName, Length -AutoSize
+          } else {
+            Write-Host "❌ NO FreeWaterTips DLLs found!"
+          }
+
+          Write-Host "`n=== All DLL files in artifact ==="
+          Get-ChildItem -Path './artifacts/azure-functions' -Filter "*.dll" -Recurse | Format-Table Name, Length -AutoSize
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
