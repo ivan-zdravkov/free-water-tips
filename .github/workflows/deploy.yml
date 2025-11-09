@@ -151,6 +151,12 @@ on:
   pull_request:
     branches:
       - master
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './FreeWaterTips.API.Azure.Functions'
+  DOTNET_VERSION: '10.0.x'
+  NODE_VERSION: '22'
 
 permissions:
   contents: write
@@ -187,7 +193,7 @@ jobs:
           echo "Branch: ${{ github.ref }}"
 
   build-azure-functions:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
     env:
@@ -199,36 +205,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup .NET SDK
+      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: ${{ env.DOTNET_VERSION }}
           dotnet-quality: 'preview'
           include-prerelease: true
 
       - name: Cache .NET packages
         uses: actions/cache@v4
         with:
-          path: ~/.nuget/packages
+          path: ~\AppData\Roaming\NuGet\packages
           key: azure-functions-${{ runner.os }}-nuget-${{ hashFiles('**/FreeWaterTips.API.Azure.Functions.csproj', '**/FreeWaterTips.DB.Cosmos.csproj', '**/FreeWaterTips.Utils.csproj') }}
           restore-keys: |
             azure-functions-${{ runner.os }}-nuget-
 
-      - name: Restore dependencies
-        run: dotnet restore FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj
-
-      - name: Build Azure Functions
-        run: dotnet build FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj --configuration Release --no-restore
-
-      - name: Publish Azure Functions
+      - name: Build Azure Functions project
+        shell: pwsh
         run: |
-          dotnet publish FreeWaterTips.API.Azure.Functions/FreeWaterTips.API.Azure.Functions.csproj \
-            --configuration Release \
-            --output ./artifacts/azure-functions \
-            --no-build \
-            --verbosity normal \
-            /property:GenerateFullPaths=true \
-            /consoleloggerparameters:NoSummary
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet build --configuration Release --output ../artifacts/azure-functions
+          popd
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
@@ -252,7 +249,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
 
@@ -287,7 +284,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
 
@@ -352,7 +349,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
           cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
 
@@ -445,7 +442,7 @@ jobs:
 
   deploy-azure-functions:
     if: needs.detect-environment.outputs.should_deploy == 'true'
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     needs: [detect-environment, build-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
 
@@ -484,10 +481,12 @@ jobs:
             --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
             --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
 
-      - name: Deploy to Azure Functions
+      - name: Publish Azure Functions
         uses: Azure/functions-action@v1
+        id: fa
         with:
           app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
+          slot-name: 'Production'
           package: './artifacts/azure-functions'
 
   deploy-web:
