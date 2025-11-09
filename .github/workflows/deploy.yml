@@ -219,23 +219,11 @@ jobs:
           restore-keys: |
             azure-functions-${{ runner.os }}-nuget-
 
-      - name: Restore dependencies
-        shell: pwsh
-        run: |
-          # Restore the entire solution to ensure all project dependencies are resolved
-          dotnet restore free-water-tips.sln --runtime win-x64 --verbosity normal
-
-      - name: Build all projects
-        shell: pwsh
-        run: |
-          # Build the entire solution first to ensure all projects are compiled
-          dotnet build free-water-tips.sln --configuration Release --no-restore --verbosity normal
-
       - name: Publish Azure Functions project
         shell: pwsh
         run: |
           # Publish the Azure Functions project with explicit project references
-          dotnet publish '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}\FreeWaterTips.API.Azure.Functions.csproj' --configuration Release --output './artifacts/azure-functions' --framework net10.0 --runtime win-x64 --self-contained false --no-restore --verbosity normal
+          dotnet publish '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}\FreeWaterTips.API.Azure.Functions.csproj' --configuration Release --output './artifacts/azure-functions' --framework net10.0 --runtime win-x64 --self-contained false --verbosity normal
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
