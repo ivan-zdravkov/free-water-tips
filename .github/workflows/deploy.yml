@@ -222,16 +222,20 @@ jobs:
       - name: Restore dependencies
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          # Restore the entire solution to ensure all project dependencies are resolved
           dotnet restore --runtime win-x64 --verbosity normal
-          popd
+
+      - name: Build all projects
+        shell: pwsh
+        run: |
+          # Build the entire solution first to ensure all projects are compiled
+          dotnet build --configuration Release --framework net10.0 --runtime win-x64 --no-restore --verbosity normal
 
       - name: Publish Azure Functions project
         shell: pwsh
         run: |
-          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet publish --configuration Release --output ../artifacts/azure-functions --framework net10.0 --runtime win-x64 --no-restore --verbosity normal
-          popd
+          # Publish the Azure Functions project with explicit project references
+          dotnet publish '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}\FreeWaterTips.API.Azure.Functions.csproj' --configuration Release --output './artifacts/azure-functions' --framework net10.0 --runtime win-x64 --self-contained false --no-restore --verbosity normal
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
