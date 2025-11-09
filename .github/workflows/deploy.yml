@@ -223,13 +223,13 @@ jobs:
         shell: pwsh
         run: |
           # Restore the entire solution to ensure all project dependencies are resolved
-          dotnet restore --runtime win-x64 --verbosity normal
+          dotnet restore free-water-tips.sln --runtime win-x64 --verbosity normal
 
       - name: Build all projects
         shell: pwsh
         run: |
           # Build the entire solution first to ensure all projects are compiled
-          dotnet build --configuration Release --framework net10.0 --runtime win-x64 --no-restore --verbosity normal
+          dotnet build free-water-tips.sln --configuration Release --framework net10.0 --runtime win-x64 --no-restore --verbosity normal
 
       - name: Publish Azure Functions project
         shell: pwsh
