@@ -69,7 +69,7 @@ get_install_instructions() {
                     echo "Install: brew install node@22 OR download from https://nodejs.org/"
                     ;;
                 dotnet)
-                    echo "Install: brew install dotnet-sdk OR download from https://dotnet.microsoft.com/download/dotnet/10.0"
+                    echo "Install: brew install dotnet@8 OR download from https://dotnet.microsoft.com/download/dotnet/8.0"
                     ;;
                 watchman)
                     echo "Install: brew install watchman"
@@ -98,7 +98,7 @@ get_install_instructions() {
                     echo "Install: curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs"
                     ;;
                 dotnet)
-                    echo "Install: https://dotnet.microsoft.com/download/dotnet/10.0"
+                    echo "Install: https://dotnet.microsoft.com/download/dotnet/8.0"
                     ;;
                 watchman)
                     echo "Install: Follow instructions at https://facebook.github.io/watchman/docs/install.html"
@@ -121,7 +121,7 @@ get_install_instructions() {
                     echo "Install: Download from https://nodejs.org/"
                     ;;
                 dotnet)
-                    echo "Install: Download from https://dotnet.microsoft.com/download/dotnet/10.0"
+                    echo "Install: Download from https://dotnet.microsoft.com/download/dotnet/8.0"
                     ;;
                 watchman)
                     echo "Install: choco install watchman (using Chocolatey)"
@@ -179,14 +179,14 @@ else
     print_status 1 "npm" "" "npm is usually installed with Node.js"
 fi
 
-# Check .NET SDK (required version 10.0)
+# Check .NET SDK (required version 8.0)
 if command -v dotnet &> /dev/null; then
     DOTNET_VERSION=$(dotnet --version)
     DOTNET_MAJOR=$(echo $DOTNET_VERSION | cut -d'.' -f1)
-    if [ "$DOTNET_MAJOR" -ge 10 ]; then
+    if [ "$DOTNET_MAJOR" -ge 8 ]; then
         print_status 0 ".NET SDK" "v${DOTNET_VERSION}"
     else
-        print_status 1 ".NET SDK" "v${DOTNET_VERSION}" ".NET SDK v10.0 or higher is required. $(get_install_instructions dotnet)"
+        print_status 1 ".NET SDK" "v${DOTNET_VERSION}" ".NET SDK v8.0 or higher is required. $(get_install_instructions dotnet)"
     fi
 else
     print_status 1 ".NET SDK" "" "$(get_install_instructions dotnet)"
