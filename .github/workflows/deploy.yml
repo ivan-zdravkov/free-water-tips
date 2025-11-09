@@ -219,11 +219,11 @@ jobs:
           restore-keys: |
             azure-functions-${{ runner.os }}-nuget-
 
-      - name: Build Azure Functions project
+      - name: Publish Azure Functions project
         shell: pwsh
         run: |
           pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ../artifacts/azure-functions
+          dotnet publish --configuration Release --output ../artifacts/azure-functions --framework net10.0 --runtime win-x64 --no-restore --verbosity normal
           popd
 
       - name: Upload Azure Functions artifact
