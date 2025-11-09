@@ -95,7 +95,7 @@ Before you start development, make sure your environment has all the required de
 
 This script will check for:
 
-- Core development tools (Git, Node.js v22+, .NET SDK v8+)
+- Core development tools (Git, Node.js v22+, .NET SDK v10+)
 - Azure Functions Core Tools
 - Cosmos DB Emulator (via Docker)
 - Expo & React Native dependencies
