@@ -210,7 +210,6 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
           dotnet-quality: 'preview'
-          include-prerelease: true
 
       - name: Cache .NET packages
         uses: actions/cache@v4
@@ -230,7 +229,7 @@ jobs:
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
         with:
-          name: azure-functions-artifact
+          name: azure-functions-artifact-${{ github.run_number }}
           path: ./artifacts/azure-functions
           retention-days: 3
 
@@ -264,7 +263,7 @@ jobs:
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
-          name: web-artifact
+          name: web-artifact-${{ github.run_number }}
           path: FreeWaterTips.ReactNative/artifacts/web
           retention-days: 3
 
@@ -329,7 +328,7 @@ jobs:
       - name: Upload signed Android AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: android-artifact
+          name: android-artifact-${{ github.run_number }}
           path: ./artifacts/android
           retention-days: 3
 
@@ -436,7 +435,7 @@ jobs:
       - name: Upload signed iOS IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ios-artifact
+          name: ios-artifact-${{ github.run_number }}
           path: FreeWaterTips.ReactNative/artifacts/ios
           retention-days: 3
 
@@ -450,7 +449,7 @@ jobs:
       - name: Download Azure Functions artifact
         uses: actions/download-artifact@v4
         with:
-          name: azure-functions-artifact
+          name: azure-functions-artifact-${{ github.run_number }}
           path: ./artifacts/azure-functions
 
       - name: Login to Azure
@@ -459,27 +458,29 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Configure Azure Function App Settings
+        shell: pwsh
         run: |
-          az functionapp config appsettings set \
-            --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }} \
-            --settings \
-              AzureWebJobsStorage="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              ENVIRONMENT="${{ needs.detect-environment.outputs.environment }}" \
-              FUNCTIONS_WORKER_RUNTIME="dotnet-isolated" \
-              FUNCTIONS_EXTENSION_VERSION="~4" \
-              WEBSITE_RUN_FROM_PACKAGE="1" \
-              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-              WEBSITE_CONTENTSHARE="fwt-${{ needs.detect-environment.outputs.environment == 'Production' && 'prod' || 'test' }}" \
-              APPINSIGHTS_CONNECTION_STRING="${{ secrets.AZURE_APPINSIGHTS_CONNECTION_STRING }}" \
-              COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
+          az functionapp config appsettings set `
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
+            --settings `
+              AzureWebJobsStorage="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" `
+              ENVIRONMENT="${{ needs.detect-environment.outputs.environment }}" `
+              FUNCTIONS_WORKER_RUNTIME="dotnet-isolated" `
+              FUNCTIONS_EXTENSION_VERSION="~4" `
+              WEBSITE_RUN_FROM_PACKAGE="1" `
+              WEBSITE_CONTENTAZUREFILECONNECTIONSTRING="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" `
+              WEBSITE_CONTENTSHARE="fwt-${{ needs.detect-environment.outputs.environment == 'Production' && 'prod' || 'test' }}" `
+              APPINSIGHTS_CONNECTION_STRING="${{ secrets.AZURE_APPINSIGHTS_CONNECTION_STRING }}" `
+              COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" `
               COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}"
 
       - name: Restart Azure Function App
+        shell: pwsh
         run: |
-          az functionapp restart \
-            --name ${{ secrets.AZURE_FUNCTION_APP_NAME }} \
-            --resource-group ${{ secrets.AZURE_RESOURCE_GROUP_NAME }}
+          az functionapp restart `
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}"
 
       - name: Publish Azure Functions
         uses: Azure/functions-action@v1
@@ -505,7 +506,7 @@ jobs:
       - name: Download web artifacts
         uses: actions/download-artifact@v4
         with:
-          name: web-artifact
+          name: web-artifact-${{ github.run_number }}
           path: ./artifacts/web
 
       - name: Deploy to production
@@ -578,7 +579,7 @@ jobs:
       - name: Download Android artifact
         uses: actions/download-artifact@v4
         with:
-          name: android-artifact
+          name: android-artifact-${{ github.run_number }}
           path: ./artifacts/android
 
       - name: Upload to Google Play Store
@@ -601,7 +602,7 @@ jobs:
       - name: Download iOS artifact
         uses: actions/download-artifact@v4
         with:
-          name: ios-artifact
+          name: ios-artifact-${{ github.run_number }}
           path: ./artifacts/ios
 
       - name: Upload to App Store Connect
