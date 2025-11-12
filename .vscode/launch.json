@@ -2,21 +2,25 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Start and Attach to Backend",
-      "type": "coreclr",
-      "request": "attach",
-      "processId": "${command:pickProcess}",
-      "preLaunchTask": "Start Backend",
-      "postDebugTask": "Terminate Backend"
+      "name": "Start All",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dummy.js",
+      "preLaunchTask": "Start Backend + Frontend"
     },
     {
-      "name": "Start and Attach to Frontend",
-      "type": "chrome",
+      "name": "Start Backend",
+      "type": "node",
       "request": "launch",
-      "url": "http://localhost:8090",
-      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
-      "preLaunchTask": "Start Frontend",
-      "postDebugTask": "Terminate Frontend"
+      "program": "${workspaceFolder}/scripts/dummy.js",
+      "preLaunchTask": "Start Backend"
+    },
+    {
+      "name": "Start Frontend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dummy.js",
+      "preLaunchTask": "Start Frontend"
     },
     {
       "name": "Attach to Backend",
@@ -31,12 +35,30 @@
       "port": 9222,
       "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
       "urlFilter": "http://localhost:8090/*"
+    },
+
+    {
+      "name": "Debug Backend",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "preLaunchTask": "Start Backend",
+      "postDebugTask": "Terminate Backend"
+    },
+    {
+      "name": "Debug Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8090",
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "preLaunchTask": "Start Frontend",
+      "postDebugTask": "Terminate Frontend"
     }
   ],
   "compounds": [
     {
-      "name": "Start and Attach to Backend + Frontend",
-      "configurations": ["Start and Attach to Backend", "Start and Attach to Frontend"],
+      "name": "Debug All",
+      "configurations": ["Debug Backend", "Debug Frontend"],
       "stopAll": true,
       "preLaunchTask": "Start Backend + Frontend",
       "postDebugTask": "Terminate Backend + Frontend"
