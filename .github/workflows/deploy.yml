@@ -214,7 +214,7 @@ jobs:
         shell: pwsh
         run: |
           pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output ./artifacts/azure-functions
+          dotnet build --configuration Release --output '${{ github.workspace }}/artifacts/azure-functions'
           popd
 
       - name: Upload Azure Functions artifact
