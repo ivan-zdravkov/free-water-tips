@@ -209,48 +209,13 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
-          dotnet-quality: 'preview'
 
-      - name: Cache .NET packages
-        uses: actions/cache@v4
-        with:
-          path: ~\AppData\Roaming\NuGet\packages
-          key: azure-functions-${{ runner.os }}-nuget-${{ hashFiles('**/FreeWaterTips.API.Azure.Functions.csproj', '**/FreeWaterTips.DB.Cosmos.csproj', '**/FreeWaterTips.Utils.csproj') }}
-          restore-keys: |
-            azure-functions-${{ runner.os }}-nuget-
-
-      - name: Publish Azure Functions project
+      - name: 'Resolve Project Dependencies Using Dotnet'
         shell: pwsh
         run: |
-          # First, clean any previous Azure Functions artifacts specifically
-          Remove-Item -Path './artifacts/azure-functions' -Recurse -Force -ErrorAction SilentlyContinue
-
-          # Publish with restore to ensure all dependencies are resolved
-          dotnet publish '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}\FreeWaterTips.API.Azure.Functions.csproj' `
-            --configuration Release `
-            --output './artifacts/azure-functions' `
-            --framework net10.0 `
-            --runtime win-x64 `
-            --self-contained false `
-            --verbosity detailed `
-            --force
-
-      - name: Debug - List published files
-        shell: pwsh
-        run: |
-          Write-Host "=== Contents of ./artifacts/azure-functions ==="
-          Get-ChildItem -Path './artifacts/azure-functions' -Recurse | Format-Table Name, Length, LastWriteTime -AutoSize
-
-          Write-Host "`n=== Looking specifically for FreeWaterTips DLLs ==="
-          $dlls = Get-ChildItem -Path './artifacts/azure-functions' -Filter "FreeWaterTips*.dll" -Recurse
-          if ($dlls) {
-            $dlls | Format-Table Name, FullName, Length -AutoSize
-          } else {
-            Write-Host "❌ NO FreeWaterTips DLLs found!"
-          }
-
-          Write-Host "`n=== All DLL files in artifact ==="
-          Get-ChildItem -Path './artifacts/azure-functions' -Filter "*.dll" -Recurse | Format-Table Name, Length -AutoSize
+          pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet build --configuration Release --output ./artifacts/azure-functions
+          popd
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
@@ -501,11 +466,11 @@ jobs:
             --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
             --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}"
 
-      - name: Publish Azure Functions
+      - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
         id: fa
         with:
-          app-name: ${{ secrets.AZURE_FUNCTION_APP_NAME }}
+          app-name: '${{ secrets.AZURE_FUNCTION_APP_NAME }}'
           slot-name: 'Production'
           package: './artifacts/azure-functions'
 
