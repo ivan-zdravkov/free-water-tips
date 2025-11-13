@@ -3,4 +3,5 @@ export interface HealthResponse {
   timestamp: string;
   environment: string;
   cosmosConnected: boolean;
+  error?: string;
 }

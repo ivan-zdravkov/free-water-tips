@@ -168,10 +168,10 @@ jobs:
             echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=Testing" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
-            echo "environment=Production" >> $GITHUB_OUTPUT
+            echo "environment=Testing" >> $GITHUB_OUTPUT
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
 

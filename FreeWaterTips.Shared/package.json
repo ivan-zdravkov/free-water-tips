@@ -1,0 +1,19 @@
+{
+  "name": "@free-water-tips/shared",
+  "version": "1.0.0",
+  "description": "Shared types and utilities for Free Water Tips",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  }
+}

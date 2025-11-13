@@ -293,6 +293,15 @@ export default function AboutScreen() {
                   />
                 )}
               />
+              {health.error && (
+                <List.Item
+                  title="Error"
+                  description={health.error}
+                  left={props => <List.Icon {...props} icon="alert-circle" />}
+                  titleStyle={{ color: '#d32f2f' }}
+                  descriptionStyle={{ color: '#d32f2f' }}
+                />
+              )}
               <Divider />
               <Paragraph style={{ marginTop: 8 }}>
                 Last checked: {new Date(health.timestamp).toLocaleString()}

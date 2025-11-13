@@ -17,7 +17,8 @@
   "license": "ISC",
   "dependencies": {
     "@azure/cosmos": "^4.2.1",
-    "@azure/functions": "^4.5.1"
+    "@azure/functions": "^4.5.1",
+    "@free-water-tips/shared": "file:../FreeWaterTips.Shared"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
