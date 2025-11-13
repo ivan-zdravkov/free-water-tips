@@ -197,7 +197,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: FreeWaterTips.API/package-lock.json
+          cache-dependency-path: |
+            FreeWaterTips.Shared/package-lock.json
+            FreeWaterTips.API/package-lock.json
+
+      - name: Build shared types package
+        working-directory: FreeWaterTips.Shared
+        run: |
+          npm ci
+          npm run build
 
       - name: Install dependencies
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
@@ -215,7 +223,7 @@ jobs:
           # Copy compiled JavaScript files
           cp -r dist '${{ github.workspace }}/artifacts/azure-functions/'
 
-          # Copy production dependencies
+          # Copy production dependencies and package files
           cp package.json package-lock.json '${{ github.workspace }}/artifacts/azure-functions/'
 
           # Copy configuration files
@@ -225,6 +233,10 @@ jobs:
           if [ -f .funcignore ]; then
             cp .funcignore '${{ github.workspace }}/artifacts/azure-functions/'
           fi
+
+          # Copy shared package to node_modules structure for deployment
+          mkdir -p '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips'
+          cp -r '${{ github.workspace }}/FreeWaterTips.Shared' '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared'
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
@@ -250,7 +262,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
+          cache-dependency-path: |
+            FreeWaterTips.Shared/package-lock.json
+            FreeWaterTips.ReactNative/package-lock.json
+
+      - name: Build shared types package
+        working-directory: FreeWaterTips.Shared
+        run: |
+          npm ci
+          npm run build
 
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
@@ -468,19 +488,6 @@ jobs:
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: 'Configure Azure Function App for Node.js'
-        run: |
-          echo "Configuring Function App for Node.js ${{ env.NODE_VERSION }} runtime on Windows..."
-
-          # Set worker runtime to node
-          az functionapp config appsettings set \
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-            --settings FUNCTIONS_WORKER_RUNTIME="node" \
-                       WEBSITE_NODE_DEFAULT_VERSION="~${{ env.NODE_VERSION }}"
-
-          echo "✓ Azure Function App configured for Node.js ${{ env.NODE_VERSION }} on Windows"
 
       - name: Configure Azure Function App Settings
         run: |

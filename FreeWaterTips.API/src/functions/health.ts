@@ -1,7 +1,6 @@
 import { app, HttpRequest, HttpResponseInit, InvocationContext } from '@azure/functions';
-import { HealthResponse } from '@free-water-tips/shared';
+import { HealthResponse, Environment } from '@free-water-tips/shared';
 import { Client } from '../db/Client';
-import { Environment } from '../utils/Environment';
 
 const cosmosClient = new Client();
 

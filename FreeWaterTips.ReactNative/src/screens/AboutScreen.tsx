@@ -12,7 +12,7 @@ import {
   Text,
 } from 'react-native-paper';
 import { getHealth } from '../services/api';
-import { HealthResponse } from '../types/api';
+import { HealthResponse, Environment } from '@free-water-tips/shared';
 
 interface CommunityStats {
   totalLocations: number;
@@ -43,7 +43,10 @@ export default function AboutScreen() {
       lastUpdated: new Date().toLocaleDateString(),
     });
 
-    loadHealthStatus();
+    // Only load health status when NOT in production
+    if (!Environment.isProduction) {
+      loadHealthStatus();
+    }
   }, []);
 
   const loadHealthStatus = async () => {
@@ -271,45 +274,47 @@ export default function AboutScreen() {
         </Card.Actions>
       </Card>
 
-      {/* System Health Status */}
-      <Card style={{ margin: 16, marginTop: 0, marginBottom: 32 }}>
-        <Card.Content>
-          <Title>System Health</Title>
-          {healthLoading ? (
-            <ActivityIndicator />
-          ) : healthError ? (
-            <Paragraph>{healthError}</Paragraph>
-          ) : health ? (
-            <>
-              <List.Item title="Status" description={health.status} />
-              <List.Item title="Environment" description={health.environment} />
-              <List.Item
-                title="Cosmos DB"
-                description={health.cosmosConnected ? 'Connected' : 'Disconnected'}
-                left={props => (
-                  <List.Icon
-                    {...props}
-                    icon={health.cosmosConnected ? 'check-circle' : 'close-circle'}
+      {/* System Health Status - Only shown when NOT in production */}
+      {!Environment.isProduction && (
+        <Card style={{ margin: 16, marginTop: 0, marginBottom: 32 }}>
+          <Card.Content>
+            <Title>System Health</Title>
+            {healthLoading ? (
+              <ActivityIndicator />
+            ) : healthError ? (
+              <Paragraph>{healthError}</Paragraph>
+            ) : health ? (
+              <>
+                <List.Item title="Status" description={health.status} />
+                <List.Item title="Environment" description={health.environment} />
+                <List.Item
+                  title="Cosmos DB"
+                  description={health.cosmosConnected ? 'Connected' : 'Disconnected'}
+                  left={props => (
+                    <List.Icon
+                      {...props}
+                      icon={health.cosmosConnected ? 'check-circle' : 'close-circle'}
+                    />
+                  )}
+                />
+                {health.error && (
+                  <List.Item
+                    title="Error"
+                    description={health.error}
+                    left={props => <List.Icon {...props} icon="alert-circle" />}
+                    titleStyle={{ color: '#d32f2f' }}
+                    descriptionStyle={{ color: '#d32f2f' }}
                   />
                 )}
-              />
-              {health.error && (
-                <List.Item
-                  title="Error"
-                  description={health.error}
-                  left={props => <List.Icon {...props} icon="alert-circle" />}
-                  titleStyle={{ color: '#d32f2f' }}
-                  descriptionStyle={{ color: '#d32f2f' }}
-                />
-              )}
-              <Divider />
-              <Paragraph style={{ marginTop: 8 }}>
-                Last checked: {new Date(health.timestamp).toLocaleString()}
-              </Paragraph>
-            </>
-          ) : null}
-        </Card.Content>
-      </Card>
+                <Divider />
+                <Paragraph style={{ marginTop: 8 }}>
+                  Last checked: {new Date(health.timestamp).toLocaleString()}
+                </Paragraph>
+              </>
+            ) : null}
+          </Card.Content>
+        </Card>
+      )}
     </ScrollView>
   );
 }
