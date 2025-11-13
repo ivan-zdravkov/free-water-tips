@@ -210,11 +210,11 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
-      - name: 'Build Project'
+      - name: 'Build and Publish Project'
         shell: pwsh
         run: |
           pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output '${{ github.workspace }}/artifacts/azure-functions'
+          dotnet publish --configuration Release --output '${{ github.workspace }}/artifacts/azure-functions'
           popd
 
       - name: Upload Azure Functions artifact
@@ -468,10 +468,9 @@ jobs:
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1
-        id: fa
+        id: 'functions-app-deploy-${{ github.run_number }}'
         with:
           app-name: '${{ secrets.AZURE_FUNCTION_APP_NAME }}'
-          slot-name: 'Production'
           package: './artifacts/azure-functions'
 
   deploy-web:
