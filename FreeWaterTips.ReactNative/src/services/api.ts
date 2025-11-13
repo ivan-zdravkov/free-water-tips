@@ -16,7 +16,7 @@ const API_BASE_URL = getApiBaseUrl();
 
 export async function getHealth(): Promise<HealthResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/health`);
+    const response = await fetch(`${API_BASE_URL}/api/health`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
