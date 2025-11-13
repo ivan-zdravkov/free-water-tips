@@ -488,6 +488,17 @@ jobs:
           npm pkg delete dependencies.@free-water-tips/shared
           npm ci --omit=dev
 
+      - name: Verify package structure
+        run: |
+          echo "=== Package structure ==="
+          ls -la ./publish
+          echo "=== Dist folder ==="
+          ls -la ./publish/dist
+          echo "=== Functions folder ==="
+          ls -la ./publish/dist/functions
+          echo "=== Node modules @free-water-tips ==="
+          ls -la ./publish/node_modules/@free-water-tips || echo "Shared package not found"
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -502,12 +513,6 @@ jobs:
               ENVIRONMENT="${{ needs.detect-environment.outputs.environment }}" \
               COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
               COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}"
-
-      - name: Restart Azure Function App
-        run: |
-          az functionapp restart \
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}"
 
       - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
