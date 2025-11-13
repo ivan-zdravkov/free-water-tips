@@ -1,7 +1,5 @@
 export class Environment {
   static get name(): string {
-    // Support both Node.js (process.env) and React Native (process.env via metro)
-    // In React Native, check ENVIRONMENT first, then fall back to NODE_ENV
     return process.env.ENVIRONMENT || process.env.NODE_ENV || '';
   }
 

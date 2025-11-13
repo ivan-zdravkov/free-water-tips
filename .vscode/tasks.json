@@ -2,16 +2,6 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "Build Shared",
-      "type": "shell",
-      "command": "npm",
-      "args": ["run", "build"],
-      "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.Shared"
-      },
-      "problemMatcher": ["$tsc"]
-    },
-    {
       "label": "Start Backend",
       "type": "shell",
       "command": "npm",
@@ -20,7 +10,6 @@
         "cwd": "${workspaceFolder}/FreeWaterTips.API"
       },
       "isBackground": true,
-      "dependsOn": ["Build Shared"],
       "problemMatcher": {
         "pattern": {
           "regexp": "^([^\\s].*)\\((\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
@@ -49,7 +38,6 @@
         }
       },
       "isBackground": true,
-      "dependsOn": ["Build Shared"],
       "problemMatcher": {
         "pattern": {
           "regexp": "^$"

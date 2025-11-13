@@ -1,5 +1,5 @@
 import { Platform } from 'react-native';
-import { HealthResponse } from '@free-water-tips/shared';
+import { HealthResponse } from '../types/HealthResponse';
 
 // Android emulator needs 10.0.2.2 to access host's localhost. iOS simulator and web can use localhost
 const getApiBaseUrl = () => {

@@ -12,7 +12,8 @@ import {
   Text,
 } from 'react-native-paper';
 import { getHealth } from '../services/api';
-import { HealthResponse, Environment } from '@free-water-tips/shared';
+import { HealthResponse } from '../types/HealthResponse';
+import { Environment } from '../utils/Environment';
 
 interface CommunityStats {
   totalLocations: number;

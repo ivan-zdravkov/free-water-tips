@@ -197,15 +197,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: |
-            FreeWaterTips.Shared/package-lock.json
-            FreeWaterTips.API/package-lock.json
-
-      - name: Build shared types package
-        working-directory: FreeWaterTips.Shared
-        run: |
-          npm ci
-          npm run build
+          cache-dependency-path: FreeWaterTips.API/package-lock.json
 
       - name: Install dependencies
         working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
@@ -234,11 +226,6 @@ jobs:
             cp .funcignore '${{ github.workspace }}/artifacts/azure-functions/'
           fi
 
-          # Copy only the built shared package (dist and package.json)
-          mkdir -p '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared'
-          cp -r '${{ github.workspace }}/FreeWaterTips.Shared/dist' '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared/'
-          cp '${{ github.workspace }}/FreeWaterTips.Shared/package.json' '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared/'
-
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
         with:
@@ -263,15 +250,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: |
-            FreeWaterTips.Shared/package-lock.json
-            FreeWaterTips.ReactNative/package-lock.json
-
-      - name: Build shared types package
-        working-directory: FreeWaterTips.Shared
-        run: |
-          npm ci
-          npm run build
+          cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
 
       - name: Install dependencies
         working-directory: FreeWaterTips.ReactNative
@@ -483,22 +462,7 @@ jobs:
 
       - name: Install production dependencies
         working-directory: ./publish
-        run: |
-          # Remove the local file dependency from package.json before installing
-          # The shared package is already included in node_modules from the build step
-          npm pkg delete dependencies.@free-water-tips/shared
-          npm ci --omit=dev
-
-      - name: Verify package structure
-        run: |
-          echo "=== Package structure ==="
-          ls -la ./publish
-          echo "=== Dist folder ==="
-          ls -la ./publish/dist
-          echo "=== Functions folder ==="
-          ls -la ./publish/dist/functions
-          echo "=== Node modules @free-water-tips ==="
-          ls -la ./publish/node_modules/@free-water-tips || echo "Shared package not found"
+        run: npm ci --omit=dev
 
       - name: Login to Azure
         uses: azure/login@v2

@@ -1,5 +1,5 @@
 import { CosmosClient } from '@azure/cosmos';
-import { Environment } from '@free-water-tips/shared';
+import { Environment } from '../utils/Environment';
 
 export class Client {
   private cosmos: CosmosClient;
