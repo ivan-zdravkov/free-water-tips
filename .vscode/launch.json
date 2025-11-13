@@ -24,9 +24,13 @@
     },
     {
       "name": "Attach to Backend",
-      "type": "coreclr",
+      "type": "node",
       "request": "attach",
-      "processId": "${command:pickProcess}"
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "remoteRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "skipFiles": ["<node_internals>/**"]
     },
     {
       "name": "Attach to Frontend",
@@ -39,9 +43,13 @@
 
     {
       "name": "Debug Backend",
-      "type": "coreclr",
+      "type": "node",
       "request": "attach",
-      "processId": "${command:pickProcess}",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "remoteRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "skipFiles": ["<node_internals>/**"],
       "preLaunchTask": "Start Backend",
       "postDebugTask": "Terminate Backend"
     },

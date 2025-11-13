@@ -68,9 +68,6 @@ get_install_instructions() {
                 node)
                     echo "Install: brew install node@22 OR download from https://nodejs.org/"
                     ;;
-                dotnet)
-                    echo "Install: brew install dotnet-sdk OR download from https://dotnet.microsoft.com/download/dotnet/10.0"
-                    ;;
                 watchman)
                     echo "Install: brew install watchman"
                     ;;
@@ -97,9 +94,6 @@ get_install_instructions() {
                 node)
                     echo "Install: curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash - && sudo apt-get install -y nodejs"
                     ;;
-                dotnet)
-                    echo "Install: https://dotnet.microsoft.com/download/dotnet/10.0"
-                    ;;
                 watchman)
                     echo "Install: Follow instructions at https://facebook.github.io/watchman/docs/install.html"
                     ;;
@@ -119,9 +113,6 @@ get_install_instructions() {
                     ;;
                 node)
                     echo "Install: Download from https://nodejs.org/"
-                    ;;
-                dotnet)
-                    echo "Install: Download from https://dotnet.microsoft.com/download/dotnet/10.0"
                     ;;
                 watchman)
                     echo "Install: choco install watchman (using Chocolatey)"
@@ -177,19 +168,6 @@ if command -v npm &> /dev/null; then
     print_status 0 "npm" "v${NPM_VERSION}"
 else
     print_status 1 "npm" "" "npm is usually installed with Node.js"
-fi
-
-# Check .NET SDK (required version 10.0)
-if command -v dotnet &> /dev/null; then
-    DOTNET_VERSION=$(dotnet --version)
-    DOTNET_MAJOR=$(echo $DOTNET_VERSION | cut -d'.' -f1)
-    if [ "$DOTNET_MAJOR" -ge 10 ]; then
-        print_status 0 ".NET SDK" "v${DOTNET_VERSION}"
-    else
-        print_status 1 ".NET SDK" "v${DOTNET_VERSION}" ".NET SDK v10.0 or higher is required. $(get_install_instructions dotnet)"
-    fi
-else
-    print_status 1 ".NET SDK" "" "$(get_install_instructions dotnet)"
 fi
 
 echo ""
@@ -372,18 +350,18 @@ if [ -f "FreeWaterTips.ReactNative/package.json" ]; then
     fi
 fi
 
-# Check if .NET packages are restored
-if [ -d "FreeWaterTips.API.Azure.Functions/obj" ]; then
-    print_status 0 ".NET Packages" "(restored)"
+# Check if Azure Functions packages are installed
+if [ -d "FreeWaterTips.API/node_modules" ]; then
+    print_status 0 "Azure Functions Dependencies" "(installed)"
 else
-    print_status 1 ".NET Packages" "" "Run: cd FreeWaterTips.API.Azure.Functions && dotnet restore"
+    print_status 1 "Azure Functions Dependencies" "" "Run: cd FreeWaterTips.API && npm install"
 fi
 
 # Check if local.settings.json exists
-if [ -f "FreeWaterTips.API.Azure.Functions/local.settings.json" ]; then
+if [ -f "FreeWaterTips.API/local.settings.json" ]; then
     print_status 0 "Azure Functions local.settings.json" "(configured)"
 else
-    print_status 1 "Azure Functions local.settings.json" "" "Run: cp FreeWaterTips.API.Azure.Functions/local.settings.json.template FreeWaterTips.API.Azure.Functions/local.settings.json"
+    print_status 1 "Azure Functions local.settings.json" "" "Run: cp FreeWaterTips.API/local.settings.json.template FreeWaterTips.API/local.settings.json"
 fi
 
 echo ""
@@ -411,7 +389,7 @@ fi
 if [ -f ".editorconfig" ]; then
     print_status 0 "EditorConfig" "(.editorconfig)"
 else
-    print_status 1 "EditorConfig" "" "Missing .editorconfig for C# formatting"
+    echo -e "${YELLOW}${WARNING}${NC} EditorConfig ${YELLOW}not found (optional)${NC}"
 fi
 
 # Check if VS Code settings exist

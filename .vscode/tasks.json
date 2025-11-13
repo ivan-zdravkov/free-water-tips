@@ -4,10 +4,10 @@
     {
       "label": "Start Backend",
       "type": "shell",
-      "command": "dotnet",
-      "args": ["run"],
+      "command": "npm",
+      "args": ["start"],
       "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.API.Azure.Functions"
+        "cwd": "${workspaceFolder}/FreeWaterTips.API"
       },
       "isBackground": true,
       "problemMatcher": {
@@ -21,8 +21,8 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Building.*|^.*Starting host.*$",
-          "endsPattern": "^.*Worker process started and initialized.*$"
+          "beginsPattern": "^.*Starting.*|^.*Building.*$",
+          "endsPattern": "^.*Worker process started and initialized.*|^.*Host started.*$"
         }
       }
     },

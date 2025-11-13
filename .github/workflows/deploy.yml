@@ -1,5 +1,5 @@
 # Project Structure:
-# - FreeWaterTips.API.Azure.Functions/ - Azure Functions backend (.NET)
+# - FreeWaterTips.API/ - Azure Functions backend (Node.js 22)
 # - FreeWaterTips.ReactNative/ - React Native with Expo (Web, Android & iOS)
 
 # ====================================================================================================
@@ -154,8 +154,7 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './FreeWaterTips.API.Azure.Functions'
-  DOTNET_VERSION: '10.0.x'
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './FreeWaterTips.API'
   NODE_VERSION: '22'
 
 permissions:
@@ -205,15 +204,39 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
-        uses: actions/setup-dotnet@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: FreeWaterTips.API/package-lock.json
 
-      - name: 'Build and Publish Project'
+      - name: Install dependencies
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: npm ci
+
+      - name: Build TypeScript
+        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        run: npm run build
+
+      - name: Prepare deployment package
         run: |
+          mkdir -p '${{ github.workspace }}/artifacts/azure-functions'
           cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet publish --configuration Release --runtime linux-x64 --self-contained false --output '${{ github.workspace }}/artifacts/azure-functions'
+
+          # Copy compiled JavaScript files
+          cp -r dist '${{ github.workspace }}/artifacts/azure-functions/'
+
+          # Copy production dependencies
+          cp package.json package-lock.json '${{ github.workspace }}/artifacts/azure-functions/'
+
+          # Copy configuration files
+          cp host.json '${{ github.workspace }}/artifacts/azure-functions/'
+
+          # Copy .funcignore if it exists
+          if [ -f .funcignore ]; then
+            cp .funcignore '${{ github.workspace }}/artifacts/azure-functions/'
+          fi
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
@@ -438,33 +461,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
-        uses: actions/setup-dotnet@v4
+      - name: Setup Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          node-version: ${{ env.NODE_VERSION }}
 
-      - name: 'Build and Publish Project for Deployment'
-        run: |
-          cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet publish --configuration Release --runtime linux-x64 --self-contained false --output '${{ github.workspace }}/publish'
+      - name: Download Azure Functions artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: azure-functions-artifact-${{ github.run_number }}
+          path: ./publish
+
+      - name: Install production dependencies
+        working-directory: ./publish
+        run: npm ci --omit=dev
 
       - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: 'Configure Azure Function App for .NET 10 Isolated Worker'
+      - name: 'Configure Azure Function App for Node.js'
         run: |
-          echo "Configuring Function App for .NET 10 isolated worker runtime on Linux..."
+          echo "Configuring Function App for Node.js ${{ env.NODE_VERSION }} runtime on Windows..."
 
-          # Set worker runtime to dotnet-isolated
+          # Set worker runtime to node
           az functionapp config appsettings set \
             --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
             --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
-            --settings FUNCTIONS_WORKER_RUNTIME="dotnet-isolated" \
-                       WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED="1"
+            --settings FUNCTIONS_WORKER_RUNTIME="node" \
+                       WEBSITE_NODE_DEFAULT_VERSION="~${{ env.NODE_VERSION }}"
 
-          echo "✓ Azure Function App configured for .NET 10 on Linux"
+          echo "✓ Azure Function App configured for Node.js ${{ env.NODE_VERSION }} on Windows"
 
       - name: Configure Azure Function App Settings
         run: |
@@ -482,7 +510,7 @@ jobs:
             --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
             --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}"
 
-      - name: 'Run Azure Functions Action'
+      - name: 'Deploy to Azure Functions'
         uses: Azure/functions-action@v1
         id: functions-app-deploy
         with:

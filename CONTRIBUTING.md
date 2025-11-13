@@ -73,14 +73,14 @@ Help make the platform accessible in different languages (coming soon).
 
 ### Backend
 
-- **API**: [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) (C#) with HTTP triggers
-- **Database**: [Azure Cosmos DB](https://azure.microsoft.com/en-us/products/cosmos-db) with JSON documents and geo location data.
+- **API**: [Azure Functions](https://learn.microsoft.com/en-us/azure/azure-functions/) (Node.js 22) with HTTP triggers
+- **Database**: [Azure Cosmos DB](https://azure.microsoft.com/en-us/products/cosmos-db) with JSON documents and geo location data
 - **Deployment**: [GitHub Actions](https://github.com/features/actions) to [Azure](https://azure.microsoft.com/en-us/products/functions)
 
 ### Development Stack
 
-- **IDE**: [Visual Studio 2026 Insiders](https://visualstudio.microsoft.com/insiders/)
-- **Languages**: [C# 14](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/csharp-14)
+- **IDE**: [Visual Studio Code](https://code.visualstudio.com/)
+- **Languages**: [TypeScript](https://www.typescriptlang.org/) for both frontend and backend
 - **Local Database**: [Azure Cosmos DB Local Emulator](https://docs.microsoft.com/en-us/azure/cosmos-db/local-emulator)
 
 ## Development Setup
@@ -95,7 +95,7 @@ Before you start development, make sure your environment has all the required de
 
 This script will check for:
 
-- Core development tools (Git, Node.js v22+, .NET SDK v10+)
+- Core development tools (Git, Node.js v22+)
 - Azure Functions Core Tools
 - Cosmos DB Emulator (via Docker)
 - Expo & React Native dependencies
@@ -108,7 +108,7 @@ The script provides clear installation instructions for any missing dependencies
 Copy the template file to create your local settings:
 
 ```bash
-cp FreeWaterTips.API.Azure.Functions/local.settings.json.template FreeWaterTips.API.Azure.Functions/local.settings.json
+cp FreeWaterTips.API/local.settings.json.template FreeWaterTips.API/local.settings.json
 ```
 
 The default configuration uses the Cosmos DB Emulator running on `https://localhost:8081`. Adjust the settings if needed for your environment.
@@ -121,9 +121,9 @@ cd FreeWaterTips.ReactNative
 npm install
 cd ..
 
-# Restore .NET packages
-cd FreeWaterTips.API.Azure.Functions
-dotnet restore
+# Install Azure Functions dependencies
+cd FreeWaterTips.API
+npm install
 cd ..
 ```
 
@@ -137,8 +137,8 @@ Or start services manually:
 
 ```bash
 # Start Azure Functions
-cd FreeWaterTips.API.Azure.Functions
-dotnet run
+cd FreeWaterTips.API
+npm start
 
 # In another terminal, start React Native Web
 cd FreeWaterTips.ReactNative
@@ -196,20 +196,19 @@ This project uses automated code formatters for consistent style across all file
 
 **Setup**
 
-- Install recommended VS Code extensions when prompted (Prettier, C# Dev Kit)
+- Install recommended VS Code extensions when prompted (Prettier, ESLint)
 - Format on save is enabled automatically via `.vscode/settings.json`
 
 **Configuration Files**
 
 - `.prettierrc.json` - Prettier settings (TS/JS/JSON/YAML/HTML/CSS)
-- `.editorconfig` - C# formatting rules
 - `.vscode/settings.json` - Format on save config
 
 Run `./health.sh` to verify formatters are properly configured.
 
 ### Code Quality
 
-- **Languages**: Follow latest C# best practices
+- **Languages**: Follow TypeScript best practices for both frontend and backend
 - **Style**: Use consistent formatting and meaningful names
 - **Testing**: Add tests for new functionality
 - **Documentation**: Update docs for significant changes
