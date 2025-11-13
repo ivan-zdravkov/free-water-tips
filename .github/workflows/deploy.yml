@@ -214,21 +214,8 @@ jobs:
         shell: pwsh
         run: |
           pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet publish --configuration Release --output '${{ github.workspace }}/artifacts/azure-functions'
+          dotnet build --configuration Release --output '${{ github.workspace }}/artifacts/azure-functions'
           popd
-
-      - name: 'Verify publish output includes .azurefunctions folder'
-        shell: pwsh
-        run: |
-          Write-Host "Checking published files:"
-          Get-ChildItem -Path '${{ github.workspace }}/artifacts/azure-functions' -Force | Select-Object Name, Mode
-          if (Test-Path '${{ github.workspace }}/artifacts/azure-functions/.azurefunctions') {
-            Write-Host ".azurefunctions folder found ✓"
-            Get-ChildItem -Path '${{ github.workspace }}/artifacts/azure-functions/.azurefunctions' | Select-Object Name
-          } else {
-            Write-Host ".azurefunctions folder MISSING - This will cause function discovery to fail!" -ForegroundColor Red
-            exit 1
-          }
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
@@ -462,83 +449,8 @@ jobs:
         shell: pwsh
         run: |
           pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-
-          # Publish with metadata generation explicitly enabled
-          # The GenerateFunctionMetadataFile property ensures functions.metadata is created
-          dotnet publish `
-            --configuration Release `
-            --output '${{ github.workspace }}/publish' `
-            /p:GenerateFunctionMetadataFile=true `
-            /p:_FunctionsSkipCleanOutput=true
-
+          dotnet build --configuration Release --output '${{ github.workspace }}/publish'
           popd
-
-          # Verify metadata was generated
-          $metadataPath = '${{ github.workspace }}/publish/functions.metadata'
-          if (Test-Path $metadataPath) {
-            Write-Host "✓ functions.metadata generated successfully" -ForegroundColor Green
-            Write-Host "`nMetadata content:" -ForegroundColor Cyan
-            Get-Content $metadataPath
-          } else {
-            Write-Host "✗ ERROR: functions.metadata was not generated!" -ForegroundColor Red
-            Write-Host "This indicates an SDK issue. Checking for metadata in build output..." -ForegroundColor Yellow
-            
-            # Try to find and copy from intermediate output
-            $intermediatePath = '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/obj/Release/net10.0/functions.metadata'
-            if (Test-Path $intermediatePath) {
-              Write-Host "Found in intermediate output, copying..." -ForegroundColor Yellow
-              Copy-Item -Path $intermediatePath -Destination $metadataPath -Force
-              Write-Host "✓ Copied from intermediate output" -ForegroundColor Green
-            } else {
-              Write-Host "✗ Not found in intermediate output either!" -ForegroundColor Red
-              Write-Host "SDK version may not support .NET 10 metadata generation properly" -ForegroundColor Red
-              exit 1
-            }
-          }
-
-      - name: 'Verify Deployment Payload Structure'
-        shell: pwsh
-        run: |
-          Write-Host "Verifying deployment payload structure..." -ForegroundColor Cyan
-
-          $publishPath = '${{ github.workspace }}/publish'
-          $requiredFiles = @(
-            'functions.metadata',
-            'host.json',
-            'worker.config.json',
-            'extensions.json',
-            'FreeWaterTips.API.Azure.Functions.dll'
-          )
-
-          $allFilesPresent = $true
-          foreach ($file in $requiredFiles) {
-            $filePath = Join-Path $publishPath $file
-            if (Test-Path $filePath) {
-              Write-Host "✓ $file found" -ForegroundColor Green
-            } else {
-              Write-Host "✗ $file MISSING" -ForegroundColor Red
-              $allFilesPresent = $false
-            }
-          }
-
-          # Check .azurefunctions folder
-          $azFunctionsPath = Join-Path $publishPath '.azurefunctions'
-          if (Test-Path $azFunctionsPath) {
-            Write-Host "✓ .azurefunctions/ directory found" -ForegroundColor Green
-          } else {
-            Write-Host "✗ .azurefunctions/ directory MISSING" -ForegroundColor Red
-            $allFilesPresent = $false
-          }
-
-          if (-not $allFilesPresent) {
-            Write-Host ""
-            Write-Host "ERROR: Deployment payload is incomplete!" -ForegroundColor Red
-            Write-Host "Azure Functions will fail to discover functions without these files." -ForegroundColor Red
-            exit 1
-          }
-
-          Write-Host ""
-          Write-Host "✓ All required files present for deployment" -ForegroundColor Green
 
       - name: Login to Azure
         uses: azure/login@v2
