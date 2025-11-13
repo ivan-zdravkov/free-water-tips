@@ -43,19 +43,7 @@
 #   How to obtain: Azure Portal -> Resource groups -> Your resource group -> Overview -> Resource group name
 #   Example: rg-free-water-tips
 #   Usage: Required for configuring Function App settings via Azure CLI
-#
-# ✓ AZURE_STORAGE_CONNECTION_STRING
-#   Description: Connection string for Azure Storage Account used by Azure Functions
-#   How to obtain: Azure Portal -> Storage accounts -> Your storage account -> Security + networking -> Access keys -> Connection string
-#   Example: DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net
-#   Security: Keep this secret secure; required for Azure Functions runtime (AzureWebJobsStorage)
-#
-# ✓ AZURE_APPINSIGHTS_CONNECTION_STRING
-#   Description: Application Insights connection string for telemetry and monitoring
-#   How to obtain: Azure Portal -> Application Insights -> Overview -> Connection String
-#   Example: InstrumentationKey=...;IngestionEndpoint=...;LiveEndpoint=...;ApplicationId=...
-#   Security: Keep this secret secure; used for function app monitoring and diagnostics
-#
+
 # --- WEB DEPLOYMENT SECRETS (✓ Implemented) ---
 #
 # ✓ GITHUB_TOKEN
@@ -180,10 +168,10 @@ jobs:
             echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           elif [[ "${{ github.ref }}" =~ ^refs/heads/feature/.* ]]; then
-            echo "environment=Testing" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=true" >> $GITHUB_OUTPUT
           else
-            echo "environment=Testing" >> $GITHUB_OUTPUT
+            echo "environment=Production" >> $GITHUB_OUTPUT
             echo "should_deploy=false" >> $GITHUB_OUTPUT
           fi
 
