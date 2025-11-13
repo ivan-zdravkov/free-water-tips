@@ -30,4 +30,17 @@
           WorkingDirectory="$(ProjectDir).." />
   </Target>
 
+  <!-- Ensure functions.metadata is always included in publish output -->
+  <Target Name="EnsureFunctionsMetadata" AfterTargets="Publish">
+    <ItemGroup>
+      <FunctionsMetadataFile Include="$(OutputPath)functions.metadata" />
+    </ItemGroup>
+    <Copy SourceFiles="@(FunctionsMetadataFile)" 
+          DestinationFolder="$(PublishDir)" 
+          Condition="Exists('$(OutputPath)functions.metadata')" 
+          SkipUnchangedFiles="false" />
+    <Message Text="Copied functions.metadata to publish directory: $(PublishDir)" Importance="high" Condition="Exists('$(OutputPath)functions.metadata')" />
+    <Warning Text="functions.metadata not found in $(OutputPath) - Azure Functions may fail to discover functions!" Condition="!Exists('$(OutputPath)functions.metadata')" />
+  </Target>
+
 </Project>
