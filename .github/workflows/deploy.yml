@@ -461,65 +461,39 @@ jobs:
       - name: 'Build and Publish Project for Deployment'
         shell: pwsh
         run: |
-          Write-Host "Starting build and publish..." -ForegroundColor Cyan
-          Write-Host "Project path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" -ForegroundColor Yellow
-
           pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
 
-          # Build first to generate metadata
-          Write-Host "`nBuilding project to generate metadata..." -ForegroundColor Cyan
-          dotnet build --configuration Release --verbosity normal
-
-          # Check if metadata was generated
-          if (Test-Path "obj/Release/net10.0/functions.metadata") {
-            Write-Host "✓ functions.metadata generated during build" -ForegroundColor Green
-          } else {
-            Write-Host "✗ Warning: functions.metadata not found after build" -ForegroundColor Yellow
-          }
-
-          # Now publish
-          Write-Host "`nPublishing project..." -ForegroundColor Cyan
-          dotnet publish --configuration Release --output '${{ github.workspace }}/publish' --no-build
+          # Publish with metadata generation explicitly enabled
+          # The GenerateFunctionMetadataFile property ensures functions.metadata is created
+          dotnet publish `
+            --configuration Release `
+            --output '${{ github.workspace }}/publish' `
+            /p:GenerateFunctionMetadataFile=true `
+            /p:_FunctionsSkipCleanOutput=true
 
           popd
 
-      - name: 'Locate and Copy functions.metadata'
-        shell: pwsh
-        run: |
-          Write-Host "Searching for functions.metadata file..." -ForegroundColor Cyan
-
-          # Search for the metadata file in common locations
-          $searchPaths = @(
-            '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/obj/Release/net10.0/functions.metadata',
-            '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/bin/Release/net10.0/functions.metadata',
-            '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/bin/output/functions.metadata'
-          )
-
-          $metadataFile = $null
-          foreach ($path in $searchPaths) {
-            Write-Host "Checking: $path"
-            if (Test-Path $path) {
-              $metadataFile = $path
-              Write-Host "✓ Found at: $path" -ForegroundColor Green
-              break
-            }
-          }
-
-          if ($metadataFile) {
-            $destPath = Join-Path '${{ github.workspace }}/publish' 'functions.metadata'
-            Copy-Item -Path $metadataFile -Destination $destPath -Force
-            Write-Host "✓ Copied functions.metadata to publish directory" -ForegroundColor Green
-            
-            # Display content for verification
+          # Verify metadata was generated
+          $metadataPath = '${{ github.workspace }}/publish/functions.metadata'
+          if (Test-Path $metadataPath) {
+            Write-Host "✓ functions.metadata generated successfully" -ForegroundColor Green
             Write-Host "`nMetadata content:" -ForegroundColor Cyan
-            Get-Content $destPath | Select-Object -First 15
+            Get-Content $metadataPath
           } else {
-            Write-Host "✗ functions.metadata not found in any expected location!" -ForegroundColor Red
-            Write-Host "`nSearched locations:" -ForegroundColor Yellow
-            $searchPaths | ForEach-Object { Write-Host "  - $_" }
+            Write-Host "✗ ERROR: functions.metadata was not generated!" -ForegroundColor Red
+            Write-Host "This indicates an SDK issue. Checking for metadata in build output..." -ForegroundColor Yellow
             
-            Write-Host "`nProject directory structure:" -ForegroundColor Yellow
-            Get-ChildItem '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/obj' -Recurse -Filter "functions.metadata" | ForEach-Object { Write-Host "  Found: $($_.FullName)" }
+            # Try to find and copy from intermediate output
+            $intermediatePath = '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/obj/Release/net10.0/functions.metadata'
+            if (Test-Path $intermediatePath) {
+              Write-Host "Found in intermediate output, copying..." -ForegroundColor Yellow
+              Copy-Item -Path $intermediatePath -Destination $metadataPath -Force
+              Write-Host "✓ Copied from intermediate output" -ForegroundColor Green
+            } else {
+              Write-Host "✗ Not found in intermediate output either!" -ForegroundColor Red
+              Write-Host "SDK version may not support .NET 10 metadata generation properly" -ForegroundColor Red
+              exit 1
+            }
           }
 
       - name: 'Verify Deployment Payload Structure'
