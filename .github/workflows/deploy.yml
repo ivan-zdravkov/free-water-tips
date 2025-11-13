@@ -450,11 +450,20 @@ jobs:
     environment: ${{ needs.detect-environment.outputs.environment }}
 
     steps:
-      - name: Download Azure Functions artifact
-        uses: actions/download-artifact@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup DotNet ${{ env.DOTNET_VERSION }} Environment
+        uses: actions/setup-dotnet@v4
         with:
-          name: azure-functions-artifact-${{ github.run_number }}
-          path: ./artifacts/azure-functions
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: 'Build and Publish Project for Deployment'
+        shell: pwsh
+        run: |
+          pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet publish --configuration Release --output '${{ github.workspace }}/publish'
+          popd
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -484,7 +493,7 @@ jobs:
         id: functions-app-deploy
         with:
           app-name: '${{ secrets.AZURE_FUNCTION_APP_NAME }}'
-          package: './artifacts/azure-functions'
+          package: './publish'
 
   deploy-web:
     if: needs.detect-environment.outputs.should_deploy == 'true'
