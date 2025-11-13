@@ -193,7 +193,7 @@ jobs:
           echo "Branch: ${{ github.ref }}"
 
   build-azure-functions:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: detect-environment
     environment: ${{ needs.detect-environment.outputs.environment }}
     env:
@@ -211,11 +211,9 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 'Build and Publish Project'
-        shell: pwsh
         run: |
-          pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output '${{ github.workspace }}/artifacts/azure-functions'
-          popd
+          cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet publish --configuration Release --runtime linux-x64 --self-contained false --output '${{ github.workspace }}/artifacts/azure-functions'
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
@@ -432,7 +430,7 @@ jobs:
 
   deploy-azure-functions:
     if: needs.detect-environment.outputs.should_deploy == 'true'
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     needs: [detect-environment, build-azure-functions]
     environment: ${{ needs.detect-environment.outputs.environment }}
 
@@ -446,11 +444,9 @@ jobs:
           dotnet-version: ${{ env.DOTNET_VERSION }}
 
       - name: 'Build and Publish Project for Deployment'
-        shell: pwsh
         run: |
-          pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet build --configuration Release --output '${{ github.workspace }}/publish'
-          popd
+          cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          dotnet publish --configuration Release --runtime linux-x64 --self-contained false --output '${{ github.workspace }}/publish'
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -458,46 +454,32 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: 'Configure Azure Function App for .NET 10 Isolated Worker'
-        shell: pwsh
         run: |
-          Write-Host "Configuring Function App for .NET 10 isolated worker runtime..." -ForegroundColor Cyan
+          echo "Configuring Function App for .NET 10 isolated worker runtime on Linux..."
 
-          # Set .NET Framework version to 10
-          az functionapp config set `
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
-            --net-framework-version "v10.0"
+          # Set worker runtime to dotnet-isolated
+          az functionapp config appsettings set \
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
+            --settings FUNCTIONS_WORKER_RUNTIME="dotnet-isolated" \
+                       WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED="1"
 
-          # Set worker runtime to dotnet-isolated and ensure 64-bit
-          az functionapp config appsettings set `
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
-            --settings FUNCTIONS_WORKER_RUNTIME="dotnet-isolated"
-
-          # Ensure 64-bit worker process (required for .NET 10 optimizations)
-          az functionapp config set `
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
-            --use-32bit-worker-process false
-
-          Write-Host "✓ Azure Function App configured for .NET 10" -ForegroundColor Green
+          echo "✓ Azure Function App configured for .NET 10 on Linux"
 
       - name: Configure Azure Function App Settings
-        shell: pwsh
         run: |
-          az functionapp config appsettings set `
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
-            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
-            --settings `
-              ENVIRONMENT="${{ needs.detect-environment.outputs.environment }}" `
-              COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" `
+          az functionapp config appsettings set \
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" \
+            --settings \
+              ENVIRONMENT="${{ needs.detect-environment.outputs.environment }}" \
+              COSMOS_DB_ENDPOINT="${{ secrets.COSMOS_DB_ENDPOINT }}" \
               COSMOS_DB_KEY="${{ secrets.COSMOS_DB_KEY }}"
 
       - name: Restart Azure Function App
-        shell: pwsh
         run: |
-          az functionapp restart `
-            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
+          az functionapp restart \
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" \
             --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}"
 
       - name: 'Run Azure Functions Action'
