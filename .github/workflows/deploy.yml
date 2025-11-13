@@ -465,10 +465,79 @@ jobs:
           dotnet publish --configuration Release --output '${{ github.workspace }}/publish'
           popd
 
+      - name: 'Verify Deployment Payload Structure'
+        shell: pwsh
+        run: |
+          Write-Host "Verifying deployment payload structure..." -ForegroundColor Cyan
+
+          $publishPath = '${{ github.workspace }}/publish'
+          $requiredFiles = @(
+            'functions.metadata',
+            'host.json',
+            'worker.config.json',
+            'extensions.json',
+            'FreeWaterTips.API.Azure.Functions.dll'
+          )
+
+          $allFilesPresent = $true
+          foreach ($file in $requiredFiles) {
+            $filePath = Join-Path $publishPath $file
+            if (Test-Path $filePath) {
+              Write-Host "✓ $file found" -ForegroundColor Green
+            } else {
+              Write-Host "✗ $file MISSING" -ForegroundColor Red
+              $allFilesPresent = $false
+            }
+          }
+
+          # Check .azurefunctions folder
+          $azFunctionsPath = Join-Path $publishPath '.azurefunctions'
+          if (Test-Path $azFunctionsPath) {
+            Write-Host "✓ .azurefunctions/ directory found" -ForegroundColor Green
+          } else {
+            Write-Host "✗ .azurefunctions/ directory MISSING" -ForegroundColor Red
+            $allFilesPresent = $false
+          }
+
+          if (-not $allFilesPresent) {
+            Write-Host ""
+            Write-Host "ERROR: Deployment payload is incomplete!" -ForegroundColor Red
+            Write-Host "Azure Functions will fail to discover functions without these files." -ForegroundColor Red
+            exit 1
+          }
+
+          Write-Host ""
+          Write-Host "✓ All required files present for deployment" -ForegroundColor Green
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: 'Configure Azure Function App for .NET 10 Isolated Worker'
+        shell: pwsh
+        run: |
+          Write-Host "Configuring Function App for .NET 10 isolated worker runtime..." -ForegroundColor Cyan
+
+          # Set .NET Framework version to 10
+          az functionapp config set `
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
+            --net-framework-version "v10.0"
+
+          # Set worker runtime to dotnet-isolated and ensure 64-bit
+          az functionapp config appsettings set `
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
+            --settings FUNCTIONS_WORKER_RUNTIME="dotnet-isolated"
+
+          # Ensure 64-bit worker process (required for .NET 10 optimizations)
+          az functionapp config set `
+            --name "${{ secrets.AZURE_FUNCTION_APP_NAME }}" `
+            --resource-group "${{ secrets.AZURE_RESOURCE_GROUP_NAME }}" `
+            --use-32bit-worker-process false
+
+          Write-Host "✓ Azure Function App configured for .NET 10" -ForegroundColor Green
 
       - name: Configure Azure Function App Settings
         shell: pwsh
