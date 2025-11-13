@@ -234,9 +234,10 @@ jobs:
             cp .funcignore '${{ github.workspace }}/artifacts/azure-functions/'
           fi
 
-          # Copy shared package to node_modules structure for deployment
-          mkdir -p '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips'
-          cp -r '${{ github.workspace }}/FreeWaterTips.Shared' '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared'
+          # Copy only the built shared package (dist and package.json)
+          mkdir -p '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared'
+          cp -r '${{ github.workspace }}/FreeWaterTips.Shared/dist' '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared/'
+          cp '${{ github.workspace }}/FreeWaterTips.Shared/package.json' '${{ github.workspace }}/artifacts/azure-functions/node_modules/@free-water-tips/shared/'
 
       - name: Upload Azure Functions artifact
         uses: actions/upload-artifact@v4
