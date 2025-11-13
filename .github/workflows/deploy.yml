@@ -461,9 +461,66 @@ jobs:
       - name: 'Build and Publish Project for Deployment'
         shell: pwsh
         run: |
+          Write-Host "Starting build and publish..." -ForegroundColor Cyan
+          Write-Host "Project path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}" -ForegroundColor Yellow
+
           pushd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
-          dotnet publish --configuration Release --output '${{ github.workspace }}/publish'
+
+          # Build first to generate metadata
+          Write-Host "`nBuilding project to generate metadata..." -ForegroundColor Cyan
+          dotnet build --configuration Release --verbosity normal
+
+          # Check if metadata was generated
+          if (Test-Path "obj/Release/net10.0/functions.metadata") {
+            Write-Host "✓ functions.metadata generated during build" -ForegroundColor Green
+          } else {
+            Write-Host "✗ Warning: functions.metadata not found after build" -ForegroundColor Yellow
+          }
+
+          # Now publish
+          Write-Host "`nPublishing project..." -ForegroundColor Cyan
+          dotnet publish --configuration Release --output '${{ github.workspace }}/publish' --no-build
+
           popd
+
+      - name: 'Locate and Copy functions.metadata'
+        shell: pwsh
+        run: |
+          Write-Host "Searching for functions.metadata file..." -ForegroundColor Cyan
+
+          # Search for the metadata file in common locations
+          $searchPaths = @(
+            '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/obj/Release/net10.0/functions.metadata',
+            '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/bin/Release/net10.0/functions.metadata',
+            '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/bin/output/functions.metadata'
+          )
+
+          $metadataFile = $null
+          foreach ($path in $searchPaths) {
+            Write-Host "Checking: $path"
+            if (Test-Path $path) {
+              $metadataFile = $path
+              Write-Host "✓ Found at: $path" -ForegroundColor Green
+              break
+            }
+          }
+
+          if ($metadataFile) {
+            $destPath = Join-Path '${{ github.workspace }}/publish' 'functions.metadata'
+            Copy-Item -Path $metadataFile -Destination $destPath -Force
+            Write-Host "✓ Copied functions.metadata to publish directory" -ForegroundColor Green
+            
+            # Display content for verification
+            Write-Host "`nMetadata content:" -ForegroundColor Cyan
+            Get-Content $destPath | Select-Object -First 15
+          } else {
+            Write-Host "✗ functions.metadata not found in any expected location!" -ForegroundColor Red
+            Write-Host "`nSearched locations:" -ForegroundColor Yellow
+            $searchPaths | ForEach-Object { Write-Host "  - $_" }
+            
+            Write-Host "`nProject directory structure:" -ForegroundColor Yellow
+            Get-ChildItem '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/obj' -Recurse -Filter "functions.metadata" | ForEach-Object { Write-Host "  Found: $($_.FullName)" }
+          }
 
       - name: 'Verify Deployment Payload Structure'
         shell: pwsh
