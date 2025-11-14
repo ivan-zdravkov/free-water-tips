@@ -35,8 +35,7 @@ export default function AboutScreen() {
   const [healthError, setHealthError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO: Fetch actual stats from API
-    // For now, using placeholder data
+    // TODO: Fetch actual stats from API, for now, using placeholder data
     setStats({
       totalLocations: 0,
       totalContributors: 0,
