@@ -297,6 +297,13 @@ export default function AboutScreen() {
                     />
                   )}
                 />
+                {health.buildNumber && (
+                  <List.Item
+                    title="Build Number"
+                    description={`#${health.buildNumber}`}
+                    left={props => <List.Icon {...props} icon="information" />}
+                  />
+                )}
                 {health.error && (
                   <List.Item
                     title="Error"

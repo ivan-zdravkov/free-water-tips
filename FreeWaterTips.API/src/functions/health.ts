@@ -17,6 +17,7 @@ export async function health(
       timestamp: new Date().toISOString(),
       environment: Environment.name,
       cosmosConnected: cosmosConnected,
+      buildNumber: process.env.GITHUB_RUN_NUMBER,
     };
 
     return {
@@ -31,6 +32,7 @@ export async function health(
       timestamp: new Date().toISOString(),
       environment: Environment.name,
       cosmosConnected: false,
+      buildNumber: process.env.GITHUB_RUN_NUMBER,
       error: error instanceof Error ? error.message : 'Unknown error',
     };
 
