@@ -13,24 +13,30 @@ We appreciate detailed bug reports as they help us improve the platform for ever
 When creating a bug report, please include:
 
 ### **Bug Description**
+
 A clear and concise description of what the bug is.
 
 ### **Steps to Reproduce**
+
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
 ### **Expected Behavior**
+
 A clear description of what you expected to happen.
 
 ### **Actual Behavior**
+
 A clear description of what actually happened.
 
 ### **Screenshots/Videos**
+
 If applicable, add screenshots or screen recordings to help explain your problem.
 
 ### **Environment Information**
+
 - **Platform**: Web App / Android App / iOS App
 - **Browser**: Chrome, Firefox, Safari, etc. (including version)
 - **Device**: Desktop, Mobile, Tablet
@@ -38,6 +44,7 @@ If applicable, add screenshots or screen recordings to help explain your problem
 - **Screen Resolution**: If relevant for UI issues
 
 ### **Additional Context**
+
 - Any error messages displayed
 - Console logs (for web app issues)
 - Network connectivity status
@@ -59,6 +66,7 @@ When reporting bugs, consider the impact:
 The "Find Nearest" button doesn't work when location services are disabled.
 
 **Steps to Reproduce**
+
 1. Open Free Water Tips web app
 2. Disable location services in browser settings
 3. Click "Find Nearest" button
@@ -71,6 +79,7 @@ Should show an error message asking user to enable location services or manually
 Button becomes unresponsive with no feedback to the user.
 
 **Environment**
+
 - Platform: Web App
 - Browser: Chrome 119.0.6045.105
 - Device: Desktop

@@ -30,6 +30,7 @@ I've mostly worked within bigger teams and contributed to large enterprise syste
    - Highlight my ability to design scalable full-stack applications and ship with **Infrastructure as Code**.
 
 ## Why This Approach?
+
 I want to build the simplest, most scalable solution that aligns with modern development practices. By using Azure, Serverless Functions and Infrastructure as Code, I can ensure the project is cost-effective, scalable, and easy to maintain. The feature-branch approach allows for rapid iteration and testing, which is crucial for an open-source project like this.
 
 ## How I’m Using AI to Accelerate Development
@@ -47,10 +48,12 @@ AI has become an invaluable tool in helping me move quickly and efficiently whil
    - Filter properties out of a JSON.
    - Generating a regex to filter out invalid emails.
    - Creating a random password generator with specific constraints.
-   - Populating error messages or simplifying repetitive tasks like switch statements.  
+   - Populating error messages or simplifying repetitive tasks like switch statements.
 
 ## How I am NOT using AI
+
 Everything AI generated gets reviewed, tested and ultimately owned by me. AI is a tool in my tool box, not the whole darn toolbox. I am ultimately not letting AI:
+
 - Make design or architectural decisions for me.
 - Generation complex functions, full classes, modules or whole applications.
 - Make critical security decisions.

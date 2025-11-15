@@ -88,6 +88,26 @@
       "label": "Terminate Backend + Frontend",
       "dependsOn": ["Terminate Backend", "Terminate Frontend"],
       "dependsOrder": "parallel"
+    },
+    {
+      "label": "Prettier: Check",
+      "type": "shell",
+      "command": "npx",
+      "args": ["prettier", ".", "--check"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prettier: Fix",
+      "type": "shell",
+      "command": "npx",
+      "args": ["prettier", ".", "--write"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [

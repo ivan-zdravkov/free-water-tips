@@ -47,15 +47,17 @@ The website and applications are and forever will be open-source and free to use
 ### Donations
 
 Even though the applications are free, the infrastructure and developer fees cost a bit, so if you do enjoy my mission and want to contribute to it, donations are welcome!
-* [GitHub](https://github.com/sponsors/ivan-zdravkov)
-* [Paypal](https://paypal.me/IZdravkov)
-* [Revolut](https://revolut.me/ivan_zdravkov)
+
+- [GitHub](https://github.com/sponsors/ivan-zdravkov)
+- [Paypal](https://paypal.me/IZdravkov)
+- [Revolut](https://revolut.me/ivan_zdravkov)
 
 ## Contributing
 
 We welcome contributions from the community! Whether you want to report bugs, suggest features, add water source locations, or contribute code, there are many ways to help.
 
 Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
+
 - Development environment setup
 - How to report bugs effectively
 - Submitting feature requests
