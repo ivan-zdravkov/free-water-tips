@@ -142,7 +142,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './FreeWaterTips.API'
+  AZURE_FUNCTIONS_APP: './FreeWaterTips.API'
+  REACT_NATIVE_APP: './FreeWaterTips.ReactNative'
   NODE_VERSION: '22'
 
 permissions:
@@ -215,20 +216,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: FreeWaterTips.API/package-lock.json
+          cache-dependency-path: ${{ env.AZURE_FUNCTIONS_APP }}/package-lock.json
 
       - name: Install dependencies
-        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        working-directory: ${{ env.AZURE_FUNCTIONS_APP }}
         run: npm ci
 
       - name: Build TypeScript
-        working-directory: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        working-directory: ${{ env.AZURE_FUNCTIONS_APP }}
         run: npm run build
 
       - name: Prepare deployment package
         run: |
           mkdir -p '${{ github.workspace }}/artifacts/azure-functions'
-          cd '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
+          cd '${{ env.AZURE_FUNCTIONS_APP }}'
 
           # Copy compiled JavaScript files
           cp -r dist '${{ github.workspace }}/artifacts/azure-functions/'
@@ -268,21 +269,21 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
+          cache-dependency-path: ${{ env.REACT_NATIVE_APP }}/package-lock.json
 
       - name: Install dependencies
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npm ci
 
       - name: Build web application
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npx expo export --platform web --output-dir ./artifacts/web
 
       - name: Upload web artifact
         uses: actions/upload-artifact@v4
         with:
           name: web-artifact-${{ github.run_number }}
-          path: FreeWaterTips.ReactNative/artifacts/web
+          path: ${{ env.REACT_NATIVE_APP }}/artifacts/web
           retention-days: 3
 
   build-android:
@@ -303,7 +304,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
+          cache-dependency-path: ${{ env.REACT_NATIVE_APP }}/package-lock.json
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -312,21 +313,21 @@ jobs:
           java-version: '17'
 
       - name: Install dependencies
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npm ci
 
       - name: Decode and setup Android keystore
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > FreeWaterTips.ReactNative/android/app/release.keystore
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > ${{ env.REACT_NATIVE_APP }}/android/app/release.keystore
 
       - name: Run Expo prebuild for Android
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npx expo prebuild --platform android --clean
 
       - name: Build signed Android App Bundle (AAB)
-        working-directory: FreeWaterTips.ReactNative/android
+        working-directory: ${{ env.REACT_NATIVE_APP }}/android
         env:
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -341,7 +342,7 @@ jobs:
       - name: Copy Android artifact to artifacts directory
         run: |
           mkdir -p ./artifacts/android
-          cp FreeWaterTips.ReactNative/android/app/build/outputs/bundle/release/*.aab ./artifacts/android/
+          cp ${{ env.REACT_NATIVE_APP }}/android/app/build/outputs/bundle/release/*.aab ./artifacts/android/
 
       - name: Upload signed Android AAB artifact
         uses: actions/upload-artifact@v4
@@ -368,10 +369,10 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-          cache-dependency-path: FreeWaterTips.ReactNative/package-lock.json
+          cache-dependency-path: ${{ env.REACT_NATIVE_APP }}/package-lock.json
 
       - name: Install dependencies
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npm ci
 
       - name: Install CocoaPods
@@ -407,15 +408,15 @@ jobs:
           cp $PP_PATH ~/Library/MobileDevice/Provisioning\ Profiles
 
       - name: Run Expo prebuild for iOS
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npx expo prebuild --platform ios --clean
 
       - name: Install iOS dependencies
-        working-directory: FreeWaterTips.ReactNative/ios
+        working-directory: ${{ env.REACT_NATIVE_APP }}/ios
         run: pod install
 
       - name: Build and archive iOS app
-        working-directory: FreeWaterTips.ReactNative/ios
+        working-directory: ${{ env.REACT_NATIVE_APP }}/ios
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
@@ -432,7 +433,7 @@ jobs:
             archive
 
       - name: Export signed IPA
-        working-directory: FreeWaterTips.ReactNative/ios
+        working-directory: ${{ env.REACT_NATIVE_APP }}/ios
         env:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
@@ -445,7 +446,7 @@ jobs:
             -exportOptionsPlist exportOptions-final.plist
 
       - name: Copy iOS artifact to artifacts directory
-        working-directory: FreeWaterTips.ReactNative
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: |
           mkdir -p ./artifacts/ios
           cp ios/build/*.ipa ./artifacts/ios/
@@ -454,7 +455,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ios-artifact-${{ github.run_number }}
-          path: FreeWaterTips.ReactNative/artifacts/ios
+          path: ${{ env.REACT_NATIVE_APP }}/artifacts/ios
           retention-days: 3
 
   deploy-azure-functions:
