@@ -166,7 +166,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: Install dependencies
+      - name: Install API dependencies
+        working-directory: ${{ env.AZURE_FUNCTIONS_APP }}
+        run: npm ci
+
+      - name: Install ReactNative dependencies
+        working-directory: ${{ env.REACT_NATIVE_APP }}
         run: npm ci
 
       - name: Run Prettier check
