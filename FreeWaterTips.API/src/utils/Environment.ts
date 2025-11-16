@@ -19,7 +19,9 @@ export class Environment {
     const endpoint = process.env.COSMOS_DB_ENDPOINT;
 
     if (!endpoint) {
-      throw new Error("Environment variable 'COSMOS_DB_ENDPOINT' missing.");
+      throw new Error(
+        "Environment variable 'COSMOS_DB_ENDPOINT' missing. Check your .env file or deployment settings."
+      );
     }
 
     return endpoint;
@@ -29,7 +31,9 @@ export class Environment {
     const key = process.env.COSMOS_DB_KEY;
 
     if (!key) {
-      throw new Error("Environment variable 'COSMOS_DB_KEY' missing.");
+      throw new Error(
+        "Environment variable 'COSMOS_DB_KEY' missing. Check your .env file or deployment settings."
+      );
     }
 
     return key;

@@ -8,7 +8,6 @@ import {
   List,
   ActivityIndicator,
   Divider,
-  Chip,
   Text,
 } from 'react-native-paper';
 import { getHealth } from '../services/api';

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { PaperProvider } from 'react-native-paper';
@@ -49,7 +49,15 @@ export default function App() {
         const path = query.slice(2);
         const screen = screenConfigs.find(s => s.path === path);
         if (screen) {
-          navigationRef.current?.navigate(screen.name);
+          if (!navigationRef.current) {
+            console.warn('Navigation ref is not initialized. Cannot navigate to:', screen.name);
+          } else {
+            try {
+              navigationRef.current.navigate(screen.name);
+            } catch (error) {
+              console.error('Navigation to', screen.name, 'failed:', error);
+            }
+          }
         }
         window.history.replaceState({}, '', '/' + path);
       }

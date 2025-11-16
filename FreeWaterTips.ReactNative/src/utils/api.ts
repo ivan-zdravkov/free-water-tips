@@ -40,11 +40,11 @@ export const apiUrl = (path: string): string => {
 const baseUrl = () => {
   const envUrl = process.env.EXPO_PUBLIC_AZURE_FUNCTIONS_ENDPOINT || '';
 
-  let baseUrl = envUrl.replace(/\/$/, ''); // Remove trailing slash if present
+  let url = envUrl.replace(/\/$/, ''); // Remove trailing slash if present
 
   if (Platform.OS === 'android') {
-    baseUrl = baseUrl.replace('localhost', '10.0.2.2').replace('127.0.0.1', '10.0.2.2');
+    url = url.replace('localhost', '10.0.2.2').replace('127.0.0.1', '10.0.2.2');
   }
 
-  return baseUrl;
+  return url;
 };
