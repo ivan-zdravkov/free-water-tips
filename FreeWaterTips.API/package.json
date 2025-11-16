@@ -1,0 +1,31 @@
+{
+  "name": "free-water-tips-api",
+  "version": "1.0.0",
+  "description": "Azure Functions API for Free Water Tips",
+  "main": "dist/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rimraf dist",
+    "prestart": "npm run build",
+    "start": "func start --language-worker -- --inspect=9229",
+    "start:debug": "func start --language-worker -- --inspect=9229",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@azure/cosmos": "^4.2.1",
+    "@azure/functions": "^4.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "azure-functions-core-tools": "^4.0.6280",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

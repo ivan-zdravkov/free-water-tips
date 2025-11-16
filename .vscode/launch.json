@@ -1,0 +1,75 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Start All",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dummy.js",
+      "preLaunchTask": "Start Backend + Frontend"
+    },
+    {
+      "name": "Start Backend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dummy.js",
+      "preLaunchTask": "Start Backend"
+    },
+    {
+      "name": "Start Frontend",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/scripts/dummy.js",
+      "preLaunchTask": "Start Frontend"
+    },
+    {
+      "name": "Attach to Backend",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "remoteRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "skipFiles": ["<node_internals>/**"]
+    },
+    {
+      "name": "Attach to Frontend",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "urlFilter": "http://localhost:8090/*"
+    },
+
+    {
+      "name": "Debug Backend",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "restart": true,
+      "localRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "remoteRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "skipFiles": ["<node_internals>/**"],
+      "preLaunchTask": "Start Backend",
+      "postDebugTask": "Terminate Backend"
+    },
+    {
+      "name": "Debug Frontend",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:8090",
+      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "preLaunchTask": "Start Frontend",
+      "postDebugTask": "Terminate Frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug All",
+      "configurations": ["Debug Backend", "Debug Frontend"],
+      "stopAll": true,
+      "preLaunchTask": "Start Backend + Frontend",
+      "postDebugTask": "Terminate Backend + Frontend"
+    }
+  ]
+}

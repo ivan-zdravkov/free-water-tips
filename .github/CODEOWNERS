@@ -6,7 +6,6 @@ docs/ @ivan-zdravkov
 *.md @ivan-zdravkov
 
 # Frontend changes
-src/web/ @ivan-zdravkov
 *.html @ivan-zdravkov
 *.css @ivan-zdravkov
 *.js @ivan-zdravkov
@@ -14,6 +13,9 @@ src/web/ @ivan-zdravkov
 # Backend changes (Azure Functions)
 src/api/ @ivan-zdravkov
 *.cs @ivan-zdravkov
+
+# Database changes
+src/db/ @ivan-zdravkov
 
 # Mobile changes (MAUI)
 src/mobile/ @ivan-zdravkov
@@ -23,8 +25,6 @@ src/mobile/ @ivan-zdravkov
 .github/ @ivan-zdravkov
 *.yml @ivan-zdravkov
 *.yaml @ivan-zdravkov
-docker-compose.* @ivan-zdravkov
-Dockerfile* @ivan-zdravkov
 
 # Configuration files
 *.json @ivan-zdravkov

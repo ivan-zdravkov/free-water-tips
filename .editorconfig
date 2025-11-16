@@ -1,0 +1,71 @@
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# TypeScript, JavaScript, and JSX files
+[*.{ts,tsx,js,jsx,mjs,cjs}]
+indent_style = space
+indent_size = 2
+quote_type = single
+max_line_length = 100
+
+# JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+
+# JSON with comments (tsconfig, etc.)
+[*.jsonc]
+indent_style = space
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Markdown files
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# HTML and template files
+[*.{html,htm}]
+indent_style = space
+indent_size = 2
+
+# CSS, SCSS, and LESS files
+[*.{css,scss,sass,less}]
+indent_style = space
+indent_size = 2
+
+# Shell scripts
+[*.{sh,bash}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+
+# Package files
+[{package.json,package-lock.json}]
+indent_style = space
+indent_size = 2
+
+# Configuration files
+[{.prettierrc,.eslintrc,.babelrc}]
+indent_style = space
+indent_size = 2
+
+# Azure Functions specific
+[host.json]
+indent_style = space
+indent_size = 2
+
+[local.settings.json]
+indent_style = space
+indent_size = 2

@@ -3,6 +3,18 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
+# Local configuration files
+src/web/js/config/config.json
+src/api/local.settings.json
+.env
+
+# Database configuration
+src/db/.env
+*.db
+
+dist/
+build/
+
 # User-specific files
 *.rsuser
 *.suo
@@ -399,3 +411,4 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+.DS_Store
