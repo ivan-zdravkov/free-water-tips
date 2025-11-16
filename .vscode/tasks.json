@@ -1,0 +1,131 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Start Backend",
+      "type": "shell",
+      "command": "npm",
+      "args": ["start"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.API"
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^([^\\s].*)\\((\\d+,\\d+)\\):\\s+(error|warning|info)\\s+(TS\\d+)\\s*:\\s*(.*)$",
+          "file": 1,
+          "location": 2,
+          "severity": 3,
+          "code": 4,
+          "message": 5
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting.*|^.*Building.*$",
+          "endsPattern": "^.*Worker process started and initialized.*|^.*Host started.*$"
+        }
+      }
+    },
+    {
+      "label": "Start Frontend",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "web"],
+      "options": {
+        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative",
+        "env": {
+          "BROWSER": "none"
+        }
+      },
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "Starting Metro Bundler|Starting development server",
+          "endsPattern": "Bundling complete|Metro.*waiting|Compiled successfully|compiled successfully"
+        }
+      }
+    },
+    {
+      "label": "Start Backend + Frontend",
+      "dependsOn": ["Start Backend", "Start Frontend"],
+      "dependsOrder": "parallel"
+    },
+    {
+      "label": "Terminate Backend",
+      "command": "echo '${input:killBackend}'",
+      "type": "shell",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "close": true
+      }
+    },
+    {
+      "label": "Terminate Frontend",
+      "command": "echo '${input:killFrontend}'",
+      "type": "shell",
+      "problemMatcher": [],
+      "presentation": {
+        "echo": false,
+        "reveal": "never",
+        "focus": false,
+        "panel": "shared",
+        "showReuseMessage": false,
+        "clear": false,
+        "close": true
+      }
+    },
+    {
+      "label": "Terminate Backend + Frontend",
+      "dependsOn": ["Terminate Backend", "Terminate Frontend"],
+      "dependsOrder": "parallel"
+    },
+    {
+      "label": "Prettier: Check",
+      "type": "shell",
+      "command": "npx",
+      "args": ["prettier", ".", "--check"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prettier: Fix",
+      "type": "shell",
+      "command": "npx",
+      "args": ["prettier", ".", "--write"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "killBackend",
+      "type": "command",
+      "command": "workbench.action.terminal.kill",
+      "args": {
+        "name": "Start Backend"
+      }
+    },
+    {
+      "id": "killFrontend",
+      "type": "command",
+      "command": "workbench.action.terminal.kill",
+      "args": {
+        "name": "Start Frontend"
+      }
+    }
+  ]
+}
