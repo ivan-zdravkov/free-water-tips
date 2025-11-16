@@ -22,14 +22,15 @@ I've mostly worked within bigger teams and contributed to large enterprise syste
 
 1. **Solve a Real Problem**: Create a meaningful platform that connects people with free drinking water locations, reducing plastic waste and promoting sustainability.
 2. **Learn and Grow**:
-   - Deepen my knowledge of [Serverless Architecture](https://azure.microsoft.com/en-us/solutions/serverless) and **NoSQL** databases with [Docker](https://www.docker.com/) and [Kubernetes](https://kubernetes.io/) down the line.
+   - Deepen my knowledge of [Serverless Architecture](https://azure.microsoft.com/en-us/solutions/serverless) and **NoSQL** databases.
    - Refresh my skills in [Azure](https://azure.microsoft.com/en-us/), [GitHub Actions](https://github.com/features/actions), and **modern CI/CD pipelines**.
-   - Go back in time to writing a web application framework-free with latest JavaScript goodies and learning [.NET MAUI](https://dotnet.microsoft.com/en-us/apps/maui) for cross-platform applications.
+   - Build cross-platform mobile applications with [React Native](https://reactnative.dev/) and [TypeScript](https://www.typescriptlang.org/).
 3. **Showcase My Expertise**:
    - Leverage my experience in **Full Stack Software Engineering**, **Application and Cloud Architectures**, and **Databases**.
-   - Highlight my ability to design scalable, containerized microservices with **Infrastructure as Code**.
+   - Highlight my ability to design scalable full-stack applications and ship with **Infrastructure as Code**.
 
 ## Why This Approach?
+
 I want to build the simplest, most scalable solution that aligns with modern development practices. By using Azure, Serverless Functions and Infrastructure as Code, I can ensure the project is cost-effective, scalable, and easy to maintain. The feature-branch approach allows for rapid iteration and testing, which is crucial for an open-source project like this.
 
 ## How I’m Using AI to Accelerate Development
@@ -47,10 +48,12 @@ AI has become an invaluable tool in helping me move quickly and efficiently whil
    - Filter properties out of a JSON.
    - Generating a regex to filter out invalid emails.
    - Creating a random password generator with specific constraints.
-   - Populating error messages or simplifying repetitive tasks like switch statements.  
+   - Populating error messages or simplifying repetitive tasks like switch statements.
 
 ## How I am NOT using AI
+
 Everything AI generated gets reviewed, tested and ultimately owned by me. AI is a tool in my tool box, not the whole darn toolbox. I am ultimately not letting AI:
+
 - Make design or architectural decisions for me.
 - Generation complex functions, full classes, modules or whole applications.
 - Make critical security decisions.

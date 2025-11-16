@@ -10,7 +10,9 @@ Our mission is to make it easier for people to find **places that serve safe dri
 
 ## About the Project
 
-The [Free Water Tips](/README.md) project consists of a [Web App](freewater.tips), an [Android App](), and an [iOS App]() all of which offer user-friendly ways of finding where free and safe drinking water is served.
+The [Free Water Tips](./README.md) project is a Progressive Web App (PWA) built with React Native, offering a user-friendly way to find where free and safe drinking water is served. The PWA works seamlessly across all devices and platforms.
+
+**Note**: While the current implementation focuses on web as a PWA, the project is built with React Native to allow for future native mobile applications for Android and iOS if there is community demand.
 
 More about how the project came to be you can find in the [Personal Statement](./docs/personal-statement.md) of the creator [Ivan Zdravkov](https://zdravkov.dev).
 
@@ -25,8 +27,8 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 
 ## Features
 
-- **Proximity-Based Search**: Find the nearest locations offering free drinking water using a Google Maps integration.
-- **Cross-Platform Support**: Access the service via the web, Android, or iOS.
+- **Proximity-Based Search**: Find the nearest locations offering free drinking water using a maps integration.
+- **Progressive Web App (PWA)**: Access the service on any device through your web browser with app-like experience.
 - **Free and Anonymous Usage**: Use free without ever logging in.
 - **Community Contributions**: Add locations to help others.
 
@@ -34,7 +36,7 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 
 - **Spread the Word**: Share the project with your friends, family, and community.
 - **Add Locations**: If you know of places that serve free drinking water, add them to our database.
-- **Contribute**: Help us improve the project by contributing code, reporting issues, or suggesting features. Find out how in the [Technical Guide](./docs/technical-guide.md).
+- **Contribute**: Help us improve the project by contributing code, reporting issues, or suggesting features. Find out how in the [Contributing Guide](CONTRIBUTING.md).
 
 ## Monetization
 
@@ -45,9 +47,25 @@ The website and applications are and forever will be open-source and free to use
 ### Donations
 
 Even though the applications are free, the infrastructure and developer fees cost a bit, so if you do enjoy my mission and want to contribute to it, donations are welcome!
-* [GitHub](https://github.com/sponsors/ivan-zdravkov)
-* [Paypal](https://paypal.me/IZdravkov)
-* [Revolut](https://revolut.me/ivan_zdravkov)
+
+- [GitHub](https://github.com/sponsors/ivan-zdravkov)
+- [Paypal](https://paypal.me/IZdravkov)
+- [Revolut](https://revolut.me/ivan_zdravkov)
+
+## Contributing
+
+We welcome contributions from the community! Whether you want to report bugs, suggest features, add water source locations, or contribute code, there are many ways to help.
+
+Please read our [Contributing Guide](CONTRIBUTING.md) for detailed information on:
+
+- Development environment setup
+- How to report bugs effectively
+- Submitting feature requests
+- Code guidelines and workflow
+- Adding new water source locations
+- Community guidelines
+
+For quick bug reports, you can also use the "Report Bug" button in the [About section](https://freewater.tips/#about) of our web app.
 
 ## License
 
