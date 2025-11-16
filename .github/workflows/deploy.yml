@@ -531,13 +531,15 @@ jobs:
 
       - name: Deploy to production
         if: needs.detect-environment.outputs.environment == 'Production'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Configure git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           # Clone gh-pages branch
-          git clone --single-branch --branch gh-pages https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git ./gh-pages-temp
+          git clone --single-branch --branch gh-pages https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git ./gh-pages-temp
           cd ./gh-pages-temp
 
           # Clear root directory but keep .git
@@ -555,7 +557,7 @@ jobs:
           # Commit and push changes
           git add .
           git commit -m "Deploy production build from commit ${{ github.sha }}" || echo "No changes to commit"
-          git push origin gh-pages
+          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}.git gh-pages
 
       - name: Deploy to testing
         if: needs.detect-environment.outputs.environment == 'Testing'
