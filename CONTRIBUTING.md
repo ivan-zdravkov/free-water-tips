@@ -109,6 +109,7 @@ Copy the template file to create your local settings:
 ```bash
 cp FreeWaterTips.API/local.settings.json.template FreeWaterTips.API/local.settings.json
 cp FreeWaterTips.ReactNative/.env.template FreeWaterTips.ReactNative/.env
+cp e2e/.env.template e2e/.env
 ```
 
 The default configuration uses the Cosmos DB Emulator running on `https://localhost:8081`. Adjust the settings if needed for your environment.
@@ -214,6 +215,111 @@ Run `./health.sh` to verify formatters are properly configured.
 - **Style**: Use consistent formatting and meaningful names
 - **Testing**: Add tests for new functionality
 - **Documentation**: Update docs for significant changes
+
+## E2E Testing
+
+Free Water Tips uses Selenium WebDriver for end-to-end testing to ensure the application works correctly from a user's perspective.
+
+### Running E2E Tests Locally
+
+1. **Install E2E test dependencies**:
+
+   ```bash
+   cd e2e
+   npm install
+   cd ..
+   ```
+
+2. **Start the development environment**:
+
+   ```bash
+   # Using VS Code tasks (recommended)
+   Cmd+Shift+P → "Tasks: Run Task" → "Start Backend + Frontend"
+
+   # Or manually
+   cd FreeWaterTips.API
+   npm start
+
+   # In another terminal
+   cd FreeWaterTips.ReactNative
+   npm run web
+   ```
+
+3. **Run E2E tests**:
+
+   ```bash
+   # Using VS Code tasks
+   Cmd+Shift+P → "Tasks: Run Task" → "E2E: Run Tests (Local)"
+
+   # Or manually
+   cd e2e
+   npm run test:local
+   ```
+
+### Running E2E Tests Against Testing Environment
+
+To test against the deployed testing environment at https://test.freewater.tips:
+
+```bash
+cd e2e
+npm run test:testing
+```
+
+### Debugging E2E Tests
+
+You can debug E2E tests using VS Code's debugger:
+
+1. Open the Debug panel (Cmd+Shift+D)
+2. Select "E2E Tests (Local)" or "E2E Tests (Testing)" from the dropdown
+3. Set breakpoints in your test files
+4. Press F5 to start debugging
+
+### Writing New E2E Tests
+
+See the [E2E README](../e2e/README.md) for detailed instructions on writing new E2E tests.
+
+**Quick Example**:
+
+```typescript
+import { WebDriver, By, until } from 'selenium-webdriver';
+import { createWebDriver, quitWebDriver, getBaseUrl } from '../utils/webdriver';
+
+async function testMyFeature(): Promise<void> {
+  let driver: WebDriver | undefined;
+
+  try {
+    driver = await createWebDriver({ headless: true });
+    await driver.get(getBaseUrl());
+
+    // Your test logic here
+    const element = await driver.findElement(By.id('my-element'));
+    const text = await element.getText();
+
+    if (text !== 'Expected Text') {
+      throw new Error('Test failed');
+    }
+
+    console.log('✓ Test PASSED');
+  } catch (error) {
+    console.error('✗ Test FAILED:', error);
+    throw error;
+  } finally {
+    if (driver) {
+      await quitWebDriver(driver);
+    }
+  }
+}
+
+testMyFeature()
+  .then(() => process.exit(0))
+  .catch(() => process.exit(1));
+```
+
+### E2E Tests in CI/CD
+
+E2E tests automatically run in the GitHub Actions workflow after deploying to the testing environment. This ensures that the deployed application works correctly before promoting changes to production.
+
+The tests run against https://test.freewater.tips after a successful deployment to the `testing` branch.
 
 ## Pull Request Process
 

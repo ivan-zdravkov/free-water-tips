@@ -108,6 +108,37 @@
         "cwd": "${workspaceFolder}"
       },
       "problemMatcher": []
+    },
+    {
+      "label": "E2E: Install Dependencies",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}/e2e"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "E2E: Run Tests (Local)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "test:local"],
+      "options": {
+        "cwd": "${workspaceFolder}/e2e"
+      },
+      "problemMatcher": [],
+      "dependsOn": ["Start Backend + Frontend"]
+    },
+    {
+      "label": "E2E: Run Tests (Testing)",
+      "type": "shell",
+      "command": "npm",
+      "args": ["run", "test:testing"],
+      "options": {
+        "cwd": "${workspaceFolder}/e2e"
+      },
+      "problemMatcher": []
     }
   ],
   "inputs": [

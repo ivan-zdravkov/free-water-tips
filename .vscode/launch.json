@@ -61,6 +61,39 @@
       "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
       "preLaunchTask": "Start Frontend",
       "postDebugTask": "Terminate Frontend"
+    },
+    {
+      "name": "E2E Tests (Local)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/e2e/node_modules/.bin/ts-node",
+      "args": [
+        "--project",
+        "${workspaceFolder}/e2e/tsconfig.json",
+        "${workspaceFolder}/e2e/tests/about.test.ts"
+      ],
+      "cwd": "${workspaceFolder}/e2e",
+      "env": {
+        "BASE_URL": "http://localhost:8090"
+      },
+      "console": "integratedTerminal",
+      "preLaunchTask": "Start Backend + Frontend"
+    },
+    {
+      "name": "E2E Tests (Testing)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/e2e/node_modules/.bin/ts-node",
+      "args": [
+        "--project",
+        "${workspaceFolder}/e2e/tsconfig.json",
+        "${workspaceFolder}/e2e/tests/about.test.ts"
+      ],
+      "cwd": "${workspaceFolder}/e2e",
+      "env": {
+        "BASE_URL": "https://test.freewater.tips"
+      },
+      "console": "integratedTerminal"
     }
   ],
   "compounds": [

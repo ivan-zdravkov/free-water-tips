@@ -412,3 +412,8 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 .DS_Store
+
+# E2E test artifacts
+e2e/node_modules/
+e2e/dist/
+e2e/package-lock.json

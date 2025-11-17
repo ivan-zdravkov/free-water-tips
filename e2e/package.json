@@ -1,0 +1,20 @@
+{
+  "name": "free-water-tips-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for Free Water Tips using Selenium WebDriver",
+  "scripts": {
+    "test": "ts-node --project tsconfig.json tests/about.test.ts",
+    "test:local": "BASE_URL=http://localhost:8090 npm test",
+    "test:testing": "BASE_URL=https://test.freewater.tips npm test"
+  },
+  "dependencies": {
+    "selenium-webdriver": "^4.27.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/selenium-webdriver": "^4.1.27",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.0"
+  },
+  "private": true
+}

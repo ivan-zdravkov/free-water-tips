@@ -1,6 +1,12 @@
 export class Environment {
   static get name(): string {
-    return process.env.ENVIRONMENT || process.env.NODE_ENV || '';
+    const environment = process.env.ENVIRONMENT || process.env.NODE_ENV;
+
+    if (!environment) {
+      throw new Error('ENVIRONMENT environment variable is not set.');
+    }
+
+    return environment;
   }
 
   static get isDevelopment(): boolean {
