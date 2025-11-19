@@ -11,8 +11,8 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "types": ["node"]
+    "types": ["node", "jest"]
   },
-  "include": ["tests/**/*", "utils/**/*"],
+  "include": ["tests/**/*", "utils/**/*", "pages/**/*"],
   "exclude": ["node_modules", "dist"]
 }

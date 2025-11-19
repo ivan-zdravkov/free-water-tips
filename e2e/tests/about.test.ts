@@ -1,49 +1,47 @@
-import { TestBase } from '../utils/TestBase';
-import { AboutPage } from '../pages/AboutPage';
-import { Logger } from '../utils/Logger';
-import { TestRunner } from '../utils/TestRunner';
+import { By, until, WebDriver, WebElement } from 'selenium-webdriver';
+import { createChromeWebDriver } from '../utils/webdriver';
+import { Environment } from '../utils/Environment';
 
-class AboutPageTest extends TestBase<AboutPage> {
-  constructor() {
-    super('About Page', AboutPage);
-  }
+describe('About Page', () => {
+  let timeout: number;
+  let baseUrl: string;
+  let driver: WebDriver;
 
-  tests(): { [testName: string]: (logger: Logger) => Promise<void> } {
-    return {
-      'About Page - Our Mission': (logger: Logger) => this.testOurMissionSection(logger),
-      'About Page - Other': (logger: Logger) => this.testOtherSection(logger),
-    };
-  }
+  let locateByXpath = async (xpath: string): Promise<WebElement> =>
+    await driver.wait(until.elementLocated(By.xpath(xpath)), timeout);
 
-  async testOurMissionSection(logger: Logger): Promise<void> {
-    await this.setup(logger);
+  beforeAll(() => {
+    const seconds = 10;
 
-    try {
-      logger.log('Loading page...');
-      await this.navigateTo('about');
-      await this.page.waitForPageLoad();
-      logger.success('Page loaded successfully.');
+    timeout = seconds * 1000;
+    baseUrl = Environment.baseUrl;
+  });
 
-      await this.page.verifyOurMissionSectionExists();
-      await this.page.verifyMissionContentExists();
-    } finally {
-      await this.teardown();
+  beforeEach(async () => {
+    driver = await createChromeWebDriver();
+
+    await driver.get(`${baseUrl}/about`);
+    await locateByXpath(`//*[contains(text(), 'About')]`);
+  });
+
+  afterEach(async () => {
+    if (driver) {
+      await driver.quit();
     }
-  }
+  });
 
-  async testOtherSection(logger: Logger): Promise<void> {
-    await this.setup(logger);
+  afterAll(() => {});
 
-    try {
-      await this.navigateTo('about');
-      await this.page.waitForPageLoad();
+  describe('Our Mission Section', () => {
+    it('should display the "Our Mission" heading', async () => {
+      const webElement = await locateByXpath(`//*[contains(text(), 'Our Mission')]`);
 
-      await this.page.verifyOurMissionSectionExists();
-      await this.page.verifyMissionContentExists();
-    } finally {
-      await this.teardown();
-    }
-  }
-}
+      expect(await webElement.isDisplayed()).toBe(true);
+    });
 
-TestRunner.run(AboutPageTest);
+    it('should display the mission content', async () => {
+      const webElement = await locateByXpath(`//*[contains(text(), 'fundamental human right')]`);
+      expect(await webElement.isDisplayed()).toBe(true);
+    });
+  });
+});
