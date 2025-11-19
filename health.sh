@@ -341,20 +341,23 @@ echo "  Project Dependencies"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-# Check if project dependencies are installed
-if [ -f "FreeWaterTips.ReactNative/package.json" ]; then
-    if [ -d "FreeWaterTips.ReactNative/node_modules" ]; then
-        print_status 0 "React Native Dependencies" "(installed)"
-    else
-        print_status 1 "React Native Dependencies" "" "Run: cd FreeWaterTips.ReactNative && npm install"
-    fi
-fi
-
-# Check if Azure Functions packages are installed
 if [ -d "FreeWaterTips.API/node_modules" ]; then
     print_status 0 "Azure Functions Dependencies" "(installed)"
 else
     print_status 1 "Azure Functions Dependencies" "" "Run: cd FreeWaterTips.API && npm install"
+fi
+
+if [ -d "FreeWaterTips.ReactNative/node_modules" ]; then
+    print_status 0 "React Native Dependencies" "(installed)"
+else
+    print_status 1 "React Native Dependencies" "" "Run: cd FreeWaterTips.ReactNative && npm install"
+fi
+
+# Check if E2E test dependencies are installed
+if [ -d "e2e/node_modules" ]; then
+    print_status 0 "E2E Test Dependencies" "(installed)"
+else
+    print_status 1 "E2E Test Dependencies" "" "Run: cd e2e && npm install"
 fi
 
 # Check if local.settings.json exists
@@ -362,6 +365,20 @@ if [ -f "FreeWaterTips.API/local.settings.json" ]; then
     print_status 0 "Azure Functions local.settings.json" "(configured)"
 else
     print_status 1 "Azure Functions local.settings.json" "" "Run: cp FreeWaterTips.API/local.settings.json.template FreeWaterTips.API/local.settings.json"
+fi
+
+# Check if E2E .env exists
+if [ -f "FreeWaterTips.ReactNative/.env" ]; then
+    print_status 0 "React Native .env" "(configured)"
+else
+    print_status 1 "React Native .env" "" "Run: cp FreeWaterTips.ReactNative/.env.template FreeWaterTips.ReactNative/.env"
+fi
+
+# Check if E2E .env exists
+if [ -f "e2e/.env" ]; then
+    print_status 0 "E2E Test .env" "(configured)"
+else
+    print_status 1 "E2E Test .env" "" "Run: cp e2e/.env.template e2e/.env"
 fi
 
 echo ""
@@ -383,6 +400,13 @@ if [ -f ".prettierrc.json" ]; then
     print_status 0 "Prettier Config" "(.prettierrc.json)"
 else
     print_status 1 "Prettier Config" "" "Missing .prettierrc.json configuration file"
+fi
+
+# Check if Prettier ignore file exists
+if [ -f ".prettierignore" ]; then
+    print_status 0 "Prettier Ignore" "(.prettierignore)"
+else
+    echo -e "${YELLOW}${WARNING}${NC} Prettier Ignore ${YELLOW}not found (optional)${NC}"
 fi
 
 # Check if EditorConfig exists
