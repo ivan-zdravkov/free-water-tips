@@ -30,7 +30,7 @@ Who would benefit from this feature and how?
 - [ ] Web app users
 - [ ] Mobile app users (Android/iOS)
 - [ ] Contributors/developers
-- [ ] Other: ****\_\_\_****
+- [ ] Other:
 
 ## Implementation Complexity
 
