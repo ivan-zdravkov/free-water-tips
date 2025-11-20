@@ -18,8 +18,8 @@ Please confirm you have completed the following before submitting your PR:
 ### 🧪 **Testing**
 
 - [ ] Manual testing completed
-- [ ] ToDo: New tests added for new functionality
-- [ ] ToDo: All tests pass locally
+- [ ] New tests added for new functionality
+- [ ] All tests pass locally
 
 ### 📝 **Code Quality**
 
@@ -33,7 +33,7 @@ Please confirm you have completed the following before submitting your PR:
 
 - [ ] Branch up-to-date and no merge conflicts with master branch
 - [ ] Used [Conventional](https://www.conventionalcommits.org/) commit messages are descriptive and
-- [ ] Ammend or squash unnecessary fragmented commits together, but don't squash everything into a single commit
+- [ ] Amend or squash unnecessary fragmented commits together, but don't squash everything into a single commit
 - [ ] No unnecessary files committed
 
 ### 🚀 **Deployment**
