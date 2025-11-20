@@ -258,7 +258,7 @@ if command -v npx &> /dev/null; then
         EXPO_VERSION=$(timeout 5 expo --version 2>/dev/null || echo "installed")
         print_status 0 "Expo CLI" "v${EXPO_VERSION}"
     else
-        print_status 1 "Expo CLI" "" "Install: cd app && npm install"
+        print_status 1 "Expo CLI" "" "Install: npm install --prefix app"
     fi
 else
     print_status 1 "npx" "" "npx is required and comes with npm"
@@ -344,37 +344,33 @@ echo ""
 if [ -d "api/node_modules" ]; then
     print_status 0 "Azure Functions Dependencies" "(installed)"
 else
-    print_status 1 "Azure Functions Dependencies" "" "Run: cd api && npm install"
+    print_status 1 "Azure Functions Dependencies" "" "Run: npm install --prefix api"
 fi
 
 if [ -d "app/node_modules" ]; then
     print_status 0 "React Native Dependencies" "(installed)"
 else
-    print_status 1 "React Native Dependencies" "" "Run: cd app && npm install"
+    print_status 1 "React Native Dependencies" "" "Run: npm install --prefix app"
 fi
 
-# Check if E2E test dependencies are installed
 if [ -d "e2e/node_modules" ]; then
     print_status 0 "E2E Test Dependencies" "(installed)"
 else
-    print_status 1 "E2E Test Dependencies" "" "Run: cd e2e && npm install"
+    print_status 1 "E2E Test Dependencies" "" "Run: npm install --prefix e2e"
 fi
 
-# Check if local.settings.json exists
 if [ -f "api/local.settings.json" ]; then
     print_status 0 "Azure Functions local.settings.json" "(configured)"
 else
     print_status 1 "Azure Functions local.settings.json" "" "Run: cp api/local.settings.json.template api/local.settings.json"
 fi
 
-# Check if E2E .env exists
 if [ -f "app/.env" ]; then
     print_status 0 "React Native .env" "(configured)"
 else
     print_status 1 "React Native .env" "" "Run: cp app/.env.template app/.env"
 fi
 
-# Check if E2E .env exists
 if [ -f "e2e/.env" ]; then
     print_status 0 "E2E Test .env" "(configured)"
 else
@@ -392,7 +388,7 @@ if [ -f "app/node_modules/.bin/prettier" ]; then
     PRETTIER_VERSION=$(cd app && npx prettier --version 2>/dev/null || echo "installed")
     print_status 0 "Prettier" "v${PRETTIER_VERSION}"
 else
-    print_status 1 "Prettier" "" "Run: cd app && npm install"
+    print_status 1 "Prettier" "" "Run: npm install --prefix app"
 fi
 
 # Check if Prettier config exists
@@ -431,7 +427,7 @@ if [ -d "app/node_modules" ]; then
         cd - > /dev/null
     else
         echo -e "${YELLOW}${WARNING}${NC} Some files need formatting ${YELLOW}(non-critical)${NC}"
-        echo -e "  ${YELLOW}→${NC} Run: cd app && npm run format"
+        echo -e "  ${YELLOW}→${NC} Run: npm run format --prefix app"
         cd - > /dev/null 2>&1
     fi
 fi
