@@ -7,7 +7,7 @@
       "command": "npm",
       "args": ["start"],
       "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.API"
+        "cwd": "${workspaceFolder}/api"
       },
       "isBackground": true,
       "problemMatcher": {
@@ -32,7 +32,7 @@
       "command": "npm",
       "args": ["run", "web"],
       "options": {
-        "cwd": "${workspaceFolder}/FreeWaterTips.ReactNative",
+        "cwd": "${workspaceFolder}/app",
         "env": {
           "BROWSER": "none"
         }

@@ -1,6 +1,6 @@
 # Project Structure:
-# - FreeWaterTips.API/ - Azure Functions backend (Node.js 22)
-# - FreeWaterTips.ReactNative/ - React Native with Expo (Web, Android & iOS)
+# - api/ - Azure Functions backend (Node.js 22)
+# - app/ - React Native with Expo (Web, Android & iOS)
 
 # ====================================================================================================
 # ENVIRONMENT SECRETS AND VARIABLES DOCUMENTATION
@@ -144,8 +144,8 @@ on:
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONS_APP: './FreeWaterTips.API'
-  REACT_NATIVE_APP: './FreeWaterTips.ReactNative'
+  AZURE_FUNCTIONS_APP: './api'
+  REACT_NATIVE_APP: './app'
   NODE_VERSION: '22'
 
 permissions:

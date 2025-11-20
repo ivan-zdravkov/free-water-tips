@@ -118,8 +118,8 @@ The script provides clear installation instructions for any missing dependencies
 Copy the template file to create your local settings:
 
 ```bash
-cp FreeWaterTips.API/local.settings.json.template FreeWaterTips.API/local.settings.json
-cp FreeWaterTips.ReactNative/.env.template FreeWaterTips.ReactNative/.env
+cp api/local.settings.json.template api/local.settings.json
+cp app/.env.template app/.env
 cp e2e/.env.template e2e/.env
 ```
 
@@ -128,8 +128,8 @@ The default configuration uses the Cosmos DB Emulator running on `https://localh
 ### 3. Install project dependencies
 
 ```bash
-npm install --prefix FreeWaterTips.ReactNative
-npm install --prefix FreeWaterTips.API
+npm install --prefix app
+npm install --prefix api
 npm install --prefix e2e
 ```
 
@@ -144,8 +144,8 @@ You can use the Debug window or VS Code tasks to start the development environme
 Or start services manually:
 
 ```bash
-npm start --prefix FreeWaterTips.API
-npm run web --prefix FreeWaterTips.ReactNative
+npm start --prefix api
+npm run web --prefix app
 ```
 
 ## Code Contributions
@@ -236,14 +236,14 @@ Running this task will start the `Start Backend + Frontend` task and then run th
 1. **Start the development environment in seperate terminals**:
 
 ```bash
-npm start --prefix FreeWaterTips.API
+npm start --prefix api
 ```
 
 ```bash
-npm run web --prefix FreeWaterTips.ReactNative
+npm run web --prefix app
 ```
 
-2. **Run E2E tests**:
+3. **Run E2E tests**:
 
 ```bash
 npm run test:local --prefix e2e

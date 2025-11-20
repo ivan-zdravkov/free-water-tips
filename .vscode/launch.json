@@ -28,8 +28,8 @@
       "request": "attach",
       "port": 9229,
       "restart": true,
-      "localRoot": "${workspaceFolder}/FreeWaterTips.API",
-      "remoteRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "localRoot": "${workspaceFolder}/api",
+      "remoteRoot": "${workspaceFolder}/api",
       "skipFiles": ["<node_internals>/**"]
     },
     {
@@ -37,7 +37,7 @@
       "type": "chrome",
       "request": "attach",
       "port": 9222,
-      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "webRoot": "${workspaceFolder}/app",
       "urlFilter": "http://localhost:8090/*"
     },
 
@@ -47,8 +47,8 @@
       "request": "attach",
       "port": 9229,
       "restart": true,
-      "localRoot": "${workspaceFolder}/FreeWaterTips.API",
-      "remoteRoot": "${workspaceFolder}/FreeWaterTips.API",
+      "localRoot": "${workspaceFolder}/api",
+      "remoteRoot": "${workspaceFolder}/api",
       "skipFiles": ["<node_internals>/**"],
       "preLaunchTask": "Start Backend",
       "postDebugTask": "Terminate Backend"
@@ -58,7 +58,7 @@
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:8090",
-      "webRoot": "${workspaceFolder}/FreeWaterTips.ReactNative",
+      "webRoot": "${workspaceFolder}/app",
       "preLaunchTask": "Start Frontend",
       "postDebugTask": "Terminate Frontend"
     },

@@ -246,7 +246,7 @@ echo ""
 
 # Check if expo is available (can be installed locally in project)
 if command -v npx &> /dev/null; then
-    if [ -f "FreeWaterTips.ReactNative/node_modules/.bin/expo" ]; then
+    if [ -f "app/node_modules/.bin/expo" ]; then
         # Use timeout to prevent hanging
         EXPO_VERSION=$(timeout 5 npx expo --version 2>/dev/null || echo "installed")
         if [ $? -eq 124 ]; then
@@ -258,7 +258,7 @@ if command -v npx &> /dev/null; then
         EXPO_VERSION=$(timeout 5 expo --version 2>/dev/null || echo "installed")
         print_status 0 "Expo CLI" "v${EXPO_VERSION}"
     else
-        print_status 1 "Expo CLI" "" "Install: cd FreeWaterTips.ReactNative && npm install"
+        print_status 1 "Expo CLI" "" "Install: cd app && npm install"
     fi
 else
     print_status 1 "npx" "" "npx is required and comes with npm"
@@ -341,16 +341,16 @@ echo "  Project Dependencies"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
 
-if [ -d "FreeWaterTips.API/node_modules" ]; then
+if [ -d "api/node_modules" ]; then
     print_status 0 "Azure Functions Dependencies" "(installed)"
 else
-    print_status 1 "Azure Functions Dependencies" "" "Run: cd FreeWaterTips.API && npm install"
+    print_status 1 "Azure Functions Dependencies" "" "Run: cd api && npm install"
 fi
 
-if [ -d "FreeWaterTips.ReactNative/node_modules" ]; then
+if [ -d "app/node_modules" ]; then
     print_status 0 "React Native Dependencies" "(installed)"
 else
-    print_status 1 "React Native Dependencies" "" "Run: cd FreeWaterTips.ReactNative && npm install"
+    print_status 1 "React Native Dependencies" "" "Run: cd app && npm install"
 fi
 
 # Check if E2E test dependencies are installed
@@ -361,17 +361,17 @@ else
 fi
 
 # Check if local.settings.json exists
-if [ -f "FreeWaterTips.API/local.settings.json" ]; then
+if [ -f "api/local.settings.json" ]; then
     print_status 0 "Azure Functions local.settings.json" "(configured)"
 else
-    print_status 1 "Azure Functions local.settings.json" "" "Run: cp FreeWaterTips.API/local.settings.json.template FreeWaterTips.API/local.settings.json"
+    print_status 1 "Azure Functions local.settings.json" "" "Run: cp api/local.settings.json.template api/local.settings.json"
 fi
 
 # Check if E2E .env exists
-if [ -f "FreeWaterTips.ReactNative/.env" ]; then
+if [ -f "app/.env" ]; then
     print_status 0 "React Native .env" "(configured)"
 else
-    print_status 1 "React Native .env" "" "Run: cp FreeWaterTips.ReactNative/.env.template FreeWaterTips.ReactNative/.env"
+    print_status 1 "React Native .env" "" "Run: cp app/.env.template app/.env"
 fi
 
 # Check if E2E .env exists
@@ -388,11 +388,11 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Check if Prettier is installed
-if [ -f "FreeWaterTips.ReactNative/node_modules/.bin/prettier" ]; then
-    PRETTIER_VERSION=$(cd FreeWaterTips.ReactNative && npx prettier --version 2>/dev/null || echo "installed")
+if [ -f "app/node_modules/.bin/prettier" ]; then
+    PRETTIER_VERSION=$(cd app && npx prettier --version 2>/dev/null || echo "installed")
     print_status 0 "Prettier" "v${PRETTIER_VERSION}"
 else
-    print_status 1 "Prettier" "" "Run: cd FreeWaterTips.ReactNative && npm install"
+    print_status 1 "Prettier" "" "Run: cd app && npm install"
 fi
 
 # Check if Prettier config exists
@@ -425,13 +425,13 @@ else
 fi
 
 # Check formatting (non-blocking)
-if [ -d "FreeWaterTips.ReactNative/node_modules" ]; then
-    if cd FreeWaterTips.ReactNative && npm run format:check > /dev/null 2>&1; then
+if [ -d "app/node_modules" ]; then
+    if cd app && npm run format:check > /dev/null 2>&1; then
         print_status 0 "Code Formatting" "(all files formatted)"
         cd - > /dev/null
     else
         echo -e "${YELLOW}${WARNING}${NC} Some files need formatting ${YELLOW}(non-critical)${NC}"
-        echo -e "  ${YELLOW}→${NC} Run: cd FreeWaterTips.ReactNative && npm run format"
+        echo -e "  ${YELLOW}→${NC} Run: cd app && npm run format"
         cd - > /dev/null 2>&1
     fi
 fi
