@@ -210,11 +210,11 @@ export default function AboutScreen() {
               style={{ color: '#0066cc', textDecorationLine: 'underline' }}
               onPress={() =>
                 openLink(
-                  'https://github.com/ivan-zdravkov/free-water-tips/blob/main/CONTRIBUTING.md#reporting-bugs'
+                  'https://github.com/ivan-zdravkov/free-water-tips/issues/new?template=bug_report.md'
                 )
               }
             >
-              follow our bug reporting guidelines
+              report it using our bug report template
             </Text>{' '}
             to help us improve the platform.
           </Paragraph>

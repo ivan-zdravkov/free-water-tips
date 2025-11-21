@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/ivan-zdravkov/free-water-tips/discussions
+    about: Ask questions and discuss ideas with the community
+  - name: Documentation
+    url: https://github.com/ivan-zdravkov/free-water-tips/blob/main/CONTRIBUTING.md
+    about: Read our contributing guide and documentation
