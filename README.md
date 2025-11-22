@@ -1,4 +1,4 @@
-# Free Water Tips
+`# Free Water Tips
 
 **Water is a right, not a product.**
 
@@ -14,7 +14,7 @@ The [Free Water Tips](./README.md) project is a Progressive Web App (PWA) built 
 
 **Note**: While the current implementation focuses on web as a PWA, the project is built with React Native to allow for future native mobile applications for Android and iOS if there is community demand.
 
-More about how the project came to be you can find in the [Personal Statement](./docs/personal-statement.md) of the creator [Ivan Zdravkov](https://zdravkov.dev).
+For background on how the project came to be, see the creator [Ivan Zdravkov](https://zdravkov.dev)'s [Personal Statement](./docs/personal-statement.md).
 
 ## Why This Matters
 
@@ -29,7 +29,7 @@ Access to clean drinking water is a basic human necessity. However, in many plac
 
 - **Proximity-Based Search**: Find the nearest locations offering free drinking water using a maps integration.
 - **Progressive Web App (PWA)**: Access the service on any device through your web browser with app-like experience.
-- **Free and Anonymous Usage**: Use free without ever logging in.
+- **Free and Anonymous Usage**: Use it for free without ever logging in.
 - **Community Contributions**: Add locations to help others.
 
 ## How You Can Help
