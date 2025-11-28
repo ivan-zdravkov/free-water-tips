@@ -15,7 +15,12 @@ import MapView, { Marker, Region } from '../components/MapView';
 import * as Location from 'expo-location';
 import { WaterLocation, WaterLocationType } from '../types/WaterLocation';
 import { getNearbyWaterLocations, saveWaterFeedback } from '../services/api';
-import { fetchOSMLocation, mapOSMTypeToWaterType, getOSMTypeDisplayName, getFreeWaterTypeDisplayName } from '../utils/osmHelper';
+import {
+  fetchOSMLocation,
+  mapOSMTypeToWaterType,
+  getOSMTypeDisplayName,
+  getFreeWaterTypeDisplayName,
+} from '../utils/osmHelper';
 import {
   determineLocationColor,
   DEFAULT_COLOR_CONFIG,
@@ -34,12 +39,18 @@ const createPinMarkerHTML = (
   // Material Design Community Icons SVG paths (official icon pack paths)
   const getMaterialIconPath = (type: WaterLocationType): string => {
     const iconPaths: { [key: string]: string } = {
-      [WaterLocationType.Fountain]: 'M7,2V4H8V22H6V4A2,2 0 0,0 4,2H3C2.45,2 2,2.45 2,3V4C2,4.55 2.45,5 3,5H4V22H2V24H8V22H10V5H11C11.55,5 12,4.55 12,4V3C12,2.45 11.55,2 11,2H10A2,2 0 0,0 8,2H7Z',
-      [WaterLocationType.Restaurant]: 'M8.1,13.34L3.91,9.16C2.35,7.59 2.35,5.06 3.91,3.5L10.93,10.5L8.1,13.34M14.88,11.53C16.32,12.97 16.32,15.31 14.88,16.75C13.44,18.19 11.1,18.19 9.66,16.75C8.22,15.31 8.22,12.97 9.66,11.53L11.77,9.42L14.88,11.53Z',
-      [WaterLocationType.Dispenser]: 'M5.5,2C4,2 2.79,3.21 2.79,4.71C2.79,6.21 4,7.42 5.5,7.42C7,7.42 8.21,6.21 8.21,4.71C8.21,3.21 7,2 5.5,2M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10M7,18A1,1 0 0,0 6,19A1,1 0 0,0 7,20H17A1,1 0 0,0 18,19A1,1 0 0,0 17,18H7Z',
-      [WaterLocationType.Cafe]: 'M2,21V19H20V21H2M20,8H18V5L16,5V3H4V5L2,5V8H4V9A4,4 0 0,0 8,13H16A4,4 0 0,0 20,9V8M16,8H6V5H16V8Z',
-      [WaterLocationType.Bar]: 'M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8H18A2,2 0 0,1 16,6V4A2,2 0 0,0 14,2H6M8,4H14V6H8V4M8,8H14V10H8V8M8,12H14V14H8V12Z',
-      [WaterLocationType.Other]: 'M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25S18,10 18,14A6,6 0 0,1 12,20Z'
+      [WaterLocationType.Fountain]:
+        'M7,2V4H8V22H6V4A2,2 0 0,0 4,2H3C2.45,2 2,2.45 2,3V4C2,4.55 2.45,5 3,5H4V22H2V24H8V22H10V5H11C11.55,5 12,4.55 12,4V3C12,2.45 11.55,2 11,2H10A2,2 0 0,0 8,2H7Z',
+      [WaterLocationType.Restaurant]:
+        'M8.1,13.34L3.91,9.16C2.35,7.59 2.35,5.06 3.91,3.5L10.93,10.5L8.1,13.34M14.88,11.53C16.32,12.97 16.32,15.31 14.88,16.75C13.44,18.19 11.1,18.19 9.66,16.75C8.22,15.31 8.22,12.97 9.66,11.53L11.77,9.42L14.88,11.53Z',
+      [WaterLocationType.Dispenser]:
+        'M5.5,2C4,2 2.79,3.21 2.79,4.71C2.79,6.21 4,7.42 5.5,7.42C7,7.42 8.21,6.21 8.21,4.71C8.21,3.21 7,2 5.5,2M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10M7,18A1,1 0 0,0 6,19A1,1 0 0,0 7,20H17A1,1 0 0,0 18,19A1,1 0 0,0 17,18H7Z',
+      [WaterLocationType.Cafe]:
+        'M2,21V19H20V21H2M20,8H18V5L16,5V3H4V5L2,5V8H4V9A4,4 0 0,0 8,13H16A4,4 0 0,0 20,9V8M16,8H6V5H16V8Z',
+      [WaterLocationType.Bar]:
+        'M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8H18A2,2 0 0,1 16,6V4A2,2 0 0,0 14,2H6M8,4H14V6H8V4M8,8H14V10H8V8M8,12H14V14H8V12Z',
+      [WaterLocationType.Other]:
+        'M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25S18,10 18,14A6,6 0 0,1 12,20Z',
     };
     return iconPaths[type] || iconPaths[WaterLocationType.Other];
   };
@@ -441,10 +452,14 @@ export default function MapScreen() {
           >
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{selectedLocation?.name || 'Water Location'}</Text>
-              <Text style={styles.modalSubtitle}>{selectedLocation && getFreeWaterTypeDisplayName(selectedLocation.type)}</Text>
-              
+              <Text style={styles.modalSubtitle}>
+                {selectedLocation && getFreeWaterTypeDisplayName(selectedLocation.type)}
+              </Text>
+
               {selectedLocation?.osmType && (
-                <Text style={styles.modalSubtitle}>OSM Type: {getOSMTypeDisplayName(selectedLocation.osmType)}</Text>
+                <Text style={styles.modalSubtitle}>
+                  OSM Type: {getOSMTypeDisplayName(selectedLocation.osmType)}
+                </Text>
               )}
 
               {selectedLocation && (
@@ -519,7 +534,9 @@ export default function MapScreen() {
               <Text style={styles.modalTitle}>{newLocationData?.osmName || 'New Location'}</Text>
 
               {newLocationData?.osmType && (
-                <Text style={styles.modalSubtitle}>OSM Type: {getOSMTypeDisplayName(newLocationData.osmType)}</Text>
+                <Text style={styles.modalSubtitle}>
+                  OSM Type: {getOSMTypeDisplayName(newLocationData.osmType)}
+                </Text>
               )}
 
               {newLocationData?.canChangeType ? (

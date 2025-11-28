@@ -111,7 +111,7 @@ export const getOSMTypeDisplayName = (type: string): string => {
     fountain: 'Water Fountain',
     water_point: 'Water Point',
     water_well: 'Water Well',
-    
+
     // Food & Drink establishments
     restaurant: 'Restaurant',
     cafe: 'Café',
@@ -120,12 +120,12 @@ export const getOSMTypeDisplayName = (type: string): string => {
     biergarten: 'Beer Garden',
     fast_food: 'Fast Food',
     food_court: 'Food Court',
-    
+
     // Accommodation
     hotel: 'Hotel',
     hostel: 'Hostel',
     guesthouse: 'Guest House',
-    
+
     // Public buildings
     library: 'Library',
     townhall: 'Town Hall',
@@ -133,42 +133,44 @@ export const getOSMTypeDisplayName = (type: string): string => {
     hospital: 'Hospital',
     school: 'School',
     university: 'University',
-    
+
     // Transport
     fuel: 'Gas Station',
     parking: 'Parking',
     bus_station: 'Bus Station',
     railway_station: 'Railway Station',
-    
+
     // Leisure
     park: 'Park',
     playground: 'Playground',
     sports_centre: 'Sports Centre',
     swimming_pool: 'Swimming Pool',
-    
+
     // Shopping
     marketplace: 'Marketplace',
     mall: 'Shopping Mall',
     supermarket: 'Supermarket',
-    
+
     // Services
     bank: 'Bank',
     post_office: 'Post Office',
     police: 'Police Station',
     fire_station: 'Fire Station',
-    
+
     // Vending
     vending_machine: 'Vending Machine',
-    
+
     // Religious
     place_of_worship: 'Place of Worship',
     church: 'Church',
     mosque: 'Mosque',
     synagogue: 'Synagogue',
-    temple: 'Temple'
+    temple: 'Temple',
   };
 
-  return typeMap[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ');
+  return (
+    typeMap[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')
+  );
 };
 
 // Get a display name for Free Water Types
@@ -179,8 +181,8 @@ export const getFreeWaterTypeDisplayName = (type: WaterLocationType): string => 
     [WaterLocationType.Dispenser]: 'Dispenser',
     [WaterLocationType.Cafe]: 'Café',
     [WaterLocationType.Bar]: 'Bar',
-    [WaterLocationType.Other]: 'Other'
+    [WaterLocationType.Other]: 'Other',
   };
-  
+
   return typeMap[type] || type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ');
 };

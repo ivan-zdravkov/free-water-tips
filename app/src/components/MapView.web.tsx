@@ -201,13 +201,13 @@ class VectorTileLayer {
 
   private getDisplayType(tags: any): string {
     let rawType = 'location';
-    
+
     if (tags.amenity) rawType = tags.amenity;
     else if (tags.shop) rawType = tags.shop;
     else if (tags.tourism) rawType = tags.tourism;
     else if (tags.leisure) rawType = tags.leisure;
     else if (tags.building) rawType = tags.building;
-    
+
     return getOSMTypeDisplayName(rawType);
   }
 
@@ -351,7 +351,7 @@ function MapController({
 
       // Check if mouse is over a custom pin marker first
       const isOverCustomPin = isMouseOverCustomPin(e.originalEvent);
-      
+
       if (isOverCustomPin) {
         // Custom pin takes priority - set pointer cursor but don't show OSM tooltip
         (container as any).style.cursor = 'pointer';
@@ -408,9 +408,9 @@ function MapController({
   // Helper function to check if mouse is over a custom pin marker
   const isMouseOverCustomPin = (event: MouseEvent): boolean => {
     if (!event.target) return false;
-    
+
     const target = event.target as HTMLElement;
-    
+
     // Check if the target or any parent has the custom-pin-marker class
     let element: HTMLElement | null = target;
     while (element) {
@@ -419,10 +419,11 @@ function MapController({
         return true;
       }
       // Also check for Leaflet marker classes that might contain our custom pins
-      if (htmlElement.classList && (
-        htmlElement.classList.contains('leaflet-marker-icon') ||
-        htmlElement.classList.contains('leaflet-div-icon')
-      )) {
+      if (
+        htmlElement.classList &&
+        (htmlElement.classList.contains('leaflet-marker-icon') ||
+          htmlElement.classList.contains('leaflet-div-icon'))
+      ) {
         // Check if this marker contains our custom pin HTML
         const html = htmlElement.innerHTML;
         if (html && (html.includes('teardrop-pin') || html.includes('svg'))) {
@@ -431,7 +432,7 @@ function MapController({
       }
       element = htmlElement.parentElement;
     }
-    
+
     return false;
   };
 
