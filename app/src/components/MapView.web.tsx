@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { MapContainer, TileLayer, Marker as LeafletMarker, useMap } from 'react-leaflet';
 import L from 'leaflet';
+import { getOSMTypeDisplayName } from '../utils/osmHelper';
 
 // Load Leaflet CSS from CDN to avoid local resource warnings
 declare const window: any;
@@ -27,6 +28,8 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
         background: transparent !important;
         border: none !important;
         cursor: pointer !important;
+        z-index: 1000 !important;
+        position: relative !important;
       }
       .leaflet-container {
         cursor: grab;
@@ -197,12 +200,15 @@ class VectorTileLayer {
   }
 
   private getDisplayType(tags: any): string {
-    if (tags.amenity) return tags.amenity;
-    if (tags.shop) return tags.shop;
-    if (tags.tourism) return tags.tourism;
-    if (tags.leisure) return tags.leisure;
-    if (tags.building) return tags.building;
-    return 'location';
+    let rawType = 'location';
+    
+    if (tags.amenity) rawType = tags.amenity;
+    else if (tags.shop) rawType = tags.shop;
+    else if (tags.tourism) rawType = tags.tourism;
+    else if (tags.leisure) rawType = tags.leisure;
+    else if (tags.building) rawType = tags.building;
+    
+    return getOSMTypeDisplayName(rawType);
   }
 
   public getPOIAt(lat: number, lon: number, radiusMeters: number = 25): any {
@@ -314,6 +320,12 @@ function MapController({
       const handleClick = (e: any) => {
         const { lat, lng } = e.latlng;
 
+        // Don't trigger OSM POI clicks if clicking on a custom pin
+        const isOverCustomPin = isMouseOverCustomPin(e.originalEvent);
+        if (isOverCustomPin) {
+          return; // Let the custom pin's onClick handler deal with it
+        }
+
         // Check if there's a POI at this location
         const poi = vectorTileLayerRef.current?.getPOIAt(lat, lng);
 
@@ -335,10 +347,20 @@ function MapController({
     const handleMouseMove = (e: any) => {
       const { lat, lng } = e.latlng;
       const zoom = map.getZoom();
+      const container = map.getContainer() as HTMLElement;
 
-      // Only check for POIs when zoomed in enough
+      // Check if mouse is over a custom pin marker first
+      const isOverCustomPin = isMouseOverCustomPin(e.originalEvent);
+      
+      if (isOverCustomPin) {
+        // Custom pin takes priority - set pointer cursor but don't show OSM tooltip
+        (container as any).style.cursor = 'pointer';
+        hideLocationTooltip();
+        return;
+      }
+
+      // Only check for POIs when zoomed in enough and not over a custom pin
       if (zoom < 15) {
-        const container = map.getContainer() as HTMLElement;
         (container as any).style.cursor = '';
         hideLocationTooltip();
         return;
@@ -346,7 +368,6 @@ function MapController({
 
       // Check for POI at current location
       const poi = vectorTileLayerRef.current?.getPOIAt(lat, lng);
-      const container = map.getContainer() as HTMLElement;
 
       if (poi) {
         (container as any).style.cursor = 'pointer';
@@ -383,6 +404,36 @@ function MapController({
       map.off('dblclick', handleDoubleClick);
     };
   }, [map]);
+
+  // Helper function to check if mouse is over a custom pin marker
+  const isMouseOverCustomPin = (event: MouseEvent): boolean => {
+    if (!event.target) return false;
+    
+    const target = event.target as HTMLElement;
+    
+    // Check if the target or any parent has the custom-pin-marker class
+    let element: HTMLElement | null = target;
+    while (element) {
+      const htmlElement = element as any;
+      if (htmlElement.classList && htmlElement.classList.contains('custom-pin-marker')) {
+        return true;
+      }
+      // Also check for Leaflet marker classes that might contain our custom pins
+      if (htmlElement.classList && (
+        htmlElement.classList.contains('leaflet-marker-icon') ||
+        htmlElement.classList.contains('leaflet-div-icon')
+      )) {
+        // Check if this marker contains our custom pin HTML
+        const html = htmlElement.innerHTML;
+        if (html && (html.includes('teardrop-pin') || html.includes('svg'))) {
+          return true;
+        }
+      }
+      element = htmlElement.parentElement;
+    }
+    
+    return false;
+  };
 
   // Show tooltip with location information
   const showLocationTooltip = (poi: any, container: HTMLElement) => {

@@ -13,32 +13,30 @@ export interface OSMPlace {
 export const mapOSMTypeToWaterType = (tags: any): WaterLocationType | null => {
   const amenity = tags.amenity?.toLowerCase();
   const shop = tags.shop?.toLowerCase();
-  const leisure = tags.leisure?.toLowerCase();
-  const building = tags.building?.toLowerCase();
 
+  // Water-specific amenities
   if (amenity === 'drinking_water' || amenity === 'fountain' || amenity === 'water_point') {
     return WaterLocationType.Fountain;
   }
 
+  // Food establishments
   if (amenity === 'restaurant' || amenity === 'fast_food' || amenity === 'food_court') {
     return WaterLocationType.Restaurant;
   }
 
-  if (amenity === 'cafe' || amenity === 'bar' || amenity === 'pub' || amenity === 'biergarten') {
-    return WaterLocationType.CafeBar;
+  // Cafes
+  if (amenity === 'cafe') {
+    return WaterLocationType.Cafe;
   }
 
-  if (
-    building === 'public' ||
-    amenity === 'library' ||
-    amenity === 'townhall' ||
-    amenity === 'community_centre'
-  ) {
-    return WaterLocationType.PublicBuilding;
+  // Bars and pubs
+  if (amenity === 'bar' || amenity === 'pub' || amenity === 'biergarten') {
+    return WaterLocationType.Bar;
   }
 
-  if (leisure === 'park' || leisure === 'garden') {
-    return WaterLocationType.Park;
+  // Water dispensers or vending machines
+  if (amenity === 'vending_machine' && tags.vending === 'water') {
+    return WaterLocationType.Dispenser;
   }
 
   // Check for generic amenities that might have water
@@ -108,18 +106,81 @@ export const fetchOSMLocation = async (
 // Get a display name for OSM type
 export const getOSMTypeDisplayName = (type: string): string => {
   const typeMap: { [key: string]: string } = {
+    // Water sources
+    drinking_water: 'Drinking Water',
+    fountain: 'Water Fountain',
+    water_point: 'Water Point',
+    water_well: 'Water Well',
+    
+    // Food & Drink establishments
     restaurant: 'Restaurant',
     cafe: 'Café',
     bar: 'Bar',
     pub: 'Pub',
-    fountain: 'Fountain',
-    drinking_water: 'Drinking Water',
-    library: 'Library',
-    park: 'Park',
-    townhall: 'Town Hall',
+    biergarten: 'Beer Garden',
     fast_food: 'Fast Food',
     food_court: 'Food Court',
+    
+    // Accommodation
+    hotel: 'Hotel',
+    hostel: 'Hostel',
+    guesthouse: 'Guest House',
+    
+    // Public buildings
+    library: 'Library',
+    townhall: 'Town Hall',
+    community_centre: 'Community Centre',
+    hospital: 'Hospital',
+    school: 'School',
+    university: 'University',
+    
+    // Transport
+    fuel: 'Gas Station',
+    parking: 'Parking',
+    bus_station: 'Bus Station',
+    railway_station: 'Railway Station',
+    
+    // Leisure
+    park: 'Park',
+    playground: 'Playground',
+    sports_centre: 'Sports Centre',
+    swimming_pool: 'Swimming Pool',
+    
+    // Shopping
+    marketplace: 'Marketplace',
+    mall: 'Shopping Mall',
+    supermarket: 'Supermarket',
+    
+    // Services
+    bank: 'Bank',
+    post_office: 'Post Office',
+    police: 'Police Station',
+    fire_station: 'Fire Station',
+    
+    // Vending
+    vending_machine: 'Vending Machine',
+    
+    // Religious
+    place_of_worship: 'Place of Worship',
+    church: 'Church',
+    mosque: 'Mosque',
+    synagogue: 'Synagogue',
+    temple: 'Temple'
   };
 
-  return typeMap[type.toLowerCase()] || type;
+  return typeMap[type.toLowerCase()] || type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ');
+};
+
+// Get a display name for Free Water Types
+export const getFreeWaterTypeDisplayName = (type: WaterLocationType): string => {
+  const typeMap: { [key: string]: string } = {
+    [WaterLocationType.Restaurant]: 'Restaurant',
+    [WaterLocationType.Fountain]: 'Fountain',
+    [WaterLocationType.Dispenser]: 'Dispenser',
+    [WaterLocationType.Cafe]: 'Café',
+    [WaterLocationType.Bar]: 'Bar',
+    [WaterLocationType.Other]: 'Other'
+  };
+  
+  return typeMap[type] || type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ');
 };

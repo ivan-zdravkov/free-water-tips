@@ -2,9 +2,8 @@ export enum WaterLocationType {
   Restaurant = 'restaurant',
   Fountain = 'fountain',
   Dispenser = 'dispenser',
-  CafeBar = 'cafe_bar',
-  PublicBuilding = 'public_building',
-  Park = 'park',
+  Cafe = 'cafe',
+  Bar = 'bar',
   Other = 'other',
 }
 
@@ -19,6 +18,7 @@ export interface WaterLocation {
   latitude: number;
   longitude: number;
   osmId?: string;
+  osmType?: string;
   name?: string;
   positiveFeedback: number;
   negativeFeedback: number;
