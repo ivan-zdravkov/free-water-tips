@@ -16,7 +16,6 @@ The map feature displays free water locations on an interactive OpenStreetMap us
 ### Frontend (App)
 
 1. **MapScreen.tsx** (`app/src/screens/MapScreen.tsx`)
-
    - Full-screen map component with user location tracking
    - Displays water locations as markers with type-specific icons
    - Modal popup for user feedback on each location
@@ -24,7 +23,6 @@ The map feature displays free water locations on an interactive OpenStreetMap us
    - Uses expo-location for GPS positioning
 
 2. **WaterLocation Types** (`app/src/types/WaterLocation.ts`)
-
    - `WaterLocationType` enum: Restaurant, Fountain, Dispenser, CafeBar, PublicBuilding, Park, Other
    - `WaterLocation` interface: location data structure
    - `WaterFeedback` interface: user feedback structure
@@ -37,7 +35,6 @@ The map feature displays free water locations on an interactive OpenStreetMap us
 ### Backend (API)
 
 1. **getNearbyWaterLocations Function** (`api/src/functions/getNearbyWaterLocations.ts`)
-
    - Azure Function endpoint: `GET /api/water/nearby`
    - Query parameters: latitude, longitude, radiusKm, limit
    - Filters locations using Haversine formula for distance calculation
@@ -45,7 +42,6 @@ The map feature displays free water locations on an interactive OpenStreetMap us
    - In-memory storage with sample data for testing
 
 2. **saveWaterFeedback Function** (`api/src/functions/saveWaterFeedback.ts`)
-
    - Azure Function endpoint: `POST /api/water/feedback`
    - Accepts: locationId, latitude, longitude, osmId (optional), isAvailable (boolean)
    - Updates feedback counts (positiveFeedback/negativeFeedback)

@@ -22,9 +22,41 @@ import {
   getColorHex,
 } from '../utils/locationColorAlgorithm';
 import { VoteHistoryGraph } from '../components/VoteHistoryGraph';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Icon emoji mappings for different water location types
-const getLocationIcon = (type: WaterLocationType): string => {
+// Icon mappings for different water location types using Material Design icon names
+const getLocationIconName = (type: WaterLocationType): string => {
+  switch (type) {
+    case WaterLocationType.Fountain:
+      return 'fountain';
+    case WaterLocationType.Restaurant:
+      return 'silverware-fork-knife';
+    case WaterLocationType.Dispenser:
+      return 'water-pump';
+    case WaterLocationType.CafeBar:
+      return 'coffee';
+    case WaterLocationType.PublicBuilding:
+      return 'domain';
+    case WaterLocationType.Park:
+      return 'tree';
+    case WaterLocationType.Other:
+      return 'water';
+    default:
+      return 'water';
+  }
+};
+
+// Render location icon for React Native components
+const LocationIcon = ({ type, size = 16 }: { type: WaterLocationType; size?: number }) => (
+  <MaterialCommunityIcons
+    name={getLocationIconName(type) as any}
+    size={size}
+    color="rgba(0,0,0,0.6)"
+  />
+);
+
+// Get simple text symbol for location type (for contexts where components can't be used)
+const getLocationSymbol = (type: WaterLocationType): string => {
   switch (type) {
     case WaterLocationType.Fountain:
       return '⛲';
@@ -35,7 +67,7 @@ const getLocationIcon = (type: WaterLocationType): string => {
     case WaterLocationType.CafeBar:
       return '☕';
     case WaterLocationType.PublicBuilding:
-      return '🏛️';
+      return '🏢';
     case WaterLocationType.Park:
       return '🌳';
     case WaterLocationType.Other:
@@ -51,15 +83,37 @@ const createPinMarkerHTML = (
   type: WaterLocationType,
   size: number = 40
 ): string => {
-  const icon = getLocationIcon(type);
+  const iconName = getLocationIconName(type);
   const colorHex = getColorHex(colorInfo.color as any); // Type cast since we know it's a valid LocationColor
+
+  // Get Material Design icon SVG path
+  const getIconPath = (name: string): string => {
+    const iconPaths: { [key: string]: string } = {
+      fountain:
+        'M7,2V4H8V22H6V4A2,2 0 0,0 4,2H3C2.45,2 2,2.45 2,3V4C2,4.55 2.45,5 3,5H4V22H2V24H8V22H10V5H11C11.55,5 12,4.55 12,4V3C12,2.45 11.55,2 11,2H10A2,2 0 0,0 8,2H7Z',
+      'silverware-fork-knife':
+        'M8.1,13.34L3.91,9.16C2.35,7.59 2.35,5.06 3.91,3.5L10.93,10.5L8.1,13.34M14.88,11.53C16.32,12.97 16.32,15.31 14.88,16.75C13.44,18.19 11.1,18.19 9.66,16.75C8.22,15.31 8.22,12.97 9.66,11.53L11.77,9.42L14.88,11.53Z',
+      'water-pump':
+        'M5.5,2C4,2 2.79,3.21 2.79,4.71C2.79,6.21 4,7.42 5.5,7.42C7,7.42 8.21,6.21 8.21,4.71C8.21,3.21 7,2 5.5,2M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M12,10A2,2 0 0,0 10,12A2,2 0 0,0 12,14A2,2 0 0,0 14,12A2,2 0 0,0 12,10M7,18A1,1 0 0,0 6,19A1,1 0 0,0 7,20H17A1,1 0 0,0 18,19A1,1 0 0,0 17,18H7Z',
+      coffee:
+        'M2,21V19H20V21H2M20,8H18V5L16,5V3H4V5L2,5V8H4V9A4,4 0 0,0 8,13H16A4,4 0 0,0 20,9V8M16,8H6V5H16V8Z',
+      domain:
+        'M18,15H16V17H18M18,11H16V13H18M20,19H12V17H14V15H12V13H14V11H12V9H20M10,7H8V5H10M10,11H8V9H10M10,15H8V13H10M10,19H8V17H10M6,7H4V5H6M6,11H4V9H6M6,15H4V13H6M6,19H4V17H6M12,7V3H2V21H22V7H12Z',
+      tree: 'M10,21V18H12V21H14V18.5C17,18.5 18,16.5 18,16.5V15C18,15 17,17 14,17V14.5C16.5,14.5 17.5,12.5 17.5,12.5V11C17.5,11 16.5,13 14,13V10.5C16,10.5 17,8.5 17,8.5V7C17,7 16,9 14,9V7.5A2.5,2.5 0 0,0 11.5,5A2.5,2.5 0 0,0 9,7.5V9C7,9 6,7 6,7V8.5C6,8.5 7,10.5 9,10.5V13C6.5,13 5.5,11 5.5,11V12.5C5.5,12.5 6.5,14.5 9,14.5V17C6,17 5,15 5,15V16.5C5,16.5 6,18.5 9,18.5V21H10Z',
+      water: 'M12,20A6,6 0 0,1 6,14C6,10 12,3.25 12,3.25S18,10 18,14A6,6 0 0,1 12,20Z',
+    };
+    return iconPaths[name] || iconPaths['water'];
+  };
+
+  const iconPath = getIconPath(iconName);
 
   return `
     <svg width="${size}" height="${size * 1.2}" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg" style="display: block;">
       <path d="M50 5 C 30 5, 15 20, 15 40 C 15 55, 25 70, 50 115 C 75 70, 85 55, 85 40 C 85 20, 70 5, 50 5 Z" 
-            fill="none" stroke="${colorHex}" stroke-width="3"/>
-      <circle cx="50" cy="38" r="18" fill="white"/>
-      <text x="50" y="48" font-size="20" text-anchor="middle" dominant-baseline="middle">${icon}</text>
+            fill="${colorHex}" stroke="none"/>
+      <g transform="translate(50, 38) scale(1.6, 1.6) translate(-12, -12)">
+        <path d="${iconPath}" fill="white"/>
+      </g>
     </svg>
   `;
 };
@@ -426,7 +480,7 @@ export default function MapScreen() {
                 longitude: location.longitude,
               }}
               title={location.name || 'Water Location'}
-              description={`${getLocationIcon(location.type)} ${location.type} - ${colorInfo.reason}`}
+              description={`${location.type} - ${colorInfo.reason}`}
               onPress={() => handleMarkerPress(location)}
               icon={customIcon}
             />
@@ -448,10 +502,7 @@ export default function MapScreen() {
           >
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>{selectedLocation?.name || 'Water Location'}</Text>
-              <Text style={styles.modalSubtitle}>
-                {selectedLocation ? getLocationIcon(selectedLocation.type) : ''}{' '}
-                {selectedLocation?.type}
-              </Text>
+              <Text style={styles.modalSubtitle}>{selectedLocation?.type}</Text>
 
               {selectedLocation && (
                 <>
@@ -542,7 +593,7 @@ export default function MapScreen() {
                       {Object.values(WaterLocationType).map(type => (
                         <Picker.Item
                           key={type}
-                          label={`${getLocationIcon(type)} ${type}`}
+                          label={`${getLocationSymbol(type)} ${type}`}
                           value={type}
                         />
                       ))}
@@ -552,7 +603,8 @@ export default function MapScreen() {
               ) : (
                 newLocationData?.detectedType && (
                   <Text style={styles.modalSubtitle}>
-                    {getLocationIcon(newLocationData.detectedType)} {newLocationData.detectedType}
+                    {getLocationSymbol(newLocationData.detectedType!)}{' '}
+                    {newLocationData.detectedType}
                   </Text>
                 )
               )}
